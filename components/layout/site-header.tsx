@@ -6,15 +6,10 @@ import { MountainSnowIcon } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { siteConfig } from "@/config/site";
-import { TripModeToggle } from "@/features/trip/mode-toggle";
-import { useTripMode } from "@/features/trip/trip-mode-provider";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const { config, mode, selectedDayId } = useTripMode();
-  const selectedDay = config.days.find((day) => day.id === selectedDayId);
-
   return (
     <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6">
@@ -24,11 +19,7 @@ export function SiteHeader() {
             className="flex min-w-0 items-center gap-2 font-semibold"
           >
             <MountainSnowIcon className="h-5 w-5 shrink-0 text-primary" />
-            <span className="max-w-32 truncate text-sm md:max-w-none md:text-base">
-              {mode === "onTrip" && selectedDay
-                ? `${selectedDay.id} · ${selectedDay.title}`
-                : siteConfig.shortName}
-            </span>
+            <span className="max-w-32 truncate text-sm md:max-w-none md:text-base">{siteConfig.shortName}</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -51,7 +42,6 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <TripModeToggle compact />
           <div className="hidden md:block">
             <ThemeToggle />
           </div>

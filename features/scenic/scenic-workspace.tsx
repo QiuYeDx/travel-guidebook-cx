@@ -1,232 +1,38 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { ListFilterIcon, RouteIcon, WifiOffIcon } from "lucide-react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { ListIcon, MapPinnedIcon, WifiOffIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { ResponsiveTabs, TabsContent } from "@/components/qiuye-ui/responsive-tabs";
 import type { ScenicItem, SourceRef } from "@/lib/trip/types";
 
 import { ScenicDetailPanel } from "./scenic-detail-panel";
-import { ScenicFilterBar } from "./scenic-filter-bar";
 import { ScenicItemList } from "./scenic-item-list";
-import {
-  countActiveScenicFilters,
-  defaultScenicFilters,
-  filterScenicItems,
-  getAvailableSubjects,
-  resolveSelectedScenicItem,
-} from "./scenic-model";
-import { ScenicRouteBand } from "./scenic-route-band";
+import { resolveSelectedScenicItem } from "./scenic-model";
 
-function subscribeToNetworkStatus(callback: () => void) {
-  window.addEventListener("online", callback);
-  window.addEventListener("offline", callback);
-  return () => {
-    window.removeEventListener("online", callback);
-    window.removeEventListener("offline", callback);
-  };
-}
+function subscribe(callback: () => void) { window.addEventListener("online", callback); window.addEventListener("offline", callback); return () => { window.removeEventListener("online", callback); window.removeEventListener("offline", callback); }; }
+function getSnapshot() { return navigator.onLine; }
+function getServerSnapshot() { return true; }
 
-function getOnlineSnapshot() {
-  return navigator.onLine;
-}
+export function ScenicWorkspace({ dayId, items, sources, initialSelectedItemId }: { dayId: string; items: ScenicItem[]; sources: SourceRef[]; initialSelectedItemId?: string }) {
+  const [selectedId, setSelectedId] = useState<string | undefined>(() => resolveSelectedScenicItem(items, initialSelectedItemId)?.id);
+  const [view, setView] = useState("list");
+  const isOnline = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const selectedItem = resolveSelectedScenicItem(items, selectedId);
 
-function getServerOnlineSnapshot() {
-  return true;
-}
+  const syncUrl = useCallback((itemId?: string) => {
+    const params = new URLSearchParams(window.location.search); params.set("day", dayId); if (itemId) params.set("item", itemId); else params.delete("item"); window.history.replaceState(window.history.state, "", `${window.location.pathname}?${params.toString()}`);
+  }, [dayId]);
+  useEffect(() => { if (selectedItem?.id !== selectedId) { setSelectedId(selectedItem?.id); syncUrl(selectedItem?.id); } }, [selectedId, selectedItem?.id, syncUrl]);
 
-export function ScenicWorkspace({
-  dayId,
-  items,
-  sources,
-  initialSelectedItemId,
-}: {
-  dayId: string;
-  items: ScenicItem[];
-  sources: SourceRef[];
-  initialSelectedItemId?: string;
-}) {
-  const [filters, setFilters] = useState(defaultScenicFilters);
-  const [selectedId, setSelectedId] = useState<string | undefined>(
-    () => resolveSelectedScenicItem(items, initialSelectedItemId)?.id,
-  );
-  const isOnline = useSyncExternalStore(
-    subscribeToNetworkStatus,
-    getOnlineSnapshot,
-    getServerOnlineSnapshot,
-  );
-  const subjects = useMemo(() => getAvailableSubjects(items), [items]);
-  const filteredItems = useMemo(
-    () => filterScenicItems(items, filters),
-    [filters, items],
-  );
-  const selectedItem = resolveSelectedScenicItem(filteredItems, selectedId);
-  const activeFilterCount = countActiveScenicFilters(filters);
+  function selectItem(itemId: string) { setSelectedId(itemId); setView("detail"); syncUrl(itemId); }
 
-  const syncSelectedItemUrl = useCallback(
-    (itemId?: string) => {
-      const params = new URLSearchParams(window.location.search);
-      params.set("day", dayId);
-      if (itemId) params.set("item", itemId);
-      else params.delete("item");
-      window.history.replaceState(
-        window.history.state,
-        "",
-        `${window.location.pathname}?${params.toString()}`,
-      );
-    },
-    [dayId],
-  );
-
-  useEffect(() => {
-    if (selectedItem?.id !== selectedId) {
-      setSelectedId(selectedItem?.id);
-      syncSelectedItemUrl(selectedItem?.id);
-    }
-  }, [selectedId, selectedItem?.id, syncSelectedItemUrl]);
-
-  function selectItem(itemId: string) {
-    setSelectedId(itemId);
-    syncSelectedItemUrl(itemId);
-  }
-
-  function resetFilters() {
-    setFilters(defaultScenicFilters);
-  }
-
-  return (
-    <section className="py-7" aria-labelledby="scenic-workspace-title">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium text-muted-foreground">
-            路线带、列表与详情共享同一选择
-          </p>
-          <h2
-            id="scenic-workspace-title"
-            className="mt-1 text-xl font-semibold"
-          >
-            当日观景工作区
-          </h2>
-        </div>
-        <p
-          className="text-sm text-muted-foreground tabular-nums"
-          aria-live="polite"
-        >
-          显示 {filteredItems.length} / {items.length} 个条目
-        </p>
-      </div>
-
-      <div className="mt-5">
-        <ScenicFilterBar
-          filters={filters}
-          subjects={subjects}
-          activeFilterCount={activeFilterCount}
-          onChange={setFilters}
-          onReset={resetFilters}
-        />
-      </div>
-
-      {!isOnline ? (
-        <p className="mt-5 flex items-start gap-3 rounded-md border border-amber-300 bg-amber-50/70 p-4 text-sm leading-6 text-amber-950 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-100">
-          <WifiOffIcon className="mt-1 size-4 shrink-0" aria-hidden="true" />
-          当前离线。路线带、顺序、安全结论和复制操作仍可使用；来源与外部地图操作已停用。
-        </p>
-      ) : null}
-
-      <div className="mt-7 grid gap-7 lg:grid-cols-[15rem_minmax(0,1fr)_20rem]">
-        <section
-          aria-labelledby="scenic-route-band-title"
-          className="min-w-0 lg:sticky lg:top-20 lg:self-start"
-        >
-          <h3
-            id="scenic-route-band-title"
-            className="flex items-center gap-2 text-sm font-semibold"
-          >
-            <RouteIcon
-              className="size-4 text-emerald-700 dark:text-emerald-400"
-              aria-hidden="true"
-            />
-            路线带
-          </h3>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            圆形为停靠点，方形虚线为连续车览走廊。
-          </p>
-          <div className="mt-4">
-            <ScenicRouteBand
-              items={filteredItems}
-              selectedId={selectedItem?.id}
-              onSelect={selectItem}
-            />
-          </div>
-        </section>
-
-        <div className="min-w-0 space-y-7">
-          <div className="lg:hidden">
-            <ScenicDetailPanel
-              item={selectedItem}
-              selectedDayId={dayId}
-              sources={sources}
-              isOnline={isOnline}
-            />
-          </div>
-
-          <section aria-labelledby="scenic-result-list-title">
-            <h3
-              id="scenic-result-list-title"
-              className="flex items-center gap-2 text-sm font-semibold"
-            >
-              <ListFilterIcon
-                className="size-4 text-emerald-700 dark:text-emerald-400"
-                aria-hidden="true"
-              />
-              筛选结果
-            </h3>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              选择任一条目可同步路线带和详情；驾驶中请由乘客操作。
-            </p>
-
-            {filteredItems.length > 0 ? (
-              <div className="mt-4">
-                <ScenicItemList
-                  items={filteredItems}
-                  selectedId={selectedItem?.id}
-                  onSelect={selectItem}
-                />
-              </div>
-            ) : (
-              <div className="mt-4 border-y py-10 text-center">
-                <h4 className="text-base font-semibold">没有符合条件的点</h4>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  当前组合过窄；清除筛选后会恢复当日完整路线顺序。
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="mt-4"
-                  onClick={resetFilters}
-                >
-                  清除全部筛选
-                </Button>
-              </div>
-            )}
-          </section>
-        </div>
-
-        <aside className="hidden lg:sticky lg:top-20 lg:block lg:self-start">
-          <ScenicDetailPanel
-            item={selectedItem}
-            selectedDayId={dayId}
-            sources={sources}
-            isOnline={isOnline}
-          />
-        </aside>
-      </div>
-    </section>
-  );
+  return <section className="py-7" aria-labelledby="scenic-workspace-title">
+    <div className="flex items-end justify-between gap-4"><div><p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">{dayId} · 按行驶顺序</p><h2 id="scenic-workspace-title" className="mt-1 text-2xl font-semibold">沿途观景</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">优先看能安全停车的点；连续车览走廊只在乘客侧记录，驾驶员不为拍照临停。</p></div><span className="shrink-0 text-sm tabular-nums text-muted-foreground">{items.length} 处</span></div>
+    {!isOnline ? <p className="mt-5 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50/70 p-4 text-sm leading-6 text-amber-950 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-100"><WifiOffIcon className="mt-1 size-4 shrink-0" aria-hidden="true" />当前离线。路线顺序与已缓存的观景说明仍可查看，外部地图请联网后使用。</p> : null}
+    <div className="mt-6"><ResponsiveTabs value={view} onValueChange={setView} items={[{ value: "list", label: "按顺序浏览", icon: <ListIcon /> }, { value: "detail", label: "查看详情", icon: <MapPinnedIcon /> }]}>
+      <TabsContent value="list" className="mt-0"><div className="grid gap-3 lg:grid-cols-2"><ScenicItemList items={items} selectedId={selectedItem?.id} onSelect={selectItem} /></div></TabsContent>
+      <TabsContent value="detail" className="mt-0"><div className="mx-auto max-w-2xl"><ScenicDetailPanel item={selectedItem} selectedDayId={dayId} sources={sources} isOnline={isOnline} /></div></TabsContent>
+    </ResponsiveTabs></div>
+  </section>;
 }

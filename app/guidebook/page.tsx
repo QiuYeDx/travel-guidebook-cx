@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { MarkdownRenderer } from "@/components/content/markdown-renderer";
+import { GuidebookMobileToc } from "@/components/content/guidebook-mobile-toc";
 import { TableOfContents } from "@/components/content/table-of-contents";
 import { Badge } from "@/components/ui/badge";
 import { getPrimaryGuidebook } from "@/lib/content/guidebook";
@@ -52,17 +53,6 @@ export default async function GuidebookPage() {
             </Badge>
           </div>
 
-          <details className="mb-8 border-y py-3 lg:hidden">
-            <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium">
-              <ListTreeIcon className="size-4" />
-              本页目录
-            </summary>
-            <TableOfContents
-              className="mt-3 max-h-80 overflow-y-auto border-t pt-3"
-              entries={guidebook.tableOfContents}
-            />
-          </details>
-
           <MarkdownRenderer content={guidebook.content} />
         </article>
 
@@ -76,6 +66,7 @@ export default async function GuidebookPage() {
           </div>
         </aside>
       </div>
+      <GuidebookMobileToc entries={guidebook.tableOfContents} />
     </div>
   );
 }

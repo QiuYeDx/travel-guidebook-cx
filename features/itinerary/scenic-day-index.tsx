@@ -56,12 +56,12 @@ export function ScenicDayIndex({
       </nav>
 
       <header className="mt-6 border-b pb-7">
-        <Badge variant="secondary">路线带 + 多维筛选</Badge>
+        <Badge variant="secondary">按行驶顺序</Badge>
         <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
-          主线 A 沿途观景
+          沿途观景
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
-          按真实行驶顺序筛选停靠点、景交站和连续车览走廊，并查看详细停车边界。停车等级不代表国庆期间一定开放或有车位。
+          按真实行驶顺序查看停靠点、景交站和连续车览走廊，并查看详细停车边界。停车等级不代表国庆期间一定开放或有车位。
         </p>
       </header>
 
@@ -105,13 +105,8 @@ export function ScenicDayIndex({
         </div>
         <dl className="mt-5 grid gap-4 border-t border-white/15 pt-4 sm:grid-cols-2">
           <div>
-            <dt className="flex items-center gap-2 text-xs text-white/55">
-              <CarFrontIcon className="size-3.5" aria-hidden="true" />
-              停车拍照预算
-            </dt>
-            <dd className="mt-1 text-sm font-medium">
-              {itinerary.parkingBudgetLabel}
-            </dd>
+            <dt className="flex items-center gap-2 text-xs text-white/55"><CarFrontIcon className="size-3.5" aria-hidden="true" />当日观景条目</dt>
+            <dd className="mt-1 text-sm font-medium">{itinerary.scenicItems.length} 处</dd>
           </div>
           <div>
             <dt className="flex items-center gap-2 text-xs text-white/55">

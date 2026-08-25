@@ -107,7 +107,7 @@ const tripData = {
           id: "TRIGGER-D2-HEALTH",
           category: "health",
           condition: "晚间有 2 人以上出现明显高反、严重晕车或无法正常进食",
-          action: "次日不前往亚丁，切换 B 方案并优先降低强度",
+          action: "次日不前往亚丁，执行亚丁取消降级并优先降低强度",
           severity: "switch-plan",
         },
         {
@@ -153,7 +153,7 @@ const tripData = {
           id: "TRIGGER-D3-ROAD",
           category: "road",
           condition: "沿线有持续雨雪、结冰、官方管制或补能路径不可靠",
-          action: "不进入亚丁方向，切换 B 或 C 方案并退到成熟县城",
+          action: "不进入亚丁方向，执行天气 / 道路降级并退到成熟县城",
           severity: "switch-plan",
         },
         {

@@ -23,7 +23,7 @@ test("the primary guidebook parses with stable metadata and anchors", async () =
   assert.ok(guidebook.tableOfContents.length > 50);
   assert.ok(
     guidebook.tableOfContents.some(
-      (entry) => entry.id === "主线-a-沿途观景路线" && entry.depth === 2,
+      (entry) => entry.id === "最终路线沿途观景路线" && entry.depth === 2,
     ),
   );
   assert.ok(

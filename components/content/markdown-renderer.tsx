@@ -117,7 +117,7 @@ const components: Components = {
   table: ({ children }) => (
     <div
       aria-label="攻略数据表格"
-      className="my-6 max-w-full overflow-x-auto rounded-md border bg-background shadow-[inset_-14px_0_18px_-20px_currentColor] overscroll-x-contain"
+      className="relative my-6 max-w-full overflow-x-auto rounded-md border bg-background after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-10 after:bg-gradient-to-l after:from-background after:to-transparent after:content-[''] overscroll-x-contain"
       role="region"
       tabIndex={0}
     >

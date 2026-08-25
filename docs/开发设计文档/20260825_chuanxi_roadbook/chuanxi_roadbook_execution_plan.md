@@ -31,7 +31,7 @@
 | 工作包                         | 状态   |   完成日期 | 关键文件                                                                                                                              | 验证                                                                                                | 实施记录                                                                                   | Open issues                                                          |
 | ------------------------------ | ------ | ---------: | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
 | INIT-01 项目领域初始化         | 已完成 | 2026-08-25 | `package.json`, `config/site.ts`, `app/*`, `README.md`, `AGENT.md`, `content/notes/README.md`                                         | 本地 ESLint、Next production build 通过；lockfile 仍为 v6                                           | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md`         | 首页是轻量占位，不是最终工作台                                       |
-| CONTENT-01 完整攻略基线        | 已完成 | 2026-08-25 | `content/guidebook/2026-chuanxi-grand-loop.md`                                                                                        | D0-D9 日期、10 晚住宿、A/B/C 方案人工一致性检查通过                                                 | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md`         | 人数、车辆参数、驾驶员和 10/6 去留待团队确认                         |
+| CONTENT-01 完整攻略基线        | 已完成 | 2026-08-25 | `content/guidebook/2026-chuanxi-grand-loop.md`                                                                                        | D0-D9 日期、最终路线与降级动作人工一致性检查通过                                                     | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md`         | 人数、车辆参数、驾驶员和 10/6 去留待团队确认                         |
 | CONTENT-01A 沿途观景点基线     | 已完成 | 2026-08-25 | 正式攻略、final design、`feat/*scenic-stops.md`                                                                                       | D1-D9 顺序、VP/SC 编号、停车分级和排除项交叉检查；ESLint 通过                                       | `chuanxi_roadbook_implementation_records/2026-08-25_CONTENT-01A_scenic-stops-design.md`    | P1/P2 坐标、进出口与国庆停车需 D-7 / D-3 复核                        |
 | DOC-01 最终设计与执行计划      | 已完成 | 2026-08-25 | 本目录 final design / execution plan                                                                                                  | 设计、计划、代码与攻略交叉检查通过                                                                  | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md`         | 无                                                                   |
 | DATA-01 结构化行程与来源模型   | 已完成 | 2026-08-25 | `data/trips/2026-chuanxi/trip.ts`, `sources.ts`, `lib/trip/*`, `package.json`, `pnpm-lock.yaml`                                       | `test:data` 7/7、tsc、ESLint、Prettier、production build 通过                                       | `chuanxi_roadbook_implementation_records/2026-08-25_DATA-01_structured-trip-data.md`       | 前端尚未读取数据；动态补能与道路状态按设计不入静态数据               |
@@ -45,6 +45,7 @@
 | FE-05 来源与复核状态           | 已完成 | 2026-08-25 | `app/sources/page.tsx`, `features/sources/*`, `features/trip/trip-home.tsx`, 移动更多与页脚入口                                       | `test` 47/47、tsc、lint、build、390 / 768 / 1440 px 与深色模式 QA                                   | `chuanxi_roadbook_implementation_records/2026-08-25_FE-05_sources-and-review-status.md`    | 当前 7 项来源无 live 类型；9/20 季节来源需人工复核                   |
 | NAV-01 地图导航深链            | 已完成 | 2026-08-25 | `lib/navigation/*`, `features/navigation/*`, 每日页、行中首页与观景详情                                                               | `test` 53/53、tsc、lint、build、390 / 768 / 1440 px 浏览器 QA                                       | `chuanxi_roadbook_implementation_records/2026-08-25_NAV-01_navigation-actions.md`          | 当前无已核准 P0/P1 入口；停车导航待 CONTENT-03 复核数据触发          |
 | OFFLINE-01 核心路书离线        | 已完成 | 2026-08-25 | `app/manifest.ts`, `app/sw.js/route.ts`, `features/offline/*`, `lib/offline/*`, 安装图标                                              | `test` 57/57、tsc、lint、build、server-off offline、update、390 / 768 / 1440 px QA                  | `chuanxi_roadbook_implementation_records/2026-08-25_OFFLINE-01_core-roadbook-offline.md`   | 首次离线前必须至少联网完成一次“已就绪”；真实手机安装留给 QA-01       |
+| UI-REWORK-01 总览、单日与观景阅读重构 | 已完成 | 2026-08-25 | `features/trip/*`, `features/itinerary/*`, `features/scenic/*`, `components/layout/*`, `components/content/*`, `components/qiuye-ui/*` | `test` 57/57、tsc、ESLint、production build、390 px 浏览器交互验收通过 | `chuanxi_roadbook_implementation_records/2026-08-25_UI-REWORK-01_readability-redesign.md` | 真实手机和 768 / 1440 px 由 QA-01 补充 |
 | QA-01 全量验收                 | 未开始 |          - | 全仓与文档                                                                                                                            | lint / test / build / visual / offline                                                              | -                                                                                          | 需至少 2 名同行者手机验收                                            |
 | CONTENT-03 出发前最终复核      | 未开始 |          - | 正式攻略、结构化来源、临时笔记                                                                                                        | 人工来源核验                                                                                        | -                                                                                          | 在 9/20、9/24-25、每日执行                                           |
 
@@ -62,7 +63,13 @@
 8. QA-01 全量验收。
 9. CONTENT-03 按真实时间节点持续复核。
 
-优先关闭“今天能看懂、风险能看到、路线能降级”的闭环，再添加视觉增强。
+优先关闭“总览看懂、单日能执行、观景能浏览”的闭环，再添加视觉增强。
+
+本轮重构约束：
+
+- 不恢复行前 / 行中双模式，不恢复线路 A / B / C 切换；降级仅作为每日页的动作说明。
+- Tab 视图必须使用 `components/qiuye-ui/` 的 `ClipPathTabs`、`ResponsiveTabs` 或 `SegmentedControl`，不得自行拼装原生 Tab。
+- 可滚动区域的边缘渐变使用 `from-background` / `from-muted` 语义色，浅色模式不得使用深色遮罩。
 
 ## 工作包详情
 
@@ -85,8 +92,8 @@
 
 目标：
 
-- 整理 9/27 至 10/6 主线 A。
-- 提供亚丁取消 B 方案和天气 / 道路回撤 C 方案。
+- 整理 9/27 至 10/6 最终路线。
+- 提供亚丁取消与天气 / 道路回撤降级动作。
 - 覆盖车辆装载、补能、高反、驾驶、住宿、预约、物资、分工和复核。
 - 引用官方来源并明确规划估算。
 
@@ -101,7 +108,7 @@
 
 目标：
 
-- 按主线 A 的真实行驶顺序整理 D1-D9 观景台、城镇停靠、景交站点和无名观景走廊。
+- 按最终路线的真实行驶顺序整理 D1-D9 观景台、城镇停靠、景交站点和无名观景走廊。
 - 为项目建立稳定编号、停车等级、每日停靠预算、排除项和 D-7 复核清单。
 - 为后续 `/scenic` 和每日页固定安全边界，不把“值得看”直接等同于“可以停车”。
 
@@ -186,7 +193,7 @@
 目标：
 
 - 实现完整时间线和静态每日页。
-- 以 A 方案为主，B/C 方案通过触发条件展示。
+- 以最终路线为主，降级动作通过触发条件展示。
 - 提供文本途经点和导航入口。
 
 验收：
@@ -291,7 +298,7 @@
 
 - 固定 pnpm 版本下 lint、test、build 通过。
 - 390 × 844、768 × 1024、1440 × 1000 通过视觉检查。
-- 至少 2 名同行者能在手机上完成“找今天路线、查看补能、切 B 方案、打开安全页”。
+- 至少 2 名同行者能在手机上完成“找当天路线、查看观景、打开安全页”。
 
 ### CONTENT-03 出发前最终复核
 
@@ -307,7 +314,7 @@
 - 关键动态信息没有过期警告未处理。
 - 每个保留的 P1 点有复核日期和入口方向；P2 / 禁停列表与可导航停车收藏人工比对无混入。
 - 订单信息只写负责人和状态，不写敏感凭据。
-- 任何路线变化都同步 A/B 方案和每日页。
+- 任何路线变化都同步最终路线和每日页降级动作。
 
 ## 不可违反约束
 

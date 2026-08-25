@@ -6,7 +6,7 @@ import { ItineraryTimeline } from "@/features/itinerary/itinerary-timeline";
 
 export const metadata: Metadata = {
   title: "行程时间线",
-  description: "2026 川西大环线 D0-D9 主线 A 与 B/C 降级方案",
+  description: "2026 川西大环线 D0-D9 最终行程",
 };
 
 export default function ItineraryPage() {
