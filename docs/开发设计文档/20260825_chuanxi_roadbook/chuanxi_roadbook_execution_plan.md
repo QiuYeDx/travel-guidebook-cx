@@ -32,11 +32,14 @@
 |---|---|---:|---|---|---|---|
 | INIT-01 项目领域初始化 | 已完成 | 2026-08-25 | `package.json`, `config/site.ts`, `app/*`, `README.md`, `AGENT.md`, `content/notes/README.md` | 本地 ESLint、Next production build 通过；lockfile 仍为 v6 | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md` | 首页是轻量占位，不是最终工作台 |
 | CONTENT-01 完整攻略基线 | 已完成 | 2026-08-25 | `content/guidebook/2026-chuanxi-grand-loop.md` | D0-D9 日期、10 晚住宿、A/B/C 方案人工一致性检查通过 | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md` | 人数、车辆参数、驾驶员和 10/6 去留待团队确认 |
+| CONTENT-01A 沿途观景点基线 | 已完成 | 2026-08-25 | 正式攻略、final design、`feat/*scenic-stops.md` | D1-D9 顺序、VP/SC 编号、停车分级和排除项交叉检查；ESLint 通过 | `chuanxi_roadbook_implementation_records/2026-08-25_CONTENT-01A_scenic-stops-design.md` | P1/P2 坐标、进出口与国庆停车需 D-7 / D-3 复核 |
 | DOC-01 最终设计与执行计划 | 已完成 | 2026-08-25 | 本目录 final design / execution plan | 设计、计划、代码与攻略交叉检查通过 | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md` | 无 |
 | DATA-01 结构化行程与来源模型 | 未开始 | - | 计划：`data/trips/2026-chuanxi/*`, `lib/trip/*` | schema / unit / build | - | 迁移后避免 Markdown 数值重复 |
+| DATA-02 结构化观景点与走廊模型 | 未开始 | - | 计划：`data/trips/2026-chuanxi/viewpoints.ts`, `lib/trip/*` | schema / unit / build / Markdown 人工对照 | - | P2 / 禁停不得产生停车导航，走廊不得伪造坐标 |
 | CONTENT-02 Markdown 内容管线 | 未开始 | - | 计划：`lib/content/*`, 攻略路由 | lint / unit / build | - | 依赖版本需在实施时确定 |
 | FE-01 行前总览工作台 | 未开始 | - | 计划：`app/page.tsx`, `features/trip/*` | lint / build / responsive QA | - | 使用真实数据替换占位页 |
-| FE-02 行程时间线与每日页 | 未开始 | - | 计划：`app/itinerary/*`, `app/days/*`, `features/itinerary/*` | unit / build / responsive QA | - | 地图第一阶段只做深链 |
+| FE-02 行程时间线与每日页 | 未开始 | - | 计划：`app/itinerary/*`, `app/days/*`, `features/itinerary/*` | unit / build / responsive QA | - | 第一阶段使用路线带与深链，不引入地图 SDK |
+| VIEW-01 观景路线可视化 | 未开始 | - | 计划：`app/scenic/page.tsx`, `features/scenic/*` | unit / build / responsive / weak-network QA | - | 首期路线带 + 列表，地图仅为后续增强 |
 | FE-03 清单与安全页 | 未开始 | - | 计划：`app/checklists/*`, `app/safety/*`, 对应 features | unit / build / mobile QA | - | localStorage 失败需退化 |
 | FE-04 行前 / 行中模式 | 未开始 | - | 计划：`features/trip/mode*`, 全局导航 | unit / build / date QA | - | 必须可手动切日和切模式 |
 | FE-05 来源与复核状态 | 未开始 | - | 计划：`app/sources/*`, freshness components | unit / build | - | 过期不能等同于错误 |
@@ -50,9 +53,9 @@
 推荐顺序：
 
 1. 完成本轮 INIT-01、CONTENT-01、DOC-01。
-2. DATA-01 建立可计算事实源。
+2. DATA-01 建立可计算行程事实源，DATA-02 建立观景点 / 走廊事实源。
 3. CONTENT-02 建立长文阅读和来源链接。
-4. FE-01、FE-02 关闭最小端到端路径。
+4. FE-01、FE-02、VIEW-01 关闭最小端到端路径。
 5. FE-03、FE-04、FE-05 补齐旅行中能力。
 6. NAV-01 提供地图深链。
 7. OFFLINE-01 在页面稳定后实现缓存。
@@ -94,6 +97,21 @@
 - 不把亚丁、补能站或道路状态写成保证。
 - 一车 7 人风险清晰，不用“座位够”代替装载验证。
 
+### CONTENT-01A 沿途观景点基线
+
+目标：
+
+- 按主线 A 的真实行驶顺序整理 D1-D9 观景台、城镇停靠、景交站点和无名观景走廊。
+- 为项目建立稳定编号、停车等级、每日停靠预算、排除项和 D-7 复核清单。
+- 为后续 `/scenic` 和每日页固定安全边界，不把“值得看”直接等同于“可以停车”。
+
+验收：
+
+- 所有项目都有 `VP-*` 或 `SC-*` 稳定编号，并能归属到一天和路线段。
+- D3 最多 4 次、D5 最多补拍 2 次，返程不复制一组重复图钉。
+- P2 / 禁止停车明确不提供停车导航；无名走廊使用区间而非虚构坐标。
+- 主线排除项有方向、绕行、体力或停车依据，不因社交平台热度进入路线。
+
 ### DOC-01 最终设计与执行计划
 
 目标：
@@ -119,6 +137,22 @@
 - 每日数据可在 Server Component 直接读取。
 - schema 错误会使测试或构建失败。
 - 人工对照记录证明 Markdown 与数据一致。
+
+### DATA-02 结构化观景点与走廊模型
+
+目标：
+
+- 实现 `Viewpoint`、`ScenicCorridor`、`GeoRef`、`ParkingProfile` 和相关枚举。
+- 将攻略 v0.2 的 `VP-*` / `SC-*`、顺序、优先级、停车等级、方向、拍摄主题和来源迁移到 `viewpoints.ts`。
+- 建立 ID、日程 / 路段引用、顺序、GeoRef 分支和停车导航权限校验。
+- 使用引用关系表达 D5 从 D3 最多补拍 2 个，不复制事实数据。
+
+验收：
+
+- 每日可按 `sequence` 稳定得到点与走廊的混合路线序列。
+- `P2`、`prohibited`、`transit-only`、`walk-only` 设置停车导航时 schema 必须失败。
+- `ScenicCorridor` 只能使用 `route-interval`，不保存假中心坐标。
+- 对 Markdown 的 D1-D9 编号、名称、等级、优先级和排除项完成人工对照并留档。
 
 ### CONTENT-02 Markdown 内容管线
 
@@ -160,6 +194,25 @@
 - 每日只有一个主目标。
 - 当前日、上一日、下一日切换稳定。
 - 没有地图时仍可完整理解路线。
+- 每日页按路线顺序摘要展示核心停靠与车览走廊，并链接 `/scenic?day=D*`。
+- D3 / D5 / D9 显示停车预算、最晚到店优先级和“剩余点改车览”的降级动作。
+
+### VIEW-01 观景路线可视化
+
+目标：
+
+- 实现 `/scenic` 的按日路线带、点 / 走廊列表和详情面板。
+- 实现日程、优先级、停车等级、拍摄主题、方向、复核状态筛选。
+- 行中模式默认今天，由副驾 / 乘客快速识别下一处合法停靠和连续车览段。
+- 预留稳定 ID 选中态用于后续地图同步，不在首期引入地图 SDK。
+
+验收：
+
+- 点节点与走廊线带视觉和语义不同；不能只靠颜色区分停车能力。
+- 选择路线带或列表项时双向同步；键盘和触屏均可操作，不引起布局跳动。
+- P0 / P1 仅在坐标与入口核准后出现停车导航；P2 / 禁停 / 景交 / 步行没有该操作。
+- 空筛选、缺少坐标、过期复核、断网和外部导航不可用均有文本退化。
+- 390 x 844、768 x 1024、1440 x 1000 无溢出或控件遮挡。
 
 ### FE-03 清单与安全页
 
@@ -204,11 +257,14 @@
 目标：
 
 - 为每段路线生成安全编码的外部地图查询。
-- 提供复制地点 / 途经点文本的退化能力。
+- 为已核准的 P0 / P1 停车入口生成安全编码的外部地图查询。
+- 提供复制地点 / 途经点 / 观景走廊起止标签的退化能力。
 
 验收：
 
 - 中文地点、多个途经点和未安装 App 场景均有验证。
+- P2、禁止停车、景交和步行点无法调用停车导航；同名点必须通过核准后的查询词 / 坐标区分。
+- 顺行 / 返程入口说明随深链展示，错过入口的默认动作是继续前行。
 - 不包含个人实时位置，不声称替代导航。
 
 ### OFFLINE-01 核心路书离线
@@ -243,10 +299,13 @@
 
 - 在 D-7、D-3 和每天前一晚核对动态来源。
 - 将最终酒店、预约和补能结果写入受控临时笔记 / 结构化数据。
+- D-7 用至少两个地图端复核保留的 `VP-*` 坐标、同名歧义、顺 / 返程入口、停车类型和近期状态。
+- D-3 按天气、管制、近期停车信息和每日预算确定最终核心点；未通过复核的 P1 降为 P2 或删除导航。
 
 验收：
 
 - 关键动态信息没有过期警告未处理。
+- 每个保留的 P1 点有复核日期和入口方向；P2 / 禁停列表与可导航停车收藏人工比对无混入。
 - 订单信息只写负责人和状态，不写敏感凭据。
 - 任何路线变化都同步 A/B 方案和每日页。
 
@@ -259,6 +318,8 @@
 - 不收集同行者敏感信息或实时精确位置。
 - 不引入大型地图、图表、CMS、认证或数据库来完成首期阅读闭环。
 - 不把重要路线信息只放在图片、颜色或地图上。
+- 不把无名景观走廊伪造成地图图钉，不向 P2 / 禁停点提供停车导航。
+- 不要求驾驶员行驶中操作观景页面；沿途观察和候选判断交给副驾 / 乘客。
 - 不复制 qiuvision 的业务代码和个人品牌资产。
 
 ## 实施记录模板
@@ -315,5 +376,5 @@ docs/开发设计文档/20260825_chuanxi_roadbook/chuanxi_roadbook_implementatio
 
 ## 下一会话建议
 
-本轮验证完成后，下一工作包应为 `DATA-01`。先把攻略中可计算的事实迁移为强类型数据并建立测试，
-再做 Markdown 渲染和页面，避免 UI 继续依赖手写重复常量。
+本轮验证完成后，下一工作包应为 `DATA-01`，随后完成 `DATA-02`。先把攻略中的行程和观景事实迁移为
+强类型数据并建立测试，再做 Markdown 渲染与 `/scenic`，避免 UI 继续依赖手写重复常量或解析表格。

@@ -11,6 +11,7 @@
 - Markdown 保存完整攻略、依据和讨论语境。
 - TypeScript 结构化数据保存前端高频读取的日期、路段、状态、触发条件和复核时间。
 - 行前模式强调对比、未决事项和预订；行中模式只突出今天、下一步、风险和降级。
+- 沿途观景采用“按日路线带 + 停靠点 + 观景走廊”，不把无名风景伪造成可导航图钉。
 - 地图只提供线路理解和导航深链，不替代车机实时导航。
 - 第一阶段无账户、数据库和 CMS；离线能力在核心阅读路径稳定后实现。
 
@@ -22,6 +23,7 @@
 4. 移动端、弱网和单手扫描优先，不把重要信息藏在地图或长文中。
 5. 不在仓库或浏览器持久化身份证、详细病史、订单密码和实时精确位置。
 6. 应用不声称提供医疗诊断、实时路况或实时充换电保证。
+7. `P2`、禁止停车和未核准坐标不得生成停车导航；驾驶员只接收路线决策，沿途观察由乘客完成。
 
 ## 背景
 
@@ -39,6 +41,7 @@
 
 - 建立唯一、可版本化的正式路书和临时笔记规范。
 - 提供路线总览、每日路书、风险、补能、预约、物资和未决事项的可视化。
+- 按实际行驶顺序呈现知名观景台、城镇停靠、景交站点和无名观景走廊，并显示停车可信度。
 - 支持“行前讨论”和“旅行中执行”两种信息组织方式。
 - 在手机弱网环境下仍可读取关键静态内容。
 - 明确展示事实来源、复核日期和过期状态。
@@ -69,7 +72,7 @@
 - `config/site.ts`：站点名称和导航已改为川西同行路书。
 - `app/page.tsx`：轻量项目总览占位，不是最终旅行首页。
 - `app/about/page.tsx`：项目边界与原则。
-- `content/guidebook/2026-chuanxi-grand-loop.md`：v0.1 正式攻略基线。
+- `content/guidebook/2026-chuanxi-grand-loop.md`：v0.2 正式攻略和主线 A 沿途观景基线。
 - `content/notes/README.md`：讨论与复核记录约定。
 - `AGENT.md`：项目级开发、内容、pnpm 和服务进程约束。
 
@@ -91,6 +94,7 @@
 | `/` | 路线结论、未决事项、预订进度、关键风险 | 今天、下一段、最晚到达、补能、住宿、紧急降级 |
 | `/itinerary` | 10 天时间线、A/B 方案切换、海拔与驾驶强度 | 当前日前后 1 天，快速切日 |
 | `/days/[dayId]` | 单日完整讨论、可选点和依据 | 单日执行卡、时间线、导航入口、收车清单 |
+| `/scenic` | 按日筛选全部停靠点、走廊、停车等级与待复核项 | 默认仅看今天，突出下一处合法停靠和连续车览路段 |
 | `/checklists` | 行李、车辆、预订、角色分工 | 出发前 / 收车清单，可本地勾选 |
 | `/safety` | 高反、驾驶、道路与紧急预案 | 危险信号、紧急电话、立即降级动作 |
 | `/notes` | 版本化临时笔记索引 | 默认隐藏在“更多”，仅查阅已同步内容 |
@@ -137,10 +141,12 @@ data/
   trips/
     2026-chuanxi/
       trip.ts
+      viewpoints.ts
       sources.ts
 features/
   trip/
   itinerary/
+  scenic/
   checklist/
   safety/
 lib/
@@ -204,11 +210,77 @@ type TripDay = {
   fallbackTriggers: FallbackTrigger[];
   sourceIds: string[];
 };
+
+type ViewpointKind = "viewpoint" | "scenic-shuttle" | "town-stop" | "candidate";
+type ViewpointPriority = "core" | "optional" | "drive-by";
+type ParkingLevel = "P0" | "P1" | "P2" | "prohibited" | "transit-only" | "walk-only";
+type TravelDirection = "outbound" | "return" | "both";
+
+type GeoRef =
+  | {
+      kind: "exact";
+      lat: number;
+      lng: number;
+      mapQuery: string;
+      verifiedAt: string;
+    }
+  | {
+      kind: "route-interval";
+      routeLegId: string;
+      fromLabel: string;
+      toLabel: string;
+    }
+  | { kind: "none"; reason: string };
+
+type ParkingProfile = {
+  level: ParkingLevel;
+  verificationStatus: VerificationStatus;
+  parkingNavigationQuery?: string;
+  entryDirectionNote?: string;
+  capacityNote?: string;
+  note: string;
+};
+
+type Viewpoint = {
+  id: `VP-${string}`;
+  dayId: string;
+  routeLegId?: string;
+  sequence: number;
+  title: string;
+  kind: ViewpointKind;
+  priority: ViewpointPriority;
+  direction: TravelDirection;
+  subjects: string[];
+  geoRef: GeoRef;
+  parking: ParkingProfile;
+  stayMinutesEstimate?: [number, number];
+  sourceIds: string[];
+};
+
+type ScenicCorridor = {
+  id: `SC-${string}`;
+  dayId: string;
+  routeLegId: string;
+  sequence: number;
+  title: string;
+  priority: "core" | "drive-by";
+  direction: TravelDirection;
+  subjects: string[];
+  geoRef: Extract<GeoRef, { kind: "route-interval" }>;
+  parking: ParkingProfile;
+  passengerCue: string;
+  sourceIds: string[];
+};
 ```
+
+观景数据校验必须保证：`VP-*` / `SC-*` ID 唯一且引用有效；同一天 `sequence` 可稳定排序；
+`P2`、`prohibited`、`transit-only`、`walk-only` 不得设置 `parkingNavigationQuery`；只有完成坐标复核的
+`exact` 点才能显示停车导航。`route-interval` 只表达线路区间，不能自动取中点冒充停车位置。
 
 ### 单一事实源规则
 
 - 日期、住宿地、路线段、强度、目标电量和触发条件以 `trip.ts` 为前端事实源。
+- 观景点、观景走廊、顺序、停车等级和复核状态以 `viewpoints.ts` 为前端事实源。
 - `guidebook.md` 保存完整叙述和可打印版本；结构化数据迁移完成后，不再手工复制可计算值。
 - 页面根据 `sourceIds` 读取来源和复核状态，不在组件中硬编码“已核实”。
 - 构建时验证日期唯一、天数连续、来源存在、`reviewAt` 格式有效。
@@ -228,6 +300,13 @@ type TripDay = {
 - 10 天时间线、日卡和单日详情。
 - A/B 方案状态和触发条件。
 - 导航深链生成；不能假设目标应用已安装。
+
+### `features/scenic`
+
+- 渲染按日路线带、连续观景走廊、停靠节点、当日停车预算和返程补拍关系。
+- 提供日程、优先级、停车等级、拍摄主题、行驶方向和复核状态筛选。
+- 管理路线带、列表和未来可选地图之间的选中态同步；不持有事实数据。
+- 严格按 `ParkingProfile` 决定操作：可导航、只复制名称、仅车览或景交 / 步行提示。
 
 ### `features/checklist`
 
@@ -260,15 +339,30 @@ type TripDay = {
 
 ### 第一阶段
 
-- 路线用文本、时间线和城市节点表达。
+- 路线用文本、时间线、城市节点和 `/scenic` 路线带表达。
+- 路线带以实际行驶顺序连接节点；`Viewpoint` 用点节点，`ScenicCorridor` 用有起止标签的线段带，
+  没有核准坐标时仍能完整工作。
 - 每段提供“在地图中打开”的查询深链，优先支持高德 Web / URI 的安全退化。
+- `P0` / `P1` 只有在精确位置和停车入口已复核后才显示停车导航；`P2` 只显示“乘客观察 / 现场判断”，
+  禁止停车和景交 / 步行节点不生成社会车辆停车操作。
 - 深链只包含公开地点名称，不包含成员实时位置。
 - 页面明确提示实时路线以车机当日结果为准。
 
 ### 后续评估
 
-如果静态线路理解仍不足，再评估 MapLibre + 自托管 / 合规公开底图。不得为了装饰性地图引入密钥、
-大体积 SDK 或离线瓦片版权问题。
+如果静态线路理解仍不足，再评估 MapLibre + 自托管 / 合规公开底图。地图与列表共享稳定 ID：
+点击路线带节点、列表项或地图要同步选中和滚动位置；精确点使用图钉，观景走廊使用沿路线的线带，
+`GeoRef.kind === "none"` 不上地图。不得为了装饰性地图引入密钥、大体积 SDK 或离线瓦片版权问题。
+
+### `/scenic` 页面交互
+
+- 默认按 D1-D9 和 `sequence` 展开；行中模式只展开今天，并保留前后日快捷切换。
+- 顶部为稳定高度的日程分段控件；其下是可横向滚动的优先级、停车、主题、方向、复核状态筛选。
+- 主视图是路线带与对应列表，不要求地图加载成功。选择节点时显示拍摄对象、预计停留、停车结论、
+  最晚放弃条件和来源复核状态。
+- `ScenicCorridor` 显示“从 A 到 B”的连续范围和乘客观察提示，不显示虚假距离或中心坐标。
+- D3 显示“最多 4 次”、D5 显示“从 D3 最多补拍 2 个”等预算约束；达到预算后剩余候选自动降为车览建议。
+- 空筛选显示“没有符合条件的点”并提供清除筛选；数据不完整时保留文本次序和复核提醒。
 
 ## 离线与弱网
 
@@ -280,6 +374,8 @@ type TripDay = {
 - PWA 工作包缓存 App Shell、正式路书、所有每日页、安全页和必要图标。
 - 显示“内容版本 / 最后同步”，不能让用户误以为离线缓存是实时数据。
 - 断网时隐藏或禁用需要网络的外部导航和来源访问，并保留文本地址。
+- `/scenic` 离线时保留路线带、停靠顺序、停车等级、拍摄提示和最后复核时间；地图区域若存在则退化为文本列表。
+- 行驶中不要求驾驶员浏览或操作观景页。由副驾 / 乘客提前查看下一段；语义标签必须明确区分“可停车”与“仅乘客观察”。
 
 ## 视觉与交互设计
 
@@ -360,6 +456,7 @@ type TripDay = {
 
 - ESLint 和 Next production build。
 - 数据 schema：日期、日序、来源引用、路线段和复核时间。
+- 观景 schema：ID / 日程 / 路段引用、顺序、GeoRef、停车导航权限和 D5 复用关系。
 - 单元测试：当前日推导、过期状态、A/B 触发显示、清单版本合并。
 - 构建时 Markdown 链接和标题锚点基本检查。
 
@@ -367,6 +464,7 @@ type TripDay = {
 
 - 390 × 844、768 × 1024、1440 × 1000 三个视口。
 - 检查行前 / 行中模式、长地点名、表格、离线提示、危险警告。
+- 检查 `/scenic` 的筛选、路线带 / 列表同步、走廊线段、P2 无导航操作和地图失败退化。
 - Safari 验证 sticky header、底部导航、滚动容器和 safe-area。
 - 无文本溢出、卡片嵌套、控件位移和不连贯遮挡。
 
@@ -376,6 +474,7 @@ type TripDay = {
 - 主线 A 每日只有一个主目标。
 - 亚丁、补能和天气没有被写成静态保证。
 - D3、D5、D9 保留明确的最晚时间和回撤逻辑。
+- D1-D9 观景顺序与主线一致，D3 / D5 停车预算和 D-7 复核要求可见。
 - 所有动态来源可看到最后复核时间。
 
 ## 发布与回滚
@@ -395,6 +494,8 @@ type TripDay = {
 | 弱网 / 断网 | 路书打不开 | 构建期内容 + OFFLINE 工作包 |
 | 一车 7 人 | 行李和舒适度风险 | 首页保留未决项，正式路书要求实车演练 |
 | 用户把项目当实时导航 | 错过管制或补能变化 | 每日页固定导航免责声明和复核入口 |
+| 把无名风景做成假图钉 | 驾驶员在不安全位置找停车点 | 走廊使用区间模型，P2 / 禁停无停车导航 |
+| 国庆停车场满位或单向难进 | 急刹、倒车或跨实线 | 记录行驶方向与入口说明，满位直接通过 |
 | 清单本地状态丢失 | 任务重复或漏做 | 状态非安全关键；页面始终显示原始清单 |
 | 手机日期 / 时区错误 | 选错当天 | 显示完整日期，允许手动切日 |
 | PWA 缓存旧内容 | 旧路线持续可见 | 显示内容版本、检测更新、提供刷新入口 |
@@ -404,6 +505,7 @@ type TripDay = {
 - 同行者实时定位和轨迹上报。
 - 自动抓取 / 爬取景区、地图或蔚来实时数据。
 - 未经人工确认自动改变 A/B 路线。
+- 为无可靠停车结论的沿途机位生成“一键导航停车”，或鼓励驾驶员行驶中操作页面。
 - 公共用户注册、UGC、评论和社交分享墙。
 - 在线预算结算和支付。
 - 将医疗或救援逻辑做成自动诊断系统。
