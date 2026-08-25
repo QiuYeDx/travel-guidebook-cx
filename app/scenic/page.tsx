@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { chuanxiSources } from "@/data/trips/2026-chuanxi/sources";
 import { chuanxiTrip } from "@/data/trips/2026-chuanxi/trip";
 import { chuanxiScenicCatalog } from "@/data/trips/2026-chuanxi/viewpoints";
 import { ScenicDayIndex } from "@/features/itinerary/scenic-day-index";
@@ -12,13 +13,15 @@ export const metadata: Metadata = {
 export default async function ScenicPage({
   searchParams,
 }: {
-  searchParams: Promise<{ day?: string }>;
+  searchParams: Promise<{ day?: string; item?: string }>;
 }) {
-  const { day } = await searchParams;
+  const { day, item } = await searchParams;
   return (
     <ScenicDayIndex
       catalog={chuanxiScenicCatalog}
+      sources={chuanxiSources}
       selectedDayId={day ?? "D1"}
+      selectedItemId={item}
       trip={chuanxiTrip}
     />
   );

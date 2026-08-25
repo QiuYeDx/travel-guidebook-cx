@@ -85,13 +85,13 @@
 - `components/content/*`：GFM 长文渲染、表格滚动容器及桌面 / 移动端目录。
 - `app/guidebook/page.tsx`：构建时静态生成的完整攻略阅读页。
 - `app/itinerary/*` / `app/days/*` / `features/itinerary/*`：D0-D9 时间线、静态每日页、停车预算和降级动作。
-- `app/scenic/page.tsx`：按日读取的观景顺序清单，作为 VIEW-01 交互可视化前的可用退化。
+- `app/scenic/page.tsx` / `features/scenic/*`：按日路线带、五类筛选、列表 / 详情同步与离线文本退化。
 - `lib/navigation/map-links.ts`：生成只包含公开地名的高德 Web 搜索链接。
 - `AGENT.md`：项目级开发、内容、pnpm 和服务进程约束。
 
 ### 已知限制
 
-- `/scenic` 当前是按日只读清单；路线带、筛选和选中态同步属于 VIEW-01。
+- `/scenic` 筛选与选中态当前只保留在页面会话和 URL 中，不做跨日持久化；“今天”默认日程属于 FE-04。
 - 每日页的地图操作是公开 Web 搜索链接；设备级深链、复制退化和 App 不可用处理属于 NAV-01。
 - 所有 P0 / P1 点仍待 D-7 坐标与停车入口复核，当前数据不提供停车导航。
 - 首页当前只提供行前模式；当前日推导、行中状态和模式切换属于 FE-04。

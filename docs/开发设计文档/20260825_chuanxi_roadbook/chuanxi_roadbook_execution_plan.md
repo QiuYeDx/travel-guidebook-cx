@@ -38,8 +38,8 @@
 | DATA-02 结构化观景点与走廊模型 | 已完成 | 2026-08-25 | `data/trips/2026-chuanxi/viewpoints.ts`, `lib/trip/types.ts`, `schema.ts`, `scenic-schema.test.ts`, `package.json` | `test:data` 总计 16/16、tsc、ESLint、Prettier、production build 通过 | `chuanxi_roadbook_implementation_records/2026-08-25_DATA-02_scenic-catalog.md` | 43 个条目均已迁移；P0/P1 坐标与入口仍待 D-7 复核，因此当前无停车导航 |
 | CONTENT-02 Markdown 内容管线 | 已完成 | 2026-08-25 | `lib/content/*`, `components/content/*`, `app/guidebook/page.tsx`, 攻略 frontmatter | `test` 21/21、tsc、ESLint、Prettier、production build、390 / 1440 px 浏览器验收通过 | `chuanxi_roadbook_implementation_records/2026-08-25_CONTENT-02_markdown-pipeline.md` | 首页尚未读取结构化数据；Next.js 15.5.7 安全升级不在本包范围 |
 | FE-01 行前总览工作台 | 已完成 | 2026-08-25 | `app/page.tsx`, `features/trip/*`, `data/trips/2026-chuanxi/planning.ts`, `lib/trip/planning.ts` | `test` 23/23、tsc、ESLint、Prettier、production build、390 / 768 / 1440 px 及深色模式浏览器验收通过 | `chuanxi_roadbook_implementation_records/2026-08-25_FE-01_planning-dashboard.md` | 当前只有行前模式；来源页和行中模式待后续工作包 |
-| FE-02 行程时间线与每日页 | 已完成 | 2026-08-25 | `app/itinerary/*`, `app/days/*`, `app/scenic/page.tsx`, `features/itinerary/*`, `lib/navigation/map-links.ts` | `test` 28/28、tsc、ESLint、Prettier、production build、390 / 768 / 1440 px 及深色模式浏览器验收通过 | `chuanxi_roadbook_implementation_records/2026-08-25_FE-02_itinerary-and-day-pages.md` | `/scenic` 只实现可用的按日清单退化；完整交互属于 VIEW-01 |
-| VIEW-01 观景路线可视化 | 未开始 | - | 已有：`app/scenic/page.tsx`；计划：`features/scenic/*` | unit / build / responsive / weak-network QA | - | 在现有按日只读清单上增加路线带、筛选和选中态同步 |
+| FE-02 行程时间线与每日页 | 已完成 | 2026-08-25 | `app/itinerary/*`, `app/days/*`, `app/scenic/page.tsx`, `features/itinerary/*`, `lib/navigation/map-links.ts` | `test` 28/28、tsc、ESLint、Prettier、production build、390 / 768 / 1440 px 及深色模式浏览器验收通过 | `chuanxi_roadbook_implementation_records/2026-08-25_FE-02_itinerary-and-day-pages.md` | 设备级导航深链与复制退化属于 NAV-01 |
+| VIEW-01 观景路线可视化 | 已完成 | 2026-08-25 | `app/scenic/page.tsx`, `features/scenic/*`, `features/itinerary/scenic-day-index.tsx` | `test` 33/33、tsc、ESLint、Prettier、production build、390 / 768 / 1440 px 及深色模式浏览器验收通过 | `chuanxi_roadbook_implementation_records/2026-08-25_VIEW-01_scenic-route-visualization.md` | 离线文本退化已实现；完整飞行模式验收留给 OFFLINE-01 |
 | FE-03 清单与安全页 | 未开始 | - | 计划：`app/checklists/*`, `app/safety/*`, 对应 features | unit / build / mobile QA | - | localStorage 失败需退化 |
 | FE-04 行前 / 行中模式 | 未开始 | - | 计划：`features/trip/mode*`, 全局导航 | unit / build / date QA | - | 必须可手动切日和切模式 |
 | FE-05 来源与复核状态 | 未开始 | - | 计划：`app/sources/*`, freshness components | unit / build | - | 过期不能等同于错误 |
@@ -376,5 +376,5 @@ docs/开发设计文档/20260825_chuanxi_roadbook/chuanxi_roadbook_implementatio
 
 ## 下一会话建议
 
-下一工作包应为 `VIEW-01`，在现有 `/scenic?day=D*` 按日只读清单上增加路线带、
-多维筛选、详情面板和稳定 ID 选中态，并保持 P2 / 禁停 / 景交节点无停车导航的安全边界。
+下一工作包应为 `FE-03`，实现行前、每日出发与收车清单，以及始终可达的安全页。
+清单需使用版本化 item ID 持久化，并在 `localStorage` 不可用时保持当前页可勾选与可阅读。

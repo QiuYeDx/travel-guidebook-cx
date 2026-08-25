@@ -8,21 +8,25 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { ScenicCatalog, Trip } from "@/lib/trip/types";
+import { ScenicWorkspace } from "@/features/scenic/scenic-workspace";
+import type { ScenicCatalog, SourceRef, Trip } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 
 import { formatTripDate } from "./formatters";
 import { buildDayItinerary } from "./itinerary-model";
-import { ScenicRouteList } from "./scenic-route-list";
 
 export function ScenicDayIndex({
   trip,
   catalog,
+  sources,
   selectedDayId,
+  selectedItemId,
 }: {
   trip: Trip;
   catalog: ScenicCatalog;
+  sources: SourceRef[];
   selectedDayId: string;
+  selectedItemId?: string;
 }) {
   const availableDays = trip.days.filter((day) =>
     catalog.dayPlans.some((plan) => plan.dayId === day.id),
@@ -52,12 +56,12 @@ export function ScenicDayIndex({
       </nav>
 
       <header className="mt-6 border-b pb-7">
-        <Badge variant="secondary">只读路线清单</Badge>
+        <Badge variant="secondary">路线带 + 多维筛选</Badge>
         <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
           主线 A 沿途观景
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
-          按每日真实行驶顺序查看停靠点、景交站和连续车览走廊。停车等级是计划边界，不代表国庆期间一定开放或有车位。
+          按真实行驶顺序筛选停靠点、景交站和连续车览走廊，并查看详细停车边界。停车等级不代表国庆期间一定开放或有车位。
         </p>
       </header>
 
@@ -121,21 +125,12 @@ export function ScenicDayIndex({
         </dl>
       </section>
 
-      <section aria-labelledby="scenic-list-title" className="py-8">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground">
-              共 {itinerary.scenicItems.length} 个条目
-            </p>
-            <h2 id="scenic-list-title" className="mt-1 text-xl font-semibold">
-              当日路线顺序
-            </h2>
-          </div>
-        </div>
-        <div className="mt-4">
-          <ScenicRouteList items={itinerary.scenicItems} />
-        </div>
-      </section>
+      <ScenicWorkspace
+        dayId={selectedDay.id}
+        items={itinerary.scenicItems}
+        sources={sources}
+        initialSelectedItemId={selectedItemId}
+      />
     </div>
   );
 }
