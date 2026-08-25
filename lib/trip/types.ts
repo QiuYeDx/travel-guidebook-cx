@@ -178,3 +178,34 @@ export type ScenicCatalog = {
   items: ScenicItem[];
   dayPlans: ScenicDayPlan[];
 };
+
+export type PlanningItemStatus = "open" | "in-progress" | "confirmed";
+
+export type PlanningDeadline = {
+  date: string;
+  label: string;
+};
+
+export type PlanningDecision = {
+  id: string;
+  title: string;
+  recommendation: string;
+  impact: string;
+  status: PlanningItemStatus;
+  deadline: PlanningDeadline;
+};
+
+export type PlanningTask = {
+  id: string;
+  title: string;
+  note: string;
+  status: PlanningItemStatus;
+  deadline: PlanningDeadline;
+};
+
+export type PlanningSnapshot = {
+  tripId: string;
+  updatedAt: string;
+  decisions: PlanningDecision[];
+  tasks: PlanningTask[];
+};

@@ -71,27 +71,33 @@
 ### 已初始化内容
 
 - `config/site.ts`：站点名称和导航已改为川西同行路书。
-- `app/page.tsx`：轻量项目总览占位，不是最终旅行首页。
+- `app/page.tsx` / `features/trip/*`：基于真实 `Trip` / `ScenicCatalog` 的静态行前总览工作台。
 - `app/about/page.tsx`：项目边界与原则。
 - `content/guidebook/2026-chuanxi-grand-loop.md`：v0.2 正式攻略和主线 A 沿途观景基线。
 - `content/notes/README.md`：讨论与复核记录约定。
 - `data/trips/2026-chuanxi/trip.ts`：D0-D9 主线 A、B/C 降级方案和触发条件事实源。
 - `data/trips/2026-chuanxi/sources.ts`：7 个来源及复核时间事实源。
 - `data/trips/2026-chuanxi/viewpoints.ts`：43 个沿途点 / 走廊、D1-D9 停靠策略和 D5 复用事实源。
+- `data/trips/2026-chuanxi/planning.ts`：六项待决、五项预订 / 复核任务及截止日期快照。
 - `lib/trip/types.ts` / `schema.ts`：共享类型、交叉引用和范围校验。
+- `lib/trip/planning.ts`：行前快照的行程归属、ID、日期与截止窗口校验。
 - `lib/content/*`：服务端读取 Markdown、校验 frontmatter、拒绝原始 HTML 并生成稳定中文目录。
 - `components/content/*`：GFM 长文渲染、表格滚动容器及桌面 / 移动端目录。
 - `app/guidebook/page.tsx`：构建时静态生成的完整攻略阅读页。
+- `app/itinerary/*` / `app/days/*` / `features/itinerary/*`：D0-D9 时间线、静态每日页、停车预算和降级动作。
+- `app/scenic/page.tsx`：按日读取的观景顺序清单，作为 VIEW-01 交互可视化前的可用退化。
+- `lib/navigation/map-links.ts`：生成只包含公开地名的高德 Web 搜索链接。
 - `AGENT.md`：项目级开发、内容、pnpm 和服务进程约束。
 
 ### 已知限制
 
-- 前端尚未读取结构化行程，页面仍无法按天组合。
+- `/scenic` 当前是按日只读清单；路线带、筛选和选中态同步属于 VIEW-01。
+- 每日页的地图操作是公开 Web 搜索链接；设备级深链、复制退化和 App 不可用处理属于 NAV-01。
 - 所有 P0 / P1 点仍待 D-7 坐标与停车入口复核，当前数据不提供停车导航。
-- 首页不支持当前日期、行程状态和模式切换。
+- 首页当前只提供行前模式；当前日推导、行中状态和模式切换属于 FE-04。
 - 没有离线缓存和 PWA manifest。
-- 没有自动检查日期、住宿夜数、路线状态或过期信息。
-- 来源复核状态尚未进入页面；当前只有数据和校验能力。
+- 数据测试已检查日期、行程连续性和引用；页面尚未实现当前日推导与过期状态展示。
+- 首页已显示最近核实日期和下一复核节点；完整来源与过期状态页属于 FE-05。
 
 ## 信息架构
 
@@ -535,6 +541,7 @@ D5 通过 `ScenicDayPlan.reuse` 引用 D3 点位并限制最多选择 2 个，�
 - ESLint 和 Next production build。
 - 数据 schema：日期、日序、来源引用、路线段和复核时间。
 - 观景 schema：ID / 日程 / 路段引用、顺序、GeoRef、停车导航权限和 D5 复用关系。
+- 行前快照：快照归属、决策 / 任务 ID、截止日期和行程窗口；首页里程、节点、风险与复核摘要从事实源派生。
 - 内容单元测试：frontmatter、日期、H1 一致性、GFM 目录、重复标题锚点和原始 HTML 拒绝。
 - 单元测试：当前日推导、过期状态、A/B 触发显示、清单版本合并。
 - production build 验证 `/guidebook` 静态生成，不带页面级客户端 Markdown 包。

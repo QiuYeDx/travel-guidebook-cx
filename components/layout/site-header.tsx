@@ -17,7 +17,7 @@ export function SiteHeader() {
         <div className="flex min-w-0 items-center gap-2 sm:gap-6">
           <Link
             href="/"
-            className="flex min-w-0 items-center gap-2 font-semibold tracking-tight"
+            className="flex min-w-0 items-center gap-2 font-semibold"
           >
             <MountainSnowIcon className="h-5 w-5 shrink-0 text-primary" />
             <span className="hidden truncate sm:inline">
