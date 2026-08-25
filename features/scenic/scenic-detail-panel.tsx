@@ -12,7 +12,11 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { createAmapSearchUrl } from "@/lib/navigation/map-links";
+import { CopyAction } from "@/features/navigation/copy-action";
+import {
+  buildScenicItemCopyText,
+  createAmapNavigationUrl,
+} from "@/lib/navigation/map-links";
 import type { ScenicItem, SourceRef } from "@/lib/trip/types";
 
 import {
@@ -25,7 +29,7 @@ import {
 } from "./scenic-labels";
 import {
   getItemSources,
-  getParkingNavigationQuery,
+  getParkingNavigationTarget,
   isScenicCorridor,
 } from "./scenic-model";
 
@@ -100,7 +104,7 @@ export function ScenicDetailPanel({
 
   const corridor = isScenicCorridor(item);
   const itemSources = getItemSources(item, sources);
-  const navigationQuery = getParkingNavigationQuery(item);
+  const navigationTarget = getParkingNavigationTarget(item);
 
   return (
     <section className="h-[34rem] overflow-y-auto rounded-md border bg-background p-5 lg:h-auto lg:min-h-[38rem] lg:overflow-visible">
@@ -241,22 +245,29 @@ export function ScenicDetailPanel({
         )}
       </div>
 
-      {navigationQuery && isOnline ? (
-        <Button asChild className="mt-6 w-full">
-          <a
-            href={createAmapSearchUrl(navigationQuery)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            在地图中搜索核准入口
-            <ArrowUpRightIcon aria-hidden="true" />
-          </a>
-        </Button>
-      ) : null}
-      {navigationQuery && !isOnline ? (
+      <div className="mt-6 grid gap-2 sm:grid-cols-2">
+        {navigationTarget && isOnline ? (
+          <Button asChild>
+            <a
+              href={createAmapNavigationUrl(navigationTarget)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              导航到核准入口
+              <ArrowUpRightIcon aria-hidden="true" />
+            </a>
+          </Button>
+        ) : null}
+        <CopyAction
+          text={buildScenicItemCopyText(item)}
+          label={corridor ? "复制走廊" : "复制观景信息"}
+          className={navigationTarget && isOnline ? undefined : "sm:col-span-2"}
+        />
+      </div>
+      {navigationTarget && !isOnline ? (
         <p className="mt-6 flex items-center gap-2 rounded-md border p-3 text-xs leading-5 text-muted-foreground">
           <WifiOffIcon className="size-4 shrink-0" aria-hidden="true" />
-          当前离线，保留地点名，恢复网络后再打开外部地图。
+          当前离线，核准入口导航已停用；可先复制观景信息，恢复网络后再打开外部地图。
         </p>
       ) : null}
     </section>

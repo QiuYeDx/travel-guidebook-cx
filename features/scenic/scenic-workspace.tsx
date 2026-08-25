@@ -135,7 +135,7 @@ export function ScenicWorkspace({
       {!isOnline ? (
         <p className="mt-5 flex items-start gap-3 rounded-md border border-amber-300 bg-amber-50/70 p-4 text-sm leading-6 text-amber-950 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-100">
           <WifiOffIcon className="mt-1 size-4 shrink-0" aria-hidden="true" />
-          当前离线。路线带、顺序和安全结论仍可读取；来源与外部地图操作已停用。
+          当前离线。路线带、顺序、安全结论和复制操作仍可使用；来源与外部地图操作已停用。
         </p>
       ) : null}
 

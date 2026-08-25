@@ -67,8 +67,9 @@ test("scenic items stay in route order", () => {
 
 test("map search links encode the public route query", () => {
   const url = new URL(createAmapSearchUrl("成都 → 泸定 → 康定"));
-  assert.equal(url.origin, "https://www.amap.com");
+  assert.equal(url.origin, "https://uri.amap.com");
   assert.equal(url.pathname, "/search");
-  assert.equal(url.searchParams.get("query"), "成都 → 泸定 → 康定");
+  assert.equal(url.searchParams.get("keyword"), "成都 → 泸定 → 康定");
+  assert.equal(url.searchParams.get("callnative"), "1");
   assert.throws(() => createAmapSearchUrl("  "));
 });

@@ -86,9 +86,7 @@ export function resolveSelectedScenicItem(
   return items.find((item) => item.id === requestedId) ?? items[0];
 }
 
-export function getParkingNavigationQuery(
-  item: ScenicItem,
-): string | undefined {
+export function getParkingNavigationTarget(item: ScenicItem) {
   const eligibleLevel =
     item.parking.level === "P0" || item.parking.level === "P1";
   if (
@@ -98,7 +96,15 @@ export function getParkingNavigationQuery(
   ) {
     return undefined;
   }
-  return item.parking.parkingNavigationQuery;
+  const mapQuery = item.parking.parkingNavigationQuery;
+  if (!mapQuery) return undefined;
+
+  return {
+    lat: item.geoRef.lat,
+    lng: item.geoRef.lng,
+    coordinateSystem: item.geoRef.coordinateSystem,
+    mapQuery,
+  };
 }
 
 export function getItemSources(

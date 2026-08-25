@@ -424,6 +424,12 @@ function validateGeoRef(
         message: "must be between -180 and 180",
       });
     }
+    if (geoRef.coordinateSystem !== "gcj02") {
+      issues.push({
+        path: `${geoPath}.coordinateSystem`,
+        message: "must be gcj02 for Amap navigation",
+      });
+    }
     validateText(geoRef.mapQuery, `${geoPath}.mapQuery`, issues);
     if (!isIsoDate(geoRef.verifiedAt)) {
       issues.push({

@@ -17,7 +17,11 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { createAmapSearchUrl } from "@/lib/navigation/map-links";
+import { CopyAction } from "@/features/navigation/copy-action";
+import {
+  buildRouteLegCopyText,
+  createAmapSearchUrl,
+} from "@/lib/navigation/map-links";
 import type { TripDay } from "@/lib/trip/types";
 
 import {
@@ -129,16 +133,19 @@ function RouteLegs({ itinerary }: { itinerary: DayItinerary }) {
                 </p>
               ) : null}
             </div>
-            <Button asChild variant="outline" size="sm">
-              <a
-                href={createAmapSearchUrl(leg.navigationQuery)}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                地图搜索
-                <ArrowUpRightIcon aria-hidden="true" />
-              </a>
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild variant="outline" size="sm">
+                <a
+                  href={createAmapSearchUrl(leg.navigationQuery)}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  打开高德
+                  <ArrowUpRightIcon aria-hidden="true" />
+                </a>
+              </Button>
+              <CopyAction text={buildRouteLegCopyText(leg)} label="复制路线" />
+            </div>
           </div>
           <dl className="mt-4 grid grid-cols-2 gap-4 border-t pt-4 text-sm">
             <div>
@@ -156,7 +163,7 @@ function RouteLegs({ itinerary }: { itinerary: DayItinerary }) {
           </dl>
           <p className="mt-4 text-xs leading-5 text-muted-foreground">
             搜索词：{leg.navigationQuery}
-            。链接只用于打开公开地图搜索，实际路线以当天车机为准。
+            。未安装地图 App 时使用 Web 页面或复制路线；实际路线以当天车机为准。
           </p>
         </article>
       ))}

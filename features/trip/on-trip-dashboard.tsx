@@ -23,7 +23,11 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { createAmapSearchUrl } from "@/lib/navigation/map-links";
+import { CopyAction } from "@/features/navigation/copy-action";
+import {
+  buildRouteLegCopyText,
+  createAmapSearchUrl,
+} from "@/lib/navigation/map-links";
 import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 
@@ -196,16 +200,22 @@ export function OnTripDashboard({
                 </h2>
               </div>
               {primaryLeg ? (
-                <Button asChild variant="outline" size="sm">
-                  <a
-                    href={createAmapSearchUrl(primaryLeg.navigationQuery)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    地图搜索
-                    <ArrowUpRightIcon aria-hidden="true" />
-                  </a>
-                </Button>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <a
+                      href={createAmapSearchUrl(primaryLeg.navigationQuery)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      打开高德
+                      <ArrowUpRightIcon aria-hidden="true" />
+                    </a>
+                  </Button>
+                  <CopyAction
+                    text={buildRouteLegCopyText(primaryLeg)}
+                    label="复制路线"
+                  />
+                </div>
               ) : null}
             </div>
             {primaryLeg ? (

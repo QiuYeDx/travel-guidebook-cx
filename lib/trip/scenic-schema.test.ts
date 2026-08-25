@@ -143,6 +143,24 @@ test("pending P1 points require exact coordinates and verified parking before na
   assert.match(messages, /parking navigation requires verified parking/);
 });
 
+test("exact points require an explicit GCJ-02 coordinate contract", () => {
+  const catalog = cloneCatalog();
+  const viewpoint = catalog.items.find((item) => item.id === "VP-D2-01");
+  assert.ok(viewpoint);
+  Object.assign(viewpoint, {
+    geoRef: {
+      kind: "exact",
+      lat: 30.1,
+      lng: 101.2,
+      coordinateSystem: "wgs84",
+      mapQuery: "测试入口",
+      verifiedAt: "2026-09-20",
+    },
+  });
+
+  assert.match(messagesFor(catalog), /must be gcj02 for Amap navigation/);
+});
+
 test("corridors reject fake point geometry", () => {
   const catalog = cloneCatalog();
   const corridor = catalog.items.find((item) => item.id === "SC-D2-02");

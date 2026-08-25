@@ -91,13 +91,13 @@
 - `features/trip/mode-model.ts` / `trip-mode-provider.tsx`：中国标准时间当前日推导、手动 D0-D9 覆盖和本机模式偏好。
 - `components/layout/mobile-trip-navigation.tsx`：行中优先的移动端底部导航，当天清单和观景页使用日程深链。
 - `app/sources/page.tsx` / `features/sources/*`：7 项来源目录、中国标准时间复核状态、引用日程与首页到期行动提示。
-- `lib/navigation/map-links.ts`：生成只包含公开地名的高德 Web 搜索链接。
+- `lib/navigation/map-links.ts` / `features/navigation/copy-action.tsx`：生成只包含公开路线信息的高德 HTTPS URI、核准停车入口坐标导航和路线 / 观景复制退化。
 - `AGENT.md`：项目级开发、内容、pnpm 和服务进程约束。
 
 ### 已知限制
 
 - `/scenic` 筛选与选中态当前只保留在页面会话和 URL 中，不做跨日持久化；行中首页和移动导航会传入当前日。
-- 每日页的地图操作是公开 Web 搜索链接；设备级深链、复制退化和 App 不可用处理属于 NAV-01。
+- 每日页和行中首页使用高德 HTTPS URI 尝试唤起 App，并同时提供可粘贴到车机或同行群的路线文本；未安装 App 时由 URI Web 页面或复制操作退化。
 - 所有 P0 / P1 点仍待 D-7 坐标与停车入口复核，当前数据不提供停车导航。
 - 没有离线缓存和 PWA manifest。
 - 清单状态只存在当前设备的当前浏览器；清理站点数据、更换浏览器或设备时不同步。
@@ -287,6 +287,7 @@ type GeoRef =
       kind: "exact";
       lat: number;
       lng: number;
+      coordinateSystem: "gcj02";
       mapQuery: string;
       verifiedAt: string;
     }
@@ -362,7 +363,7 @@ type ScenicCatalog = {
 
 观景数据校验必须保证：`VP-*` / `SC-*` ID 唯一且引用有效；同一天 `sequence` 可稳定排序；
 `P2`、`prohibited`、`transit-only`、`walk-only` 不得设置 `parkingNavigationQuery`；只有完成坐标复核的
-`exact` 点才能显示停车导航。`route-interval` 只表达线路区间，不能自动取中点冒充停车位置。
+`exact` 点才能显示停车导航，且必须声明经 D-7 / D-3 复核的 `gcj02` 坐标系。`route-interval` 只表达线路区间，不能自动取中点冒充停车位置。
 D5 通过 `ScenicDayPlan.reuse` 引用 D3 点位并限制最多选择 2 个，不复制第二套数据。
 
 ### 单一事实源规则
@@ -435,9 +436,12 @@ D5 通过 `ScenicDayPlan.reuse` 引用 D3 点位并限制最多选择 2 个，�
 - 路线用文本、时间线、城市节点和 `/scenic` 路线带表达。
 - 路线带以实际行驶顺序连接节点；`Viewpoint` 用点节点，`ScenicCorridor` 用有起止标签的线段带，
   没有核准坐标时仍能完整工作。
-- 每段提供“在地图中打开”的查询深链，优先支持高德 Web / URI 的安全退化。
+- 每段提供 `https://uri.amap.com/search` 查询 URI，中文地点和多个途经点通过 `URLSearchParams` 编码；URI 尝试唤起高德 App，未安装时保留 Web 页面。
+- 每段同时提供复制路线，包含起点、依序途经点、终点和公开搜索词；Clipboard API 不可用时退化到临时只读文本域复制。
 - `P0` / `P1` 只有在精确位置和停车入口已复核后才显示停车导航；`P2` 只显示“乘客观察 / 现场判断”，
   禁止停车和景交 / 步行节点不生成社会车辆停车操作。
+- 停车导航使用核准查询词和 GCJ-02 经纬度消歧；顺行 / 返程入口说明进入复制文本，所有观景文本固定提示错过入口继续前行、不倒车、不急刹。
+- 离线时隐藏外部地图操作，但路线、地点或走廊区间复制仍可使用。
 - 深链只包含公开地点名称，不包含成员实时位置。
 - 页面明确提示实时路线以车机当日结果为准。
 

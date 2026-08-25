@@ -9,7 +9,7 @@ import {
   defaultScenicFilters,
   filterScenicItems,
   getAvailableSubjects,
-  getParkingNavigationQuery,
+  getParkingNavigationTarget,
   resolveSelectedScenicItem,
   type ScenicFilters,
 } from "./scenic-model";
@@ -90,6 +90,7 @@ test("parking navigation requires verified exact P0 or P1 data", () => {
       kind: "exact" as const,
       lat: 30.1,
       lng: 101.2,
+      coordinateSystem: "gcj02" as const,
       mapQuery: "天路十八弯观景台",
       verifiedAt: "2026-09-20",
     },
@@ -101,16 +102,21 @@ test("parking navigation requires verified exact P0 or P1 data", () => {
     },
   };
 
-  assert.equal(getParkingNavigationQuery(eligible), "天路十八弯观景台 停车场");
+  assert.deepEqual(getParkingNavigationTarget(eligible), {
+    lat: 30.1,
+    lng: 101.2,
+    coordinateSystem: "gcj02",
+    mapQuery: "天路十八弯观景台 停车场",
+  });
   assert.equal(
-    getParkingNavigationQuery({
+    getParkingNavigationTarget({
       ...eligible,
       parking: { ...eligible.parking, level: "P2" },
     }),
     undefined,
   );
   assert.equal(
-    getParkingNavigationQuery({
+    getParkingNavigationTarget({
       ...eligible,
       parking: {
         ...eligible.parking,
@@ -119,5 +125,5 @@ test("parking navigation requires verified exact P0 or P1 data", () => {
     }),
     undefined,
   );
-  assert.equal(getParkingNavigationQuery(base), undefined);
+  assert.equal(getParkingNavigationTarget(base), undefined);
 });

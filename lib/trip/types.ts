@@ -107,6 +107,7 @@ export type GeoRef =
       kind: "exact";
       lat: number;
       lng: number;
+      coordinateSystem: "gcj02";
       mapQuery: string;
       verifiedAt: string;
     }
