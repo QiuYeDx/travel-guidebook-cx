@@ -4,12 +4,15 @@ import type { ReactNode } from "react";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import type { TripModeConfig } from "@/features/trip/mode-model";
+import { TripModeProvider } from "@/features/trip/trip-mode-provider";
 
 interface AppProvidersProps {
   children: ReactNode;
+  tripModeConfig: TripModeConfig;
 }
 
-export function AppProviders({ children }: AppProvidersProps) {
+export function AppProviders({ children, tripModeConfig }: AppProvidersProps) {
   return (
     <ThemeProvider
       attribute="class"
@@ -17,8 +20,10 @@ export function AppProviders({ children }: AppProvidersProps) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
-      <Toaster />
+      <TripModeProvider config={tripModeConfig}>
+        {children}
+        <Toaster />
+      </TripModeProvider>
     </ThemeProvider>
   );
 }

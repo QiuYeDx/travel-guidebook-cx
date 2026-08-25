@@ -15,6 +15,23 @@ test("the 2026 Chuanxi baseline satisfies the data contract", () => {
   assert.equal(assertValidTrip(chuanxiTrip, chuanxiSources), chuanxiTrip);
 });
 
+test("driving days expose the guidebook target arrival state of charge", () => {
+  assert.deepEqual(
+    chuanxiTrip.days.flatMap((day) =>
+      day.legs.map((leg) => [day.id, leg.targetArrivalSoc]),
+    ),
+    [
+      ["D1", 25],
+      ["D2", 30],
+      ["D3", 25],
+      ["D5", 25],
+      ["D6", 30],
+      ["D7", 35],
+      ["D9", 20],
+    ],
+  );
+});
+
 test("dates, route titles, intensity, and overnight places match guidebook v0.2", () => {
   assert.deepEqual(
     chuanxiTrip.days.map(({ id, date, title, intensity, overnight }) => ({

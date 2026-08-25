@@ -12,12 +12,19 @@ export const metadata: Metadata = {
   description: "川西大环线行前、每日出发和收车清单",
 };
 
-export default function ChecklistsPage() {
+export default async function ChecklistsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ day?: string; view?: string }>;
+}) {
+  const { day, view } = await searchParams;
   return (
     <ChecklistWorkspace
       trip={chuanxiTrip}
       definitions={chuanxiChecklists}
       contentVersion={chuanxiChecklistVersion}
+      initialDayId={day}
+      initialView={view === "daily" ? "daily" : "pretrip"}
     />
   );
 }

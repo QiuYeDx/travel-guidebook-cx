@@ -6,26 +6,32 @@ import { MountainSnowIcon } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { siteConfig } from "@/config/site";
+import { TripModeToggle } from "@/features/trip/mode-toggle";
+import { useTripMode } from "@/features/trip/trip-mode-provider";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { config, mode, selectedDayId } = useTripMode();
+  const selectedDay = config.days.find((day) => day.id === selectedDayId);
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-6">
+        <div className="flex min-w-0 items-center gap-3 md:gap-6">
           <Link
             href="/"
             className="flex min-w-0 items-center gap-2 font-semibold"
           >
             <MountainSnowIcon className="h-5 w-5 shrink-0 text-primary" />
-            <span className="hidden truncate sm:inline">
-              {siteConfig.shortName}
+            <span className="max-w-32 truncate text-sm md:max-w-none md:text-base">
+              {mode === "onTrip" && selectedDay
+                ? `${selectedDay.id} · ${selectedDay.title}`
+                : siteConfig.shortName}
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1">
+          <nav className="hidden items-center gap-1 md:flex">
             {siteConfig.navItems.map((item) => (
               <Link
                 key={item.href}
@@ -45,7 +51,10 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
+          <TripModeToggle compact />
+          <div className="hidden md:block">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>

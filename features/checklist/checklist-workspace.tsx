@@ -185,10 +185,14 @@ export function ChecklistWorkspace({
   trip,
   definitions,
   contentVersion,
+  initialView = "pretrip",
+  initialDayId,
 }: {
   trip: Trip;
   definitions: ChecklistDefinition[];
   contentVersion: string;
+  initialView?: WorkspaceView;
+  initialDayId?: string;
 }) {
   const dayIds = useMemo(() => trip.days.map((day) => day.id), [trip.days]);
   const instances = useMemo(
@@ -199,8 +203,12 @@ export function ChecklistWorkspace({
     () => getChecklistItemKeys(trip.id, instances),
     [instances, trip.id],
   );
-  const [view, setView] = useState<WorkspaceView>("pretrip");
-  const [selectedDayId, setSelectedDayId] = useState(trip.days[0]?.id ?? "D0");
+  const [view, setView] = useState<WorkspaceView>(initialView);
+  const [selectedDayId, setSelectedDayId] = useState(
+    trip.days.some((day) => day.id === initialDayId)
+      ? initialDayId!
+      : (trip.days[0]?.id ?? "D0"),
+  );
   const [storageStatus, setStorageStatus] = useState<StorageStatus>("loading");
   const [resetScope, setResetScope] = useState<ResetScope>(null);
   const [state, setState] = useState<PersistedChecklistState>(() =>

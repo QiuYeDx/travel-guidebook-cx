@@ -71,7 +71,7 @@
 ### 已初始化内容
 
 - `config/site.ts`：站点名称和导航已改为川西同行路书。
-- `app/page.tsx` / `features/trip/*`：基于真实 `Trip` / `ScenicCatalog` 的静态行前总览工作台。
+- `app/page.tsx` / `features/trip/*`：基于真实 `Trip` / `ScenicCatalog` 的行前总览和行中当日执行工作台。
 - `app/about/page.tsx`：项目边界与原则。
 - `content/guidebook/2026-chuanxi-grand-loop.md`：v0.2 正式攻略和主线 A 沿途观景基线。
 - `content/notes/README.md`：讨论与复核记录约定。
@@ -88,18 +88,20 @@
 - `app/scenic/page.tsx` / `features/scenic/*`：按日路线带、五类筛选、列表 / 详情同步与离线文本退化。
 - `app/checklists/page.tsx` / `data/trips/2026-chuanxi/checklists.ts` / `features/checklist/*`：版本化行前、每日出发和收车清单，支持本机持久化、按日重置和内存退化。
 - `app/safety/page.tsx` / `data/trips/2026-chuanxi/safety.ts` / `features/safety/*`：直接展示高海拔危险信号、驾驶停止条件、现场动作和紧急电话。
+- `features/trip/mode-model.ts` / `trip-mode-provider.tsx`：中国标准时间当前日推导、手动 D0-D9 覆盖和本机模式偏好。
+- `components/layout/mobile-trip-navigation.tsx`：行中优先的移动端底部导航，当天清单和观景页使用日程深链。
 - `lib/navigation/map-links.ts`：生成只包含公开地名的高德 Web 搜索链接。
 - `AGENT.md`：项目级开发、内容、pnpm 和服务进程约束。
 
 ### 已知限制
 
-- `/scenic` 筛选与选中态当前只保留在页面会话和 URL 中，不做跨日持久化；“今天”默认日程属于 FE-04。
+- `/scenic` 筛选与选中态当前只保留在页面会话和 URL 中，不做跨日持久化；行中首页和移动导航会传入当前日。
 - 每日页的地图操作是公开 Web 搜索链接；设备级深链、复制退化和 App 不可用处理属于 NAV-01。
 - 所有 P0 / P1 点仍待 D-7 坐标与停车入口复核，当前数据不提供停车导航。
-- 首页当前只提供行前模式；当前日推导、行中状态和模式切换属于 FE-04。
 - 没有离线缓存和 PWA manifest。
 - 清单状态只存在当前设备的当前浏览器；清理站点数据、更换浏览器或设备时不同步。
-- 数据测试已检查日期、行程连续性和引用；页面尚未实现当前日推导与过期状态展示。
+- 中国标准时间当前日推导、手动切日和模式持久化已实现；完整来源过期状态展示属于 FE-05。
+- `/checklists` 为了在首次响应中精确打开 D0-D9 每日执行清单，在服务端解析 `view` / `day` 查询参数；OFFLINE-01 需将这些参数 URL 纳入核心缓存。
 - 首页已显示最近核实日期和下一复核节点；完整来源与过期状态页属于 FE-05。
 
 ## 信息架构
