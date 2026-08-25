@@ -26,17 +26,17 @@ export function OverviewDashboard({ trip, scenicCatalog }: { trip: Trip; scenicC
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-7 sm:px-6 sm:pt-10">
       <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-        <div className="grid gap-8 bg-[linear-gradient(120deg,rgba(16,82,58,0.98),rgba(28,61,54,0.96))] px-5 py-7 text-white sm:px-8 sm:py-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
+        <div className="grid gap-8 border-b border-border bg-gradient-to-br from-emerald-50 via-background to-background px-5 py-7 text-foreground dark:from-emerald-950/45 dark:via-background dark:to-background sm:px-8 sm:py-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="max-w-3xl">
-            <Badge className="border-white/20 bg-white/10 text-white hover:bg-white/10">2026 · 9/27 — 10/6</Badge>
+            <Badge variant="secondary">2026 · 9/27 — 10/6</Badge>
             <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-5xl">川西大环线</h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">成都集结，沿康定、新都桥、理塘、稻城亚丁，经雅江、塔公、丹巴与四姑娘山回到成都。</p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">成都集结，沿康定、新都桥、理塘、稻城亚丁，经雅江、塔公、丹巴与四姑娘山回到成都。</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild className="bg-white text-emerald-950 hover:bg-white/90"><Link href="/itinerary">查看完整行程 <ArrowRightIcon aria-hidden="true" /></Link></Button>
-              <Button asChild variant="outline" className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"><Link href="/scenic">浏览沿途观景 <MapPinnedIcon aria-hidden="true" /></Link></Button>
+              <Button asChild><Link href="/itinerary">查看完整行程 <ArrowRightIcon aria-hidden="true" /></Link></Button>
+              <Button asChild variant="outline" className="bg-background/70"><Link href="/scenic">浏览沿途观景 <MapPinnedIcon aria-hidden="true" /></Link></Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 border-t border-white/15 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+          <div className="grid grid-cols-2 gap-4 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
             <Metric label="行程" value={`${trip.days.length} 天`} />
             <Metric label="公路移动" value={`${drivingDays} 天`} />
             <Metric label="规划里程" value={`${distance[0]}–${distance[1]} km`} />
@@ -67,13 +67,13 @@ export function OverviewDashboard({ trip, scenicCatalog }: { trip: Trip; scenicC
         </ol>
       </section>
 
-      <section className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="rounded-xl border bg-card p-5 sm:p-6"><div className="flex items-center gap-2"><RouteIcon className="size-5 text-emerald-700 dark:text-emerald-400" aria-hidden="true" /><h2 className="text-lg font-semibold">路线节奏</h2></div><p className="mt-3 text-sm leading-6 text-muted-foreground">前段逐步升高海拔，中段以亚丁轻量游为核心，后段经塔公、丹巴和四姑娘山回蓉。每天只设一个主目标，沿途观景点按行驶顺序查看。</p><div className="mt-5 flex items-center gap-2 overflow-x-auto pb-2" aria-label="路线顺序"><div className="flex min-w-max items-center gap-2">{trip.days.map((day, index) => <span key={day.id} className="flex items-center gap-2"><Link href={`/days/${day.id}`} className="rounded-full border px-3 py-1.5 text-xs font-medium hover:border-emerald-500 hover:text-emerald-700">{day.id} · {day.overnight.place}</Link>{index < trip.days.length - 1 ? <span className="text-muted-foreground" aria-hidden="true">→</span> : null}</span>)}</div></div></div>
+      <section className="mt-12 grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="min-w-0 overflow-hidden rounded-xl border bg-card p-5 sm:p-6"><div className="flex items-center gap-2"><RouteIcon className="size-5 text-emerald-700 dark:text-emerald-400" aria-hidden="true" /><h2 className="text-lg font-semibold">路线节奏</h2></div><p className="mt-3 text-sm leading-6 text-muted-foreground">前段逐步升高海拔，中段以亚丁轻量游为核心，后段经塔公、丹巴和四姑娘山回蓉。每天只设一个主目标，沿途观景点按行驶顺序查看。</p><div className="mt-5 flex items-center gap-2 overflow-x-auto pb-2" aria-label="路线顺序"><div className="flex min-w-max items-center gap-2">{trip.days.map((day, index) => <span key={day.id} className="flex items-center gap-2"><Link href={`/days/${day.id}`} className="rounded-full border px-3 py-1.5 text-xs font-medium hover:border-emerald-500 hover:text-emerald-700">{day.id} · {day.overnight.place}</Link>{index < trip.days.length - 1 ? <span className="text-muted-foreground" aria-hidden="true">→</span> : null}</span>)}</div></div></div>
         <div className="rounded-xl border bg-muted/35 p-5 sm:p-6"><div className="flex items-center gap-2"><CalendarDaysIcon className="size-5 text-emerald-700 dark:text-emerald-400" aria-hidden="true" /><h2 className="text-lg font-semibold">出发前先看</h2></div><ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground"><li>每日页：路线、观景、注意事项分开查看。</li><li>观景页：按日期浏览停车与车览策略。</li><li>完整攻略：集中阅读长文和背景说明。</li></ul></div>
       </section>
     </div>
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) { return <div><dt className="text-xs text-white/55">{label}</dt><dd className="mt-1 text-lg font-semibold tabular-nums">{value}</dd></div>; }
+function Metric({ label, value }: { label: string; value: string }) { return <div><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 text-lg font-semibold tabular-nums text-foreground">{value}</dd></div>; }
 function QuickFact({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <div className="flex items-center gap-3"><span className="text-emerald-700 dark:text-emerald-400">{icon}</span><div><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-sm font-medium">{value}</p></div></div>; }
