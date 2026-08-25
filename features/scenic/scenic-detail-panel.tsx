@@ -87,7 +87,7 @@ export function ScenicDetailPanel({
 }) {
   if (!item) {
     return (
-      <section className="flex h-[34rem] items-center justify-center rounded-md border p-6 text-center lg:h-auto lg:min-h-[38rem]">
+      <section className="flex h-[34rem] items-center justify-center rounded-2xl border p-6 text-center lg:h-auto lg:min-h-[38rem]">
         <div>
           <RouteIcon
             className="mx-auto size-5 text-muted-foreground"
@@ -107,7 +107,7 @@ export function ScenicDetailPanel({
   const navigationTarget = getParkingNavigationTarget(item);
 
   return (
-    <section className="h-[34rem] overflow-y-auto rounded-md border bg-background p-5 lg:h-auto lg:min-h-[38rem] lg:overflow-visible">
+    <section className="h-[34rem] overflow-y-auto rounded-2xl border bg-background p-5 lg:h-auto lg:min-h-[38rem] lg:overflow-visible">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="outline">
           {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
@@ -265,7 +265,7 @@ export function ScenicDetailPanel({
         />
       </div>
       {navigationTarget && !isOnline ? (
-        <p className="mt-6 flex items-center gap-2 rounded-md border p-3 text-xs leading-5 text-muted-foreground">
+        <p className="mt-6 flex items-center gap-2 rounded-xl border p-3 text-xs leading-5 text-muted-foreground">
           <WifiOffIcon className="size-4 shrink-0" aria-hidden="true" />
           当前离线，核准入口导航已停用；可先复制观景信息，恢复网络后再打开外部地图。
         </p>

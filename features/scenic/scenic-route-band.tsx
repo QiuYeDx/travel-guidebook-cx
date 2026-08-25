@@ -52,7 +52,7 @@ export function ScenicRouteBand({
               aria-pressed={selected}
               onClick={() => onSelect(item.id)}
               className={cn(
-                "flex min-h-24 w-full items-start gap-3 rounded-md border bg-background p-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:min-h-20",
+                "flex min-h-24 w-full items-start gap-3 rounded-xl border bg-background p-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:min-h-20",
                 corridor && "border-dashed",
                 selected
                   ? "border-emerald-700 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950/25"

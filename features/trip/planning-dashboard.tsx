@@ -115,7 +115,7 @@ function RouteOverview({ overview }: { overview: TripOverview }) {
   return (
     <section
       aria-labelledby="route-overview-title"
-      className="overflow-hidden rounded-md bg-[#17231d] text-white shadow-sm dark:bg-[#111a16]"
+      className="overflow-hidden rounded-2xl bg-[#17231d] text-white shadow-sm dark:bg-[#111a16]"
     >
       <div className="grid gap-7 px-5 py-6 sm:px-7 sm:py-7">
         <div className="min-w-0">
@@ -485,7 +485,7 @@ export function PlanningDashboard({
           </div>
         </div>
 
-        <dl className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-4">
+        <dl className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-4">
           <div className="bg-background px-4 py-4">
             <dt className="flex items-center gap-2 text-xs text-muted-foreground">
               <UsersIcon className="size-4" aria-hidden="true" />

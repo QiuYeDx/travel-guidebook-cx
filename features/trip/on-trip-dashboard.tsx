@@ -91,7 +91,7 @@ export function OnTripDashboard({
       ) : null}
 
       <section
-        className="overflow-hidden rounded-md bg-[#17231d] text-white dark:bg-[#101914]"
+        className="overflow-hidden rounded-2xl bg-[#17231d] text-white dark:bg-[#101914]"
         aria-labelledby="today-title"
       >
         <div className="grid gap-6 px-5 py-6 sm:px-7 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">

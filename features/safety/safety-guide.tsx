@@ -100,7 +100,7 @@ export function SafetyGuide({ guide }: { guide: typeof chuanxiSafetyGuide }) {
           {guide.contacts.map((contact) => (
             <div
               key={contact.id}
-              className="grid gap-4 rounded-md border p-4 sm:p-5"
+                  className="grid gap-4 rounded-xl border p-4 sm:p-5"
             >
               <div>
                 <div className="flex items-baseline justify-between gap-3">
