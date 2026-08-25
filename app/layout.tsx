@@ -8,6 +8,7 @@ import { MobileTripNavigation } from "@/components/layout/mobile-trip-navigation
 import { AppProviders } from "@/components/providers/app-providers";
 import { siteConfig } from "@/config/site";
 import { chuanxiTrip } from "@/data/trips/2026-chuanxi/trip";
+import { OfflineStatusBar } from "@/features/offline/offline-status";
 
 const tripModeConfig = {
   tripId: chuanxiTrip.id,
@@ -34,6 +35,16 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.shortName,
+  },
 };
 
 export default function RootLayout({
@@ -48,6 +59,7 @@ export default function RootLayout({
       >
         <AppProviders tripModeConfig={tripModeConfig}>
           <SiteHeader />
+          <OfflineStatusBar contentVersion={chuanxiTrip.contentVersion} />
           <main className="flex-1 pb-16 md:pb-0">{children}</main>
           <SiteFooter />
           <MobileTripNavigation />
