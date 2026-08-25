@@ -22,8 +22,6 @@ export function buildOfflineCorePaths(dayIds: readonly string[]): string[] {
     "/itinerary",
     "/guidebook",
     "/safety",
-    "/checklists",
-    "/checklists?view=pretrip",
     "/scenic",
     "/sources",
     "/about",
@@ -33,9 +31,6 @@ export function buildOfflineCorePaths(dayIds: readonly string[]): string[] {
     "/icon-512.png",
     "/apple-touch-icon.png",
     ...validDayIds.map((dayId) => `/days/${dayId}`),
-    ...validDayIds.map(
-      (dayId) => `/checklists?view=daily&day=${encodeURIComponent(dayId)}`,
-    ),
     ...validDayIds
       .filter((dayId) => dayId !== "D0")
       .map((dayId) => `/scenic?day=${encodeURIComponent(dayId)}`),

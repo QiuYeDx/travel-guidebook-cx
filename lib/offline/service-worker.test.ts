@@ -14,7 +14,6 @@ test("offline core paths cover all daily and parameterized execution pages", () 
   assert.equal(paths.length, new Set(paths).size);
   for (const dayId of dayIds) {
     assert.ok(paths.includes(`/days/${dayId}`));
-    assert.ok(paths.includes(`/checklists?view=daily&day=${dayId}`));
   }
   assert.ok(paths.includes("/"));
   assert.ok(paths.includes("/itinerary"));
@@ -29,13 +28,6 @@ test("offline core paths cover all daily and parameterized execution pages", () 
 test("offline links use cached documents, block web exits, and preserve phone calls", () => {
   const currentUrl = "https://roadbook.example/days/D3";
 
-  assert.deepEqual(
-    getOfflineLinkAction("/checklists?view=daily&day=D3", currentUrl),
-    {
-      kind: "internal-document",
-      url: "https://roadbook.example/checklists?view=daily&day=D3",
-    },
-  );
   assert.deepEqual(
     getOfflineLinkAction(
       "https://uri.amap.com/search?keyword=test",
@@ -71,7 +63,6 @@ test("service worker source keeps updates explicit and caches only same-origin G
   assert.match(source, /request\.mode === "navigate"/);
   assert.match(source, /url\.origin !== self\.location\.origin/);
   assert.match(source, /event\.data\?\.type === "SKIP_WAITING"/);
-  assert.match(source, /\/checklists\?view=daily&day=D9/);
   assert.doesNotMatch(source, /geolocation|当前位置|实时位置/);
   assert.doesNotThrow(() => new Script(source));
 });

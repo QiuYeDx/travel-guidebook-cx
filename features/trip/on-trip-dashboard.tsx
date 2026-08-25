@@ -12,7 +12,6 @@ import {
   CheckCircle2Icon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ClipboardCheckIcon,
   CloudOffIcon,
   GaugeIcon,
   MapPinnedIcon,
@@ -371,12 +370,6 @@ export function OnTripDashboard({
               <Link href={`/days/${day.id}`}>
                 <MapPinnedIcon aria-hidden="true" />
                 当天完整路书
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href={`/checklists?view=daily&day=${day.id}`}>
-                <ClipboardCheckIcon aria-hidden="true" />
-                当天清单
               </Link>
             </Button>
             {hasScenicPlan ? (
