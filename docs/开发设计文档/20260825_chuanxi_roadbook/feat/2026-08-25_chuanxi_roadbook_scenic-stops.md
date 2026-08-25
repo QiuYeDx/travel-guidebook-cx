@@ -32,7 +32,9 @@
 ## 实现摘要
 
 - 攻略 v0.2 已建立稳定的 `VP-D*-*` / `SC-D*-*` 编号、类型、停车等级、每日预算和 D-7 复核清单。
-- 结构化层采用 `Viewpoint`、`ScenicCorridor`、`GeoRef` 和 `ParkingProfile`，走廊只保存路线区间。
+- DATA-02 已实现 `Viewpoint`、`ScenicCorridor`、`GeoRef`、`ParkingProfile` 与 `ScenicCatalog`。
+- 43 个 `VP-*` / `SC-*` 已迁移，走廊只保存路线区间；D5 只引用 D3 候选并限制最多选 2 个。
+- 当前没有点完成双地图坐标和停车入口复核，因此 P0 / P1 仍是 `needs-review` 且不提供停车导航。
 - 第一阶段使用可离线的路线带 + 列表；地图是后续渐进增强，并通过稳定 ID 与列表同步。
 - 筛选维度为日程、优先级、停车等级、拍摄主题、行驶方向和复核状态。
 
@@ -55,6 +57,6 @@ rg -n '/scenic|Viewpoint|ScenicCorridor|GeoRef|ParkingProfile' docs/开发设计
 
 ## 后续建议
 
-- 先完成 `DATA-01` 与 `DATA-02`，再实现 `VIEW-01`，避免页面继续解析 Markdown 表格。
+- 先完成 `CONTENT-02` 与基础行程页面，再由 `VIEW-01` 直接读取 `ScenicCatalog`，避免解析 Markdown 表格。
 - D-7 由副驾负责人用至少两个地图端校准保留点坐标、进出口和近期停车信息。
 - 只有真实使用证明路线带不足时，才评估 MapLibre；地图不作为首期阅读闭环的前置条件。

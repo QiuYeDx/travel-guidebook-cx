@@ -8,7 +8,10 @@
     "build": "next build --turbopack",
     "start": "next start",
     "serve": "npx serve@latest out",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx --test lib/content/*.test.ts lib/trip/*.test.ts",
+    "test:content": "tsx --test lib/content/*.test.ts",
+    "test:data": "tsx --test lib/trip/*.test.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",
@@ -25,15 +28,24 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "github-slugger": "^2.0.0",
+    "gray-matter": "^4.0.3",
     "lucide-react": "^0.544.0",
+    "mdast-util-to-string": "^4.0.0",
     "motion": "^12.23.15",
     "next": "15.5.7",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.6.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-markdown": "^10.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "server-only": "^0.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
+    "unist-util-visit": "^5.1.0",
     "vaul": "^1.1.2"
   },
   "devDependencies": {
@@ -46,6 +58,7 @@
     "eslint-config-next": "15.5.3",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
+    "tsx": "^4.20.5",
     "tw-animate-css": "^1.3.8",
     "typescript": "^5"
   }

@@ -66,6 +66,7 @@
 - `pnpm-lock.yaml` 为 lockfile v6，本功能初始化不修改 lockfile。
 - `components/ui/` 已有 Button、Card、Tabs、Drawer、Sheet、ScrollArea、Tooltip 等基础组件。
 - `components/qiuye-ui/` 已有主题切换相关组件，`components.json` 配置了 qiuye-ui registry。
+- `tsx` 作为开发依赖运行纯 TypeScript 数据契约测试，不进入客户端生产包。
 
 ### 已初始化内容
 
@@ -74,16 +75,23 @@
 - `app/about/page.tsx`：项目边界与原则。
 - `content/guidebook/2026-chuanxi-grand-loop.md`：v0.2 正式攻略和主线 A 沿途观景基线。
 - `content/notes/README.md`：讨论与复核记录约定。
+- `data/trips/2026-chuanxi/trip.ts`：D0-D9 主线 A、B/C 降级方案和触发条件事实源。
+- `data/trips/2026-chuanxi/sources.ts`：7 个来源及复核时间事实源。
+- `data/trips/2026-chuanxi/viewpoints.ts`：43 个沿途点 / 走廊、D1-D9 停靠策略和 D5 复用事实源。
+- `lib/trip/types.ts` / `schema.ts`：共享类型、交叉引用和范围校验。
+- `lib/content/*`：服务端读取 Markdown、校验 frontmatter、拒绝原始 HTML 并生成稳定中文目录。
+- `components/content/*`：GFM 长文渲染、表格滚动容器及桌面 / 移动端目录。
+- `app/guidebook/page.tsx`：构建时静态生成的完整攻略阅读页。
 - `AGENT.md`：项目级开发、内容、pnpm 和服务进程约束。
 
 ### 已知限制
 
-- 尚无 Markdown 解析或渲染能力。
-- 路线数据仍主要存在于长文中，前端无法按天组合。
+- 前端尚未读取结构化行程，页面仍无法按天组合。
+- 所有 P0 / P1 点仍待 D-7 坐标与停车入口复核，当前数据不提供停车导航。
 - 首页不支持当前日期、行程状态和模式切换。
 - 没有离线缓存和 PWA manifest。
 - 没有自动检查日期、住宿夜数、路线状态或过期信息。
-- 当前目录没有可识别的 `.git` 元数据，本轮无法依赖 Git diff / history 做审计。
+- 来源复核状态尚未进入页面；当前只有数据和校验能力。
 
 ## 信息架构
 
@@ -211,10 +219,55 @@ type TripDay = {
   sourceIds: string[];
 };
 
+type FallbackPlanDay = {
+  date: string;
+  routeSummary: string;
+  overnight?: string;
+  primaryGoal: string;
+};
+
+type FallbackPlan = {
+  id: "B" | "C";
+  title: string;
+  description: string;
+  triggerMode: "any" | "all";
+  triggers: FallbackTrigger[];
+  days: FallbackPlanDay[];
+  priorities?: string[];
+};
+
+type Trip = {
+  id: string;
+  name: string;
+  contentVersion: string;
+  timezone: "Asia/Shanghai";
+  startDate: string;
+  endDate: string;
+  primaryPlanId: "A";
+  days: TripDay[];
+  fallbackPlans: FallbackPlan[];
+  sourceIds: string[];
+};
+
 type ViewpointKind = "viewpoint" | "scenic-shuttle" | "town-stop" | "candidate";
 type ViewpointPriority = "core" | "optional" | "drive-by";
 type ParkingLevel = "P0" | "P1" | "P2" | "prohibited" | "transit-only" | "walk-only";
 type TravelDirection = "outbound" | "return" | "both";
+type ScenicSubject =
+  | "snow-mountain"
+  | "mountain"
+  | "valley"
+  | "road"
+  | "grassland"
+  | "river"
+  | "wetland"
+  | "village"
+  | "town"
+  | "forest"
+  | "lake"
+  | "geology"
+  | "architecture"
+  | "culture";
 
 type GeoRef =
   | {
@@ -250,7 +303,7 @@ type Viewpoint = {
   kind: ViewpointKind;
   priority: ViewpointPriority;
   direction: TravelDirection;
-  subjects: string[];
+  subjects: ScenicSubject[];
   geoRef: GeoRef;
   parking: ParkingProfile;
   stayMinutesEstimate?: [number, number];
@@ -265,17 +318,39 @@ type ScenicCorridor = {
   title: string;
   priority: "core" | "drive-by";
   direction: TravelDirection;
-  subjects: string[];
+  subjects: ScenicSubject[];
   geoRef: Extract<GeoRef, { kind: "route-interval" }>;
   parking: ParkingProfile;
   passengerCue: string;
   sourceIds: string[];
+};
+
+type ScenicItem = Viewpoint | ScenicCorridor;
+
+type ScenicDayPlan = {
+  dayId: string;
+  mode: "road-stops" | "scenic-transit" | "reuse";
+  photoStopBudget?: [number, number];
+  note: string;
+  reuse?: {
+    sourceDayId: string;
+    maxSelections: number;
+    itemIds: `VP-${string}`[];
+  };
+};
+
+type ScenicCatalog = {
+  tripId: string;
+  contentVersion: string;
+  items: ScenicItem[];
+  dayPlans: ScenicDayPlan[];
 };
 ```
 
 观景数据校验必须保证：`VP-*` / `SC-*` ID 唯一且引用有效；同一天 `sequence` 可稳定排序；
 `P2`、`prohibited`、`transit-only`、`walk-only` 不得设置 `parkingNavigationQuery`；只有完成坐标复核的
 `exact` 点才能显示停车导航。`route-interval` 只表达线路区间，不能自动取中点冒充停车位置。
+D5 通过 `ScenicDayPlan.reuse` 引用 D3 点位并限制最多选择 2 个，不复制第二套数据。
 
 ### 单一事实源规则
 
@@ -283,7 +358,8 @@ type ScenicCorridor = {
 - 观景点、观景走廊、顺序、停车等级和复核状态以 `viewpoints.ts` 为前端事实源。
 - `guidebook.md` 保存完整叙述和可打印版本；结构化数据迁移完成后，不再手工复制可计算值。
 - 页面根据 `sourceIds` 读取来源和复核状态，不在组件中硬编码“已核实”。
-- 构建时验证日期唯一、天数连续、来源存在、`reviewAt` 格式有效。
+- `pnpm test:data` 验证日期唯一、天数连续、ID、来源、`reviewAt`、数值范围和 B/C 方案完整性；
+  production build 同时完成 TypeScript 形状检查。
 
 首个数据迁移工作包必须对 Markdown 与 `trip.ts` 做一次人工对照并记录；迁移完成前 Markdown 仍是基线。
 
@@ -329,11 +405,13 @@ type ScenicCorridor = {
 
 ## Markdown 方案
 
-首选轻量服务端解析：`gray-matter` + `remark` / `remark-gfm` + 安全的 React 渲染链。
-具体包在 FE-01 工作包确认版本后安装，必须使用 pnpm 8.7.0 更新 lockfile。
+已使用 `gray-matter` + `remark` / `remark-gfm` 实现轻量服务端解析，并由
+`react-markdown` + `rehype-slug` 渲染受信任仓库内容。依赖由 pnpm 8.7.0 安装，lockfile 保持 v6。
 
-不支持原始 HTML，避免 `rehype-raw`。正式攻略由可信仓库内容提供，但仍不需要扩大 HTML 攻击面。
-标题生成稳定锚点，表格在移动端允许横向滚动并带边缘提示。
+解析阶段遇到原始 HTML 直接失败，渲染阶段同时使用 `skipHtml`，不引入 `rehype-raw`。
+`github-slugger` 与 `rehype-slug` 共用相同标题命名规则，保证目录和中文标题锚点一致。桌面目录独立吸附滚动，
+移动目录使用原生 `details`；长表格只在自身受限容器横向滚动，不造成页面级溢出。
+攻略在 Server Component 中读取并静态生成，Markdown 解析代码不进入客户端包。
 
 ## 地图与导航
 
@@ -457,8 +535,9 @@ type ScenicCorridor = {
 - ESLint 和 Next production build。
 - 数据 schema：日期、日序、来源引用、路线段和复核时间。
 - 观景 schema：ID / 日程 / 路段引用、顺序、GeoRef、停车导航权限和 D5 复用关系。
+- 内容单元测试：frontmatter、日期、H1 一致性、GFM 目录、重复标题锚点和原始 HTML 拒绝。
 - 单元测试：当前日推导、过期状态、A/B 触发显示、清单版本合并。
-- 构建时 Markdown 链接和标题锚点基本检查。
+- production build 验证 `/guidebook` 静态生成，不带页面级客户端 Markdown 包。
 
 ### 视觉验证
 

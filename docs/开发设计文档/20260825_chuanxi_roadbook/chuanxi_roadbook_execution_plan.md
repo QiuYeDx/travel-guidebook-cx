@@ -34,9 +34,9 @@
 | CONTENT-01 完整攻略基线 | 已完成 | 2026-08-25 | `content/guidebook/2026-chuanxi-grand-loop.md` | D0-D9 日期、10 晚住宿、A/B/C 方案人工一致性检查通过 | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md` | 人数、车辆参数、驾驶员和 10/6 去留待团队确认 |
 | CONTENT-01A 沿途观景点基线 | 已完成 | 2026-08-25 | 正式攻略、final design、`feat/*scenic-stops.md` | D1-D9 顺序、VP/SC 编号、停车分级和排除项交叉检查；ESLint 通过 | `chuanxi_roadbook_implementation_records/2026-08-25_CONTENT-01A_scenic-stops-design.md` | P1/P2 坐标、进出口与国庆停车需 D-7 / D-3 复核 |
 | DOC-01 最终设计与执行计划 | 已完成 | 2026-08-25 | 本目录 final design / execution plan | 设计、计划、代码与攻略交叉检查通过 | `chuanxi_roadbook_implementation_records/2026-08-25_INIT-01_content-and-design.md` | 无 |
-| DATA-01 结构化行程与来源模型 | 未开始 | - | 计划：`data/trips/2026-chuanxi/*`, `lib/trip/*` | schema / unit / build | - | 迁移后避免 Markdown 数值重复 |
-| DATA-02 结构化观景点与走廊模型 | 未开始 | - | 计划：`data/trips/2026-chuanxi/viewpoints.ts`, `lib/trip/*` | schema / unit / build / Markdown 人工对照 | - | P2 / 禁停不得产生停车导航，走廊不得伪造坐标 |
-| CONTENT-02 Markdown 内容管线 | 未开始 | - | 计划：`lib/content/*`, 攻略路由 | lint / unit / build | - | 依赖版本需在实施时确定 |
+| DATA-01 结构化行程与来源模型 | 已完成 | 2026-08-25 | `data/trips/2026-chuanxi/trip.ts`, `sources.ts`, `lib/trip/*`, `package.json`, `pnpm-lock.yaml` | `test:data` 7/7、tsc、ESLint、Prettier、production build 通过 | `chuanxi_roadbook_implementation_records/2026-08-25_DATA-01_structured-trip-data.md` | 前端尚未读取数据；动态补能与道路状态按设计不入静态数据 |
+| DATA-02 结构化观景点与走廊模型 | 已完成 | 2026-08-25 | `data/trips/2026-chuanxi/viewpoints.ts`, `lib/trip/types.ts`, `schema.ts`, `scenic-schema.test.ts`, `package.json` | `test:data` 总计 16/16、tsc、ESLint、Prettier、production build 通过 | `chuanxi_roadbook_implementation_records/2026-08-25_DATA-02_scenic-catalog.md` | 43 个条目均已迁移；P0/P1 坐标与入口仍待 D-7 复核，因此当前无停车导航 |
+| CONTENT-02 Markdown 内容管线 | 已完成 | 2026-08-25 | `lib/content/*`, `components/content/*`, `app/guidebook/page.tsx`, 攻略 frontmatter | `test` 21/21、tsc、ESLint、Prettier、production build、390 / 1440 px 浏览器验收通过 | `chuanxi_roadbook_implementation_records/2026-08-25_CONTENT-02_markdown-pipeline.md` | 首页尚未读取结构化数据；Next.js 15.5.7 安全升级不在本包范围 |
 | FE-01 行前总览工作台 | 未开始 | - | 计划：`app/page.tsx`, `features/trip/*` | lint / build / responsive QA | - | 使用真实数据替换占位页 |
 | FE-02 行程时间线与每日页 | 未开始 | - | 计划：`app/itinerary/*`, `app/days/*`, `features/itinerary/*` | unit / build / responsive QA | - | 第一阶段使用路线带与深链，不引入地图 SDK |
 | VIEW-01 观景路线可视化 | 未开始 | - | 计划：`app/scenic/page.tsx`, `features/scenic/*` | unit / build / responsive / weak-network QA | - | 首期路线带 + 列表，地图仅为后续增强 |
@@ -376,5 +376,5 @@ docs/开发设计文档/20260825_chuanxi_roadbook/chuanxi_roadbook_implementatio
 
 ## 下一会话建议
 
-本轮验证完成后，下一工作包应为 `DATA-01`，随后完成 `DATA-02`。先把攻略中的行程和观景事实迁移为
-强类型数据并建立测试，再做 Markdown 渲染与 `/scenic`，避免 UI 继续依赖手写重复常量或解析表格。
+下一工作包应为 `FE-01`，用现成 `Trip` / `ScenicCatalog` 替换首页占位内容，建立行前总览工作台。
+随后实施 `FE-02` 的行程时间线和每日页，再由 `VIEW-01` 完成 `/scenic` 路线带与列表。
