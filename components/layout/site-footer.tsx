@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MountainSnowIcon } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
@@ -13,9 +14,18 @@ export function SiteFooter() {
           </span>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          路线与预约信息以出发前最后复核为准
-        </p>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground sm:justify-end">
+          <Link
+            href="/guidebook"
+            className="hover:text-foreground hover:underline"
+          >
+            完整攻略
+          </Link>
+          <Link href="/about" className="hover:text-foreground hover:underline">
+            项目说明
+          </Link>
+          <span>动态信息以最后复核为准</span>
+        </div>
       </div>
     </footer>
   );

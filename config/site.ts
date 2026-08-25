@@ -5,7 +5,8 @@ export const siteConfig = {
   navItems: [
     { label: "总览", href: "/" },
     { label: "行程", href: "/itinerary" },
-    { label: "完整攻略", href: "/guidebook" },
-    { label: "项目说明", href: "/about" },
+    { label: "观景", href: "/scenic" },
+    { label: "清单", href: "/checklists" },
+    { label: "安全", href: "/safety" },
   ],
 } as const;

@@ -68,8 +68,8 @@ export default function AboutPage() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
           <p>
-            当前已建立完整攻略、行前总览、行程时间线和每日执行页；交互式观景路线、行中模式、
-            离线缓存和多人编辑仍不在现阶段能力内。
+            当前已建立完整攻略、行前总览、行程时间线、每日执行页、交互式观景路线、
+            本地清单和安全页；行中模式、离线缓存和多人编辑仍不在现阶段能力内。
           </p>
           <p>
             票务、路况、天气和充换电状态都是动态信息，页面最终会展示复核时间，

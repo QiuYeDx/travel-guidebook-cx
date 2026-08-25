@@ -14,7 +14,10 @@ interface ThemeToggleProps {
 export function ThemeToggle({ duration = 400 }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
   const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const isDark = resolvedTheme === "dark";
+  const [mounted, setMounted] = React.useState(false);
+  const isDark = mounted && resolvedTheme === "dark";
+
+  React.useEffect(() => setMounted(true), []);
 
   const toggleTheme = React.useCallback(async () => {
     // 基于实际解析后的主题切换，避免 system + dark 时按钮状态滞后。
@@ -38,7 +41,7 @@ export function ThemeToggle({ duration = 400 }: ThemeToggleProps) {
     const y = top + height / 2;
     const maxRadius = Math.hypot(
       Math.max(left, window.innerWidth - left),
-      Math.max(top, window.innerHeight - top)
+      Math.max(top, window.innerHeight - top),
     );
 
     // 启动 View Transition
@@ -63,7 +66,7 @@ export function ThemeToggle({ duration = 400 }: ThemeToggleProps) {
         duration,
         easing: "ease-in-out",
         pseudoElement: "::view-transition-new(root)",
-      }
+      },
     );
   }, [isDark, setTheme, duration]);
 
@@ -79,6 +82,7 @@ export function ThemeToggle({ duration = 400 }: ThemeToggleProps) {
       variant="ghost"
       effect="rotate"
       transitionDuration={0.35}
+      disabled={!mounted}
     />
   );
 }
