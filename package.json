@@ -9,8 +9,8 @@
     "start": "next start",
     "serve": "npx serve@latest out",
     "lint": "eslint",
-    "test": "tsx --test features/checklist/*.test.ts features/itinerary/*.test.ts features/scenic/*.test.ts features/trip/*.test.ts lib/content/*.test.ts lib/trip/*.test.ts",
-    "test:features": "tsx --test features/checklist/*.test.ts features/itinerary/*.test.ts features/scenic/*.test.ts features/trip/*.test.ts",
+    "test": "tsx --test features/checklist/*.test.ts features/itinerary/*.test.ts features/scenic/*.test.ts features/sources/*.test.ts features/trip/*.test.ts lib/content/*.test.ts lib/trip/*.test.ts",
+    "test:features": "tsx --test features/checklist/*.test.ts features/itinerary/*.test.ts features/scenic/*.test.ts features/sources/*.test.ts features/trip/*.test.ts",
     "test:content": "tsx --test lib/content/*.test.ts",
     "test:data": "tsx --test lib/trip/*.test.ts"
   },

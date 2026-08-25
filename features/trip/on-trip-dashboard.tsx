@@ -65,6 +65,9 @@ export function OnTripDashboard({
   const previousDay = trip.days[dayIndex - 1];
   const nextDay = trip.days[dayIndex + 1];
   const primaryLeg = day.legs[0];
+  const hasScenicPlan = scenicCatalog.dayPlans.some(
+    (plan) => plan.dayId === day.id,
+  );
   const risks = [...day.fallbackTriggers].sort((a, b) => {
     const rank = { stop: 0, "switch-plan": 1, warning: 2 } as const;
     return rank[a.severity] - rank[b.severity];
@@ -366,12 +369,14 @@ export function OnTripDashboard({
                 当天清单
               </Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link href={`/scenic?day=${day.id}`}>
-                <CheckCircle2Icon aria-hidden="true" />
-                当天观景顺序
-              </Link>
-            </Button>
+            {hasScenicPlan ? (
+              <Button asChild variant="outline">
+                <Link href={`/scenic?day=${day.id}`}>
+                  <CheckCircle2Icon aria-hidden="true" />
+                  当天观景顺序
+                </Link>
+              </Button>
+            ) : null}
           </section>
         </aside>
       </div>

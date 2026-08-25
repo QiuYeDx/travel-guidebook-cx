@@ -18,6 +18,7 @@ export default function Home() {
     <TripHome
       trip={chuanxiTrip}
       scenicCatalog={chuanxiScenicCatalog}
+      sources={chuanxiSources}
       planningView={
         <PlanningDashboard
           overview={overview}

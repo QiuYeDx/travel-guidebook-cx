@@ -9,6 +9,7 @@ import {
   ClipboardCheckIcon,
   EllipsisIcon,
   HouseIcon,
+  LibraryBigIcon,
   MapPinnedIcon,
   ShieldAlertIcon,
 } from "lucide-react";
@@ -49,6 +50,7 @@ export function MobileTripNavigation() {
     mode === "onTrip"
       ? `/checklists?view=daily&day=${selectedDayId}`
       : "/checklists";
+  const scenicDayId = selectedDayId === "D0" ? "D1" : selectedDayId;
 
   return (
     <nav
@@ -82,6 +84,7 @@ export function MobileTripNavigation() {
             pathname.startsWith("/safety") ||
               pathname.startsWith("/scenic") ||
               pathname.startsWith("/guidebook") ||
+              pathname.startsWith("/sources") ||
               pathname.startsWith("/about")
               ? "text-foreground"
               : "text-muted-foreground",
@@ -93,7 +96,7 @@ export function MobileTripNavigation() {
         <div className="absolute bottom-[calc(100%+0.5rem)] right-0 w-52 rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
           {[
             {
-              href: `/scenic?day=${selectedDayId}`,
+              href: `/scenic?day=${scenicDayId}`,
               label: "沿途观景",
               icon: MapPinnedIcon,
             },
@@ -106,6 +109,11 @@ export function MobileTripNavigation() {
               href: "/guidebook",
               label: "完整攻略",
               icon: BookOpenTextIcon,
+            },
+            {
+              href: "/sources",
+              label: "来源与复核",
+              icon: LibraryBigIcon,
             },
             { href: "/about", label: "项目说明", icon: CircleHelpIcon },
           ].map((item) => (

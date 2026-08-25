@@ -90,6 +90,7 @@
 - `app/safety/page.tsx` / `data/trips/2026-chuanxi/safety.ts` / `features/safety/*`：直接展示高海拔危险信号、驾驶停止条件、现场动作和紧急电话。
 - `features/trip/mode-model.ts` / `trip-mode-provider.tsx`：中国标准时间当前日推导、手动 D0-D9 覆盖和本机模式偏好。
 - `components/layout/mobile-trip-navigation.tsx`：行中优先的移动端底部导航，当天清单和观景页使用日程深链。
+- `app/sources/page.tsx` / `features/sources/*`：7 项来源目录、中国标准时间复核状态、引用日程与首页到期行动提示。
 - `lib/navigation/map-links.ts`：生成只包含公开地名的高德 Web 搜索链接。
 - `AGENT.md`：项目级开发、内容、pnpm 和服务进程约束。
 
@@ -100,9 +101,9 @@
 - 所有 P0 / P1 点仍待 D-7 坐标与停车入口复核，当前数据不提供停车导航。
 - 没有离线缓存和 PWA manifest。
 - 清单状态只存在当前设备的当前浏览器；清理站点数据、更换浏览器或设备时不同步。
-- 中国标准时间当前日推导、手动切日和模式持久化已实现；完整来源过期状态展示属于 FE-05。
+- 中国标准时间当前日推导、手动切日、模式持久化与来源过期状态已实现。
 - `/checklists` 为了在首次响应中精确打开 D0-D9 每日执行清单，在服务端解析 `view` / `day` 查询参数；OFFLINE-01 需将这些参数 URL 纳入核心缓存。
-- 首页已显示最近核实日期和下一复核节点；完整来源与过期状态页属于 FE-05。
+- 当前 7 项来源中没有 `live` 类型；实时状态规则已有单元测试，待后续真实数据验证页面状态。
 
 ## 信息架构
 
@@ -370,6 +371,8 @@ D5 通过 `ScenicDayPlan.reuse` 引用 D3 点位并限制最多选择 2 个，�
 - 观景点、观景走廊、顺序、停车等级和复核状态以 `viewpoints.ts` 为前端事实源。
 - `guidebook.md` 保存完整叙述和可打印版本；结构化数据迁移完成后，不再手工复制可计算值。
 - 页面根据 `sourceIds` 读取来源和复核状态，不在组件中硬编码“已核实”。
+- 稳定来源无 `reviewAt` 时保持 `verified`；稳定 / 季节来源在 `reviewAt` 前 7 天进入 `needs-review`，超过复核日进入 `expired`。
+- 实时来源在 `verifiedAt` 当天为 `verified`，次日起为 `needs-review`，超过 `reviewAt` 为 `expired`。`expired` 只表示不再具有当日时效，不表示旧结论已错。
 - `pnpm test:data` 验证日期唯一、天数连续、ID、来源、`reviewAt`、数值范围和 B/C 方案完整性；
   production build 同时完成 TypeScript 形状检查。
 

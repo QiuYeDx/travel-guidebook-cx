@@ -4,7 +4,9 @@ import { type ReactNode } from "react";
 import { NavigationIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { ScenicCatalog, Trip } from "@/lib/trip/types";
+import { getActionableSourceReviews } from "@/features/sources/source-model";
+import { SourceReviewAlert } from "@/features/sources/source-review-alert";
+import type { ScenicCatalog, SourceRef, Trip } from "@/lib/trip/types";
 
 import { OnTripDashboard } from "./on-trip-dashboard";
 import { useTripMode } from "./trip-mode-provider";
@@ -13,15 +15,30 @@ export function TripHome({
   planningView,
   trip,
   scenicCatalog,
+  sources,
 }: {
   planningView: ReactNode;
   trip: Trip;
   scenicCatalog: ScenicCatalog;
+  sources: SourceRef[];
 }) {
-  const { mode, clock, setMode } = useTripMode();
+  const { mode, clock, hydrated, selectedDayId, setMode } = useTripMode();
+  const selectedDay = trip.days.find((day) => day.id === selectedDayId);
+  const relevantSources =
+    mode === "onTrip" && selectedDay
+      ? sources.filter((source) => selectedDay.sourceIds.includes(source.id))
+      : sources;
+  const sourceReviews = hydrated
+    ? getActionableSourceReviews(relevantSources, clock.date)
+    : [];
 
   if (mode === "onTrip") {
-    return <OnTripDashboard trip={trip} scenicCatalog={scenicCatalog} />;
+    return (
+      <>
+        <SourceReviewAlert reviews={sourceReviews} asOf={clock.date} />
+        <OnTripDashboard trip={trip} scenicCatalog={scenicCatalog} />
+      </>
+    );
   }
 
   return (
@@ -39,6 +56,7 @@ export function TripHome({
           </div>
         </div>
       ) : null}
+      <SourceReviewAlert reviews={sourceReviews} asOf={clock.date} />
       {planningView}
     </>
   );
