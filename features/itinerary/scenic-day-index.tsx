@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeftIcon,
   CalendarRangeIcon,
@@ -8,9 +11,9 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { ScenicWorkspace } from "@/features/scenic/scenic-workspace";
 import type { ScenicCatalog, SourceRef, Trip } from "@/lib/trip/types";
-import { cn } from "@/lib/utils";
 
 import { formatTripDate } from "./formatters";
 import { buildDayItinerary } from "./itinerary-model";
@@ -28,6 +31,7 @@ export function ScenicDayIndex({
   selectedDayId: string;
   selectedItemId?: string;
 }) {
+  const router = useRouter();
   const availableDays = trip.days.filter((day) =>
     catalog.dayPlans.some((plan) => plan.dayId === day.id),
   );
@@ -65,25 +69,17 @@ export function ScenicDayIndex({
         </p>
       </header>
 
-      <nav aria-label="选择观景日程" className="mt-6 overflow-x-auto pb-2">
-        <div className="flex min-w-max gap-1 rounded-md border p-1">
-          {availableDays.map((day) => (
-            <Link
-              key={day.id}
-              href={`/scenic?day=${day.id}`}
-              aria-current={day.id === selectedDay.id ? "page" : undefined}
-              className={cn(
-                "flex h-10 min-w-16 items-center justify-center rounded px-3 text-sm font-medium transition-colors",
-                day.id === selectedDay.id
-                  ? "bg-emerald-700 text-white"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
-              )}
-            >
-              {day.id}
-            </Link>
-          ))}
-        </div>
-      </nav>
+      <div className="mt-6">
+        <ResponsiveTabs
+          value={selectedDay.id}
+          ariaLabel="选择观景日程"
+          items={availableDays.map((day) => ({
+            value: day.id,
+            label: day.id,
+          }))}
+          onValueChange={(value) => router.replace(`/scenic?day=${value}`)}
+        />
+      </div>
 
       <section className="mt-5 rounded-md bg-[#17231d] px-5 py-5 text-white dark:bg-[#111a16] sm:px-6">
         <div className="flex flex-wrap items-start justify-between gap-4">

@@ -10,8 +10,6 @@ import {
   BedDoubleIcon,
   CalendarClockIcon,
   CheckCircle2Icon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   CloudOffIcon,
   GaugeIcon,
   MapPinnedIcon,
@@ -22,6 +20,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { CopyAction } from "@/features/navigation/copy-action";
 import {
   buildRouteLegCopyText,
@@ -131,32 +130,18 @@ export function OnTripDashboard({
 
       <section
         aria-label="手动切换行程日期"
-        className="mt-4 grid grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] items-center border-y py-3"
+        className="mt-4 border-y py-3"
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          disabled={!previousDay}
-          onClick={() => previousDay && setSelectedDayId(previousDay.id)}
-          aria-label="前一天"
-        >
-          <ChevronLeftIcon aria-hidden="true" />
-        </Button>
         <div className="min-w-0 text-center">
-          <label>
-            <span className="sr-only">选择执行日期</span>
-            <select
-              value={day.id}
-              onChange={(event) => setSelectedDayId(event.currentTarget.value)}
-              className="max-w-full cursor-pointer appearance-none bg-transparent text-center text-sm font-semibold outline-none"
-            >
-              {trip.days.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.id} · {formatTripDate(item.date)} · {item.title}
-                </option>
-              ))}
-            </select>
-          </label>
+          <ResponsiveTabs
+            value={day.id}
+            ariaLabel="选择执行日期"
+            items={trip.days.map((item) => ({
+              value: item.id,
+              label: item.id,
+            }))}
+            onValueChange={setSelectedDayId}
+          />
           <p className="mt-1 text-xs text-muted-foreground">
             {isManualDay ? "已覆盖手机日期" : relationLabels[clock.relation]}
           </p>
@@ -170,15 +155,6 @@ export function OnTripDashboard({
             </button>
           ) : null}
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          disabled={!nextDay}
-          onClick={() => nextDay && setSelectedDayId(nextDay.id)}
-          aria-label="后一天"
-        >
-          <ChevronRightIcon aria-hidden="true" />
-        </Button>
       </section>
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)] lg:gap-14">
