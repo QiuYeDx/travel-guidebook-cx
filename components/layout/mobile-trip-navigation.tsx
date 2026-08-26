@@ -1,22 +1,73 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import * as React from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { BookOpenTextIcon, FileTextIcon, MapPinnedIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { ClipPathTabs } from "@/components/qiuye-ui/clip-path-tabs";
 
-function NavLink({ href, label, active, icon: Icon }: { href: string; label: string; active: boolean; icon: typeof MapPinnedIcon }) {
-  return <Link href={href} className={cn("flex min-h-14 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors", active ? "text-foreground" : "text-muted-foreground")}><Icon className="size-5" aria-hidden="true" />{label}</Link>;
-}
+const navItems = [
+  { value: "/", label: "总览", icon: <MapPinnedIcon aria-hidden="true" /> },
+  {
+    value: "/itinerary",
+    label: "行程",
+    icon: <BookOpenTextIcon aria-hidden="true" />,
+  },
+  {
+    value: "/scenic",
+    label: "观景",
+    icon: <MapPinnedIcon aria-hidden="true" />,
+  },
+  {
+    value: "/guidebook",
+    label: "文档",
+    icon: <FileTextIcon aria-hidden="true" />,
+  },
+];
 
 export function MobileTripNavigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const activeNavValue =
+    navItems.find(
+      (item) =>
+        pathname === item.value ||
+        (item.value !== "/" && pathname.startsWith(`${item.value}/`)) ||
+        (item.value === "/itinerary" && pathname.startsWith("/days/")),
+    )?.value ?? "/";
+  const [selectedNavValue, setSelectedNavValue] =
+    React.useState(activeNavValue);
 
-  return <nav aria-label="移动端主导航" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t bg-background/95 px-[max(0.5rem,env(safe-area-inset-left))] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
-    <NavLink href="/" label="总览" active={pathname === "/"} icon={MapPinnedIcon} />
-    <NavLink href="/itinerary" label="行程" active={pathname.startsWith("/itinerary") || pathname.startsWith("/days/")} icon={BookOpenTextIcon} />
-    <NavLink href="/scenic" label="观景" active={pathname.startsWith("/scenic")} icon={MapPinnedIcon} />
-    <NavLink href="/guidebook" label="文档" active={pathname.startsWith("/guidebook")} icon={FileTextIcon} />
-  </nav>;
+  React.useEffect(() => {
+    setSelectedNavValue(activeNavValue);
+  }, [activeNavValue]);
+
+  return (
+    <nav
+      aria-label="移动端主导航"
+      className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 px-[max(0.5rem,env(safe-area-inset-left))] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
+    >
+      <ClipPathTabs
+        ariaLabel="移动端主导航"
+        items={navItems}
+        value={selectedNavValue}
+        onValueChange={(value) => {
+          setSelectedNavValue(value);
+          router.push(value);
+        }}
+        size="sm"
+        shape="rounded"
+        smoothCorners
+        transitionMode="continuous"
+        fullWidth
+        activeBackground="var(--foreground)"
+        activeForeground="var(--background)"
+        inactiveForeground="var(--muted-foreground)"
+        className="w-full"
+        listClassName="h-14 items-center gap-1 py-1"
+        triggerClassName="h-12 rounded-lg px-2 [&>span]:flex-col [&>span]:gap-0.5 [&>span]:leading-none [&>span>span:last-child]:text-[0.6875rem]"
+        activeItemClassName="h-12 self-center rounded-lg px-2 [&>span]:flex-col [&>span]:gap-0.5 [&>span]:leading-none [&>span>span:last-child]:text-[0.6875rem]"
+      />
+    </nav>
+  );
 }

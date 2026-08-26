@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@qiuyedx/smooth-corners':
+    specifier: ^0.1.0
+    version: 0.1.0
   '@radix-ui/react-avatar':
     specifier: ^1.1.10
     version: 1.2.0(@types/react-dom@19.2.3)(@types/react@19.2.17)(react-dom@19.1.0)(react@19.1.0)
@@ -935,6 +938,10 @@ packages:
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
     dev: true
+
+  /@qiuyedx/smooth-corners@0.1.0:
+    resolution: {integrity: sha512-xAJ2i+dUKxDbd4zRY8KZlI3atL+jrqcia/+fdHdtOn3hmWsnnN2rQLi3nOp89DbBXxvu1uLFHaiYTw511287uw==}
+    dev: false
 
   /@radix-ui/number@1.1.2:
     resolution: {integrity: sha512-ceTwaxc4I5IOi97DgCotl3pqiyRGvffcc0oOsE2dQYaJOFIDsDt4VWG6xEbg1QePv9QWausCEIppud/tJ1wNig==}
