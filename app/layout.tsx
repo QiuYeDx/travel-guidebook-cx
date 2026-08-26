@@ -8,7 +8,6 @@ import { MobileTripNavigation } from "@/components/layout/mobile-trip-navigation
 import { AppProviders } from "@/components/providers/app-providers";
 import { siteConfig } from "@/config/site";
 import { chuanxiTrip } from "@/data/trips/2026-chuanxi/trip";
-import { OfflineStatusBar } from "@/features/offline/offline-status";
 
 const tripModeConfig = {
   tripId: chuanxiTrip.id,
@@ -59,7 +58,6 @@ export default function RootLayout({
       >
         <AppProviders tripModeConfig={tripModeConfig}>
           <SiteHeader />
-          <OfflineStatusBar contentVersion={chuanxiTrip.contentVersion} />
           <main className="flex-1 pb-16 md:pb-0">{children}</main>
           <SiteFooter />
           <MobileTripNavigation />

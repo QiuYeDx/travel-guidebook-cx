@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   BookOpenTextIcon,
@@ -29,31 +28,23 @@ export default async function GuidebookPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-7 sm:px-6 sm:py-10">
-      <nav
-        aria-label="面包屑"
-        className="mb-6 flex items-center gap-2 text-sm text-muted-foreground"
-      >
-        <Link className="hover:text-foreground" href="/">
-          总览
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="text-foreground">完整攻略</span>
-      </nav>
-
       <div className="grid min-w-0 gap-10 lg:grid-cols-[minmax(0,1fr)_17rem] xl:gap-14">
         <article className="min-w-0 max-w-3xl">
-          <div className="mb-7 flex flex-wrap items-center gap-2 border-b pb-5">
-            <Badge variant="secondary">
-              <BookOpenTextIcon />
-              正式路书 v{guidebook.version}
-            </Badge>
-            <Badge variant="outline">
-              <CalendarClockIcon />
-              更新于 {guidebook.lastUpdated}
-            </Badge>
-          </div>
-
-          <MarkdownRenderer content={guidebook.content} />
+          <MarkdownRenderer
+            content={guidebook.content}
+            headingMeta={
+              <div className="flex flex-col items-end gap-2">
+                <Badge variant="secondary">
+                  <BookOpenTextIcon />
+                  正式路书 v{guidebook.version}
+                </Badge>
+                <Badge variant="outline">
+                  <CalendarClockIcon />
+                  更新于 {guidebook.lastUpdated}
+                </Badge>
+              </div>
+            }
+          />
         </article>
 
         <aside className="hidden min-w-0 border-l pl-6 lg:block">

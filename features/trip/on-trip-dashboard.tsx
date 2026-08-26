@@ -280,12 +280,6 @@ export function OnTripDashboard({
                 当天没有单独触发器，仍执行全队高反、驾驶和天气停止规则。
               </p>
             )}
-            <Button asChild variant="link" className="h-auto px-0">
-              <Link href="/safety">
-                打开安全与紧急联系
-                <ArrowRightIcon aria-hidden="true" />
-              </Link>
-            </Button>
           </section>
         </div>
 

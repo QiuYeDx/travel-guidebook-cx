@@ -440,30 +440,31 @@ export function PlanningDashboard({
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
       <section aria-labelledby="page-title" className="pb-8 sm:pb-10">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge className="bg-emerald-700 text-white hover:bg-emerald-700">
-            <FlagIcon aria-hidden="true" />
-            行前模式
-          </Badge>
-          <Badge variant="outline">正式路书 v{trip.contentVersion}</Badge>
-          <span className="text-xs text-muted-foreground">
-            计划快照 {formatFullDate(planning.updatedAt)}
-          </span>
-        </div>
-
-        <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="max-w-3xl">
             <p className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
               <MapPinnedIcon className="size-4" aria-hidden="true" />
               {formatDate(trip.startDate)} 成都集结 · {formatDate(trip.endDate)}{" "}
               返回成都
             </p>
-            <h1
-              id="page-title"
-              className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl"
-            >
-              {trip.name}
-            </h1>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <h1
+                id="page-title"
+                className="text-3xl font-semibold leading-tight sm:text-4xl"
+              >
+                {trip.name}
+              </h1>
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                <Badge className="bg-emerald-700 text-white hover:bg-emerald-700">
+                  <FlagIcon aria-hidden="true" />
+                  行前模式
+                </Badge>
+                <Badge variant="outline">正式路书 v{trip.contentVersion}</Badge>
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              计划快照 {formatFullDate(planning.updatedAt)}
+            </p>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
               第一次川西、低体力消耗版大环线。当前优先关闭人数、车辆、驾驶员、亚丁原则与住宿，
               已确认信息再进入每日执行页。

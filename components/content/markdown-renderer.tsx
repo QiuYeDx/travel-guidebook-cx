@@ -150,10 +150,33 @@ const components: Components = {
   ),
 };
 
-export function MarkdownRenderer({ content }: { content: string }) {
+export function MarkdownRenderer({
+  content,
+  headingMeta,
+}: {
+  content: string;
+  headingMeta?: React.ReactNode;
+}) {
+  const markdownComponents: Components = headingMeta
+    ? {
+        ...components,
+        h1: ({ children, id }) => (
+          <div className="mb-7 flex flex-wrap items-center justify-between gap-3 border-b pb-5">
+            <h1
+              id={id}
+              className="min-w-0 scroll-mt-24 text-3xl font-semibold leading-tight sm:text-4xl"
+            >
+              <HeadingLink id={id}>{children}</HeadingLink>
+            </h1>
+            <div className="ml-auto">{headingMeta}</div>
+          </div>
+        ),
+      }
+    : components;
+
   return (
     <Markdown
-      components={components}
+      components={markdownComponents}
       rehypePlugins={[rehypeSlug]}
       remarkPlugins={[remarkGfm]}
       skipHtml

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRightIcon, CalendarRangeIcon, MapPinHouseIcon, RouteIcon } from "lucide-react";
+import { ArrowRightIcon, CalendarRangeIcon, MapPinHouseIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import type { Trip } from "@/lib/trip/types";
@@ -22,19 +22,9 @@ export function ItineraryTimeline({
 }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-      <nav aria-label="面包屑" className="text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          总览
-        </Link>
-        <span className="px-2" aria-hidden="true">
-          /
-        </span>
-        <span className="text-foreground">行程</span>
-      </nav>
-
-      <header className="mt-6 grid gap-5 border-b pb-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <header className="pb-7">
         <div className="max-w-3xl">
-          <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
+          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
             D0-D9 行程
           </h1>
           <p className="mt-3 text-base leading-7 text-muted-foreground">
@@ -43,7 +33,7 @@ export function ItineraryTimeline({
         </div>
       </header>
 
-      <div className="grid gap-10 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
+      <div className="py-8">
         <section aria-labelledby="primary-timeline-title">
           <div className="flex items-center gap-2">
             <CalendarRangeIcon
@@ -125,13 +115,6 @@ export function ItineraryTimeline({
             })}
           </ol>
         </section>
-
-        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <p className="flex items-start gap-2 border-t pt-4 text-xs leading-5 text-muted-foreground">
-            <RouteIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            实时路线仍以当天车机、官方道路信息和现场管制为准。
-          </p>
-        </aside>
       </div>
     </div>
   );

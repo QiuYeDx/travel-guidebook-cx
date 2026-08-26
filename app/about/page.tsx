@@ -38,10 +38,12 @@ export default function AboutPage() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-9 px-4 py-10 sm:px-6 sm:py-14">
       <section className="max-w-3xl space-y-4">
-        <Badge variant="secondary">项目说明</Badge>
-        <h1 className="text-3xl font-semibold">
-          一份能讨论，也能在路上执行的路书
-        </h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-3xl font-semibold">
+            一份能讨论，也能在路上执行的路书
+          </h1>
+          <Badge className="ml-auto" variant="secondary">项目说明</Badge>
+        </div>
         <p className="leading-7 text-muted-foreground">
           本项目服务于约 6 至 7 名朋友的 2026 川西自驾。它不是景点营销页，
           重点是把每日路线、海拔适应、补能、预约、降级条件和团队分工放在同一处。
@@ -69,7 +71,7 @@ export default function AboutPage() {
         <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
           <p>
             当前已建立完整攻略、行前总览、行程时间线、每日执行页、交互式观景路线、
-            本地清单和安全页；行中模式、离线缓存和多人编辑仍不在现阶段能力内。
+            本地清单；行中模式和多人编辑仍不在现阶段能力内。
           </p>
           <p>
             票务、路况、天气和充换电状态都是动态信息，页面最终会展示复核时间，

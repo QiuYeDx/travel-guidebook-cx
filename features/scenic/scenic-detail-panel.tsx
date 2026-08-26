@@ -7,7 +7,6 @@ import {
   MapPinnedIcon,
   RouteIcon,
   ShieldCheckIcon,
-  WifiOffIcon,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -78,12 +77,10 @@ export function ScenicDetailPanel({
   item,
   selectedDayId,
   sources,
-  isOnline,
 }: {
   item?: ScenicItem;
   selectedDayId: string;
   sources: SourceRef[];
-  isOnline: boolean;
 }) {
   if (!item) {
     return (
@@ -107,7 +104,7 @@ export function ScenicDetailPanel({
   const navigationTarget = getParkingNavigationTarget(item);
 
   return (
-    <section className="h-[34rem] overflow-y-auto rounded-2xl border bg-background p-5 lg:h-auto lg:min-h-[38rem] lg:overflow-visible">
+    <section className="max-h-[calc(100dvh-2rem)] overflow-y-auto bg-background p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="outline">
           {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
@@ -130,7 +127,7 @@ export function ScenicDetailPanel({
       <p className="mt-4 font-mono text-xs text-emerald-700 dark:text-emerald-400">
         {item.id}
       </p>
-      <h2 className="mt-1 text-xl font-semibold leading-7" aria-live="polite">
+      <h2 className="mt-1 pr-8 text-xl font-semibold leading-7" aria-live="polite">
         {item.title}
       </h2>
 
@@ -215,22 +212,18 @@ export function ScenicDetailPanel({
           <ul className="mt-3 space-y-3">
             {itemSources.map((source) => (
               <li key={source.id} className="text-xs leading-5">
-                {isOnline ? (
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium underline decoration-border underline-offset-4 hover:decoration-foreground"
-                  >
-                    {source.publisher}
-                    <ArrowUpRightIcon
-                      className="ml-1 inline size-3"
-                      aria-hidden="true"
-                    />
-                  </a>
-                ) : (
-                  <span className="font-medium">{source.publisher}</span>
-                )}
+                <a
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium underline decoration-border underline-offset-4 hover:decoration-foreground"
+                >
+                  {source.publisher}
+                  <ArrowUpRightIcon
+                    className="ml-1 inline size-3"
+                    aria-hidden="true"
+                  />
+                </a>
                 <span className="mt-1 block text-muted-foreground">
                   最近核实 {source.verifiedAt}
                   {source.reviewAt ? ` · 下次复核 ${source.reviewAt}` : ""}
@@ -246,7 +239,7 @@ export function ScenicDetailPanel({
       </div>
 
       <div className="mt-6 grid gap-2 sm:grid-cols-2">
-        {navigationTarget && isOnline ? (
+        {navigationTarget ? (
           <Button asChild>
             <a
               href={createAmapNavigationUrl(navigationTarget)}
@@ -261,15 +254,9 @@ export function ScenicDetailPanel({
         <CopyAction
           text={buildScenicItemCopyText(item)}
           label={corridor ? "复制走廊" : "复制观景信息"}
-          className={navigationTarget && isOnline ? undefined : "sm:col-span-2"}
+          className={navigationTarget ? undefined : "sm:col-span-2"}
         />
       </div>
-      {navigationTarget && !isOnline ? (
-        <p className="mt-6 flex items-center gap-2 rounded-xl border p-3 text-xs leading-5 text-muted-foreground">
-          <WifiOffIcon className="size-4 shrink-0" aria-hidden="true" />
-          当前离线，核准入口导航已停用；可先复制观景信息，恢复网络后再打开外部地图。
-        </p>
-      ) : null}
     </section>
   );
 }

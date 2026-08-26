@@ -1,11 +1,9 @@
 import Link from "next/link";
 import {
   ArrowRightIcon,
-  CalendarDaysIcon,
   CarFrontIcon,
   MapPinnedIcon,
   MountainSnowIcon,
-  RouteIcon,
   SparklesIcon,
 } from "lucide-react";
 
@@ -28,8 +26,10 @@ export function OverviewDashboard({ trip, scenicCatalog }: { trip: Trip; scenicC
       <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
         <div className="grid gap-8 border-b border-border bg-gradient-to-br from-emerald-50 via-background to-background px-5 py-7 text-foreground dark:from-emerald-950/45 dark:via-background dark:to-background sm:px-8 sm:py-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="max-w-3xl">
-            <Badge variant="secondary">2026 · 9/27 — 10/6</Badge>
-            <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-5xl">川西大环线</h1>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">川西大环线</h1>
+              <Badge className="ml-auto" variant="secondary">2026 · 9/27 — 10/6</Badge>
+            </div>
             <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">成都集结，沿康定、新都桥、理塘、稻城亚丁，经雅江、塔公、丹巴与四姑娘山回到成都。</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild><Link href="/itinerary">查看完整行程 <ArrowRightIcon aria-hidden="true" /></Link></Button>
@@ -67,10 +67,6 @@ export function OverviewDashboard({ trip, scenicCatalog }: { trip: Trip; scenicC
         </ol>
       </section>
 
-      <section className="mt-12 grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="min-w-0 overflow-hidden rounded-xl border bg-card p-5 sm:p-6"><div className="flex items-center gap-2"><RouteIcon className="size-5 text-emerald-700 dark:text-emerald-400" aria-hidden="true" /><h2 className="text-lg font-semibold">路线节奏</h2></div><p className="mt-3 text-sm leading-6 text-muted-foreground">前段逐步升高海拔，中段以亚丁轻量游为核心，后段经塔公、丹巴和四姑娘山回蓉。每天只设一个主目标，沿途观景点按行驶顺序查看。</p><div className="mt-5 flex items-center gap-2 overflow-x-auto pb-2" aria-label="路线顺序"><div className="flex min-w-max items-center gap-2">{trip.days.map((day, index) => <span key={day.id} className="flex items-center gap-2"><Link href={`/days/${day.id}`} className="rounded-full border px-3 py-1.5 text-xs font-medium hover:border-emerald-500 hover:text-emerald-700">{day.id} · {day.overnight.place}</Link>{index < trip.days.length - 1 ? <span className="text-muted-foreground" aria-hidden="true">→</span> : null}</span>)}</div></div></div>
-        <div className="rounded-xl border bg-muted/35 p-5 sm:p-6"><div className="flex items-center gap-2"><CalendarDaysIcon className="size-5 text-emerald-700 dark:text-emerald-400" aria-hidden="true" /><h2 className="text-lg font-semibold">出发前先看</h2></div><ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground"><li>每日页：路线、观景、注意事项分开查看。</li><li>观景页：按日期浏览停车与车览策略。</li><li>完整攻略：集中阅读长文和背景说明。</li></ul></div>
-      </section>
     </div>
   );
 }

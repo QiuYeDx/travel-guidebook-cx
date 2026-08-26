@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpenTextIcon, CircleHelpIcon, EllipsisIcon, LibraryBigIcon, MapPinnedIcon, ShieldAlertIcon } from "lucide-react";
+import { BookOpenTextIcon, CircleHelpIcon, EllipsisIcon, LibraryBigIcon, MapPinnedIcon } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -14,10 +14,9 @@ function NavLink({ href, label, active, icon: Icon }: { href: string; label: str
 
 export function MobileTripNavigation() {
   const pathname = usePathname();
-  const moreActive = ["/guidebook", "/safety", "/sources", "/about"].some((prefix) => pathname.startsWith(prefix));
+  const moreActive = ["/guidebook", "/sources", "/about"].some((prefix) => pathname.startsWith(prefix));
   const links = [
     { href: "/guidebook", label: "完整攻略", icon: BookOpenTextIcon },
-    { href: "/safety", label: "安全与紧急联系", icon: ShieldAlertIcon },
     { href: "/sources", label: "来源与复核", icon: LibraryBigIcon },
     { href: "/about", label: "项目说明", icon: CircleHelpIcon },
   ];
