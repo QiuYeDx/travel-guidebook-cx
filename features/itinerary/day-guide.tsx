@@ -35,7 +35,7 @@ import { ScenicRouteList } from "./scenic-route-list";
 
 function DayNavigation({ itinerary }: { itinerary: DayItinerary }) {
   return (
-    <nav aria-label="前后日切换" className="grid grid-cols-2 gap-3">
+    <nav aria-label="前后日切换" className="grid grid-cols-2 gap-3 md:gap-4">
       {itinerary.previousDay ? (
         <DayLink day={itinerary.previousDay} direction="previous" />
       ) : (
@@ -247,14 +247,14 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
         <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
           {day.title}
         </h1>
-        <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
+        <p className="mt-2 max-w-2xl text-base leading-7 text-muted-foreground md:mt-3">
           {day.primaryGoal}
         </p>
       </header>
-      <div className="mt-6">
+      <div className="mt-3 md:mt-4">
         <DayNavigation itinerary={itinerary} />
       </div>
-      <section className="mt-6 rounded-2xl bg-[#17231d] px-5 py-5 text-white shadow-sm dark:bg-[#111a16] sm:px-7">
+      <section className="mt-3 rounded-2xl bg-[#17231d] px-5 py-5 text-white shadow-sm dark:bg-[#111a16] sm:px-7 md:mt-4">
         <p className="text-xs font-medium text-emerald-200">
           今天只记住这一件事
         </p>
@@ -268,11 +268,11 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
           </p>
         ) : null}
       </section>
-      <div className="mt-5">
+      <div className="mt-3 md:mt-4">
         <ClipPathTabs
           items={tabItems}
           defaultValue="overview"
-          className="w-full"
+          className="w-full gap-3 md:gap-4"
         >
           <TabsContent value="overview" className="mt-0">
             <section>
