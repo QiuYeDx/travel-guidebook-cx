@@ -84,7 +84,7 @@ export function buildScenicItemCopyText(item: ScenicItem): string {
   if (item.geoRef.kind === "route-interval") {
     lines.push(`区间：${item.geoRef.fromLabel} → ${item.geoRef.toLabel}`);
   } else if (item.geoRef.kind === "exact") {
-    lines.push(`核准位置：${item.geoRef.mapQuery}`);
+    lines.push(`地图位置：${item.geoRef.mapQuery}`);
     lines.push(`坐标：${item.geoRef.lng},${item.geoRef.lat}（GCJ-02 / 高德）`);
   } else {
     lines.push(`位置说明：${item.geoRef.reason}`);
@@ -94,12 +94,12 @@ export function buildScenicItemCopyText(item: ScenicItem): string {
     lines.push(`乘客观察：${item.passengerCue}`);
   }
   if (item.parking.parkingNavigationQuery) {
-    lines.push(`核准停车入口：${item.parking.parkingNavigationQuery}`);
+    lines.push(`停车入口：${item.parking.parkingNavigationQuery}`);
   }
   if (item.parking.entryDirectionNote) {
     lines.push(`入口方向：${item.parking.entryDirectionNote}`);
   }
-  lines.push(`停车结论：${item.parking.note}`);
+  lines.push(`停车说明：${item.parking.note}`);
   lines.push("安全提示：错过入口或无法安全驶入时继续前行，不倒车、不急刹。");
   return lines.join("\n");
 }

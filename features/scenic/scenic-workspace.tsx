@@ -8,12 +8,12 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { ScenicItem, SourceRef } from "@/lib/trip/types";
+import type { ScenicItem } from "@/lib/trip/types";
 
 import { ScenicDetailPanel } from "./scenic-detail-panel";
 import { ScenicItemList } from "./scenic-item-list";
 
-export function ScenicWorkspace({ dayId, items, sources, initialSelectedItemId }: { dayId: string; items: ScenicItem[]; sources: SourceRef[]; initialSelectedItemId?: string }) {
+export function ScenicWorkspace({ dayId, items, initialSelectedItemId }: { dayId: string; items: ScenicItem[]; initialSelectedItemId?: string }) {
   const initialItem = items.find((item) => item.id === initialSelectedItemId);
   const [selectedId, setSelectedId] = useState<string | undefined>(initialItem?.id);
   const [detailsOpen, setDetailsOpen] = useState(Boolean(initialItem));
@@ -46,9 +46,9 @@ export function ScenicWorkspace({ dayId, items, sources, initialSelectedItemId }
       <DialogContent className="max-h-[calc(100dvh-2rem)] gap-0 overflow-hidden rounded-xl p-0 sm:max-w-2xl!">
         <DialogTitle className="sr-only">{selectedItem?.title ?? "观景详情"}</DialogTitle>
         <DialogDescription className="sr-only">
-          查看观景位置、停车结论、拍摄对象及来源信息。
+          查看观景位置、停车提示和拍摄对象。
         </DialogDescription>
-        <ScenicDetailPanel item={selectedItem} selectedDayId={dayId} sources={sources} />
+        <ScenicDetailPanel item={selectedItem} selectedDayId={dayId} />
       </DialogContent>
     </Dialog>
   </section>;

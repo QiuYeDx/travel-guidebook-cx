@@ -70,7 +70,7 @@ export function ScenicRouteBand({
               </span>
               <span className="min-w-0">
                 <span className="block font-mono text-[11px] text-muted-foreground tabular-nums">
-                  {String(index + 1).padStart(2, "0")} · {item.id}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className="mt-1 block text-sm font-semibold leading-5">
                   {item.title}

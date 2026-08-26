@@ -101,7 +101,7 @@ export function ScenicRouteList({
                   <p className="mt-1">
                     {item.parking.verificationStatus === "verified"
                       ? "已复核"
-                      : "D-7 / D-3 复核"}
+                      : "待确认"}
                   </p>
                 </div>
               ) : null}

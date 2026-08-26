@@ -14,9 +14,9 @@ export const scenicPriorityLabels = {
 } satisfies Record<ViewpointPriority, string>;
 
 export const scenicParkingLabels = {
-  P0: "正式停车体系",
-  P1: "观景区待复核",
-  P2: "仅现场判断",
+  P0: "可停车",
+  P1: "停车待确认",
+  P2: "现场判断",
   prohibited: "禁止停车",
   "transit-only": "仅景交",
   "walk-only": "仅步行",
@@ -30,8 +30,8 @@ export const scenicDirectionLabels = {
 
 export const scenicVerificationLabels = {
   verified: "已复核",
-  "needs-review": "待复核",
-  expired: "已过期",
+  "needs-review": "待确认",
+  expired: "需要更新",
 } satisfies Record<VerificationStatus, string>;
 
 export const scenicSubjectLabels = {

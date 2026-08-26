@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpenTextIcon, CircleHelpIcon, EllipsisIcon, LibraryBigIcon, MapPinnedIcon } from "lucide-react";
+import { BookOpenTextIcon, EllipsisIcon, MapPinnedIcon } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -14,11 +14,9 @@ function NavLink({ href, label, active, icon: Icon }: { href: string; label: str
 
 export function MobileTripNavigation() {
   const pathname = usePathname();
-  const moreActive = ["/guidebook", "/sources", "/about"].some((prefix) => pathname.startsWith(prefix));
+  const moreActive = pathname.startsWith("/guidebook");
   const links = [
     { href: "/guidebook", label: "完整攻略", icon: BookOpenTextIcon },
-    { href: "/sources", label: "来源与复核", icon: LibraryBigIcon },
-    { href: "/about", label: "项目说明", icon: CircleHelpIcon },
   ];
 
   return <nav aria-label="移动端主导航" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t bg-background/95 px-[max(0.5rem,env(safe-area-inset-left))] pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">

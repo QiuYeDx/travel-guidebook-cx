@@ -385,49 +385,6 @@ function RiskSummary({ risks }: { risks: FallbackTrigger[] }) {
   );
 }
 
-function ReviewSummary({
-  overview,
-  planning,
-}: {
-  overview: TripOverview;
-  planning: PlanningSnapshot;
-}) {
-  return (
-    <section
-      aria-labelledby="review-title"
-      className="grid gap-6 border-t pt-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end"
-    >
-      <div>
-        <p className="flex items-center gap-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-          <CalendarCheckIcon className="size-4" aria-hidden="true" />
-          来源与复核
-        </p>
-        <h2
-          id="review-title"
-          className="mt-2 scroll-mt-20 text-lg font-semibold"
-        >
-          最近核实 {formatFullDate(overview.lastVerifiedAt)}
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          当前有 {overview.reviewSourceCount}{" "}
-          个季节性来源设置了下一次复核节点；最近节点为{" "}
-          <time dateTime={overview.nextReviewAt}>
-            {formatFullDate(overview.nextReviewAt)}
-          </time>
-          。规划快照更新于 {formatFullDate(planning.updatedAt)}
-          ，动态道路、天气和补能仍以 D-7 / D-3 及当天信息为准。
-        </p>
-      </div>
-      <Button asChild variant="outline">
-        <Link href="/guidebook#已核实来源">
-          查看来源依据
-          <ArrowRightIcon aria-hidden="true" />
-        </Link>
-      </Button>
-    </section>
-  );
-}
-
 export function PlanningDashboard({
   trip,
   planning,
@@ -526,7 +483,6 @@ export function PlanningDashboard({
       </div>
 
       <RiskSummary risks={overview.criticalRisks} />
-      <ReviewSummary overview={overview} planning={planning} />
     </div>
   );
 }

@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { ScenicWorkspace } from "@/features/scenic/scenic-workspace";
-import type { ScenicCatalog, SourceRef, Trip } from "@/lib/trip/types";
+import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 
 import { formatTripDate } from "./formatters";
 import { buildDayItinerary } from "./itinerary-model";
@@ -21,13 +21,11 @@ import { buildDayItinerary } from "./itinerary-model";
 export function ScenicDayIndex({
   trip,
   catalog,
-  sources,
   selectedDayId,
   selectedItemId,
 }: {
   trip: Trip;
   catalog: ScenicCatalog;
-  sources: SourceRef[];
   selectedDayId: string;
   selectedItemId?: string;
 }) {
@@ -51,7 +49,7 @@ export function ScenicDayIndex({
           <Badge className="ml-auto" variant="secondary">按行驶顺序</Badge>
         </div>
         <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
-          按真实行驶顺序查看停靠点、景交站和连续车览走廊，并查看详细停车边界。停车等级不代表国庆期间一定开放或有车位。
+          按真实行驶顺序查看停靠点、景交站和连续车览走廊，了解位置和停车提示。
         </p>
       </header>
 
@@ -109,7 +107,6 @@ export function ScenicDayIndex({
         key={selectedDay.id}
         dayId={selectedDay.id}
         items={itinerary.scenicItems}
-        sources={sources}
         initialSelectedItemId={selectedItemId}
       />
     </div>

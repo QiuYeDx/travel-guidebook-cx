@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { chuanxiSources } from "@/data/trips/2026-chuanxi/sources";
 import { chuanxiTrip } from "@/data/trips/2026-chuanxi/trip";
 import { chuanxiScenicCatalog } from "@/data/trips/2026-chuanxi/viewpoints";
 import { ScenicDayIndex } from "@/features/itinerary/scenic-day-index";
@@ -19,7 +18,6 @@ export default async function ScenicPage({
   return (
     <ScenicDayIndex
       catalog={chuanxiScenicCatalog}
-      sources={chuanxiSources}
       selectedDayId={day ?? "D1"}
       selectedItemId={item}
       trip={chuanxiTrip}

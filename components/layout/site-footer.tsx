@@ -21,16 +21,6 @@ export function SiteFooter() {
           >
             完整攻略
           </Link>
-          <Link
-            href="/sources"
-            className="hover:text-foreground hover:underline"
-          >
-            来源与复核
-          </Link>
-          <Link href="/about" className="hover:text-foreground hover:underline">
-            项目说明
-          </Link>
-          <span>动态信息以最后复核为准</span>
         </div>
       </div>
     </footer>

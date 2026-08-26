@@ -16,7 +16,7 @@ import {
   buildScenicItemCopyText,
   createAmapNavigationUrl,
 } from "@/lib/navigation/map-links";
-import type { ScenicItem, SourceRef } from "@/lib/trip/types";
+import type { ScenicItem } from "@/lib/trip/types";
 
 import {
   scenicDirectionLabels,
@@ -26,29 +26,25 @@ import {
   scenicSubjectLabels,
   scenicVerificationLabels,
 } from "./scenic-labels";
-import {
-  getItemSources,
-  getParkingNavigationTarget,
-  isScenicCorridor,
-} from "./scenic-model";
+import { getParkingNavigationTarget, isScenicCorridor } from "./scenic-model";
 
-function getParkingAction(item: ScenicItem): string {
+function getParkingAction(item: ScenicItem): string | undefined {
   if (item.parking.level === "prohibited") {
-    return "禁止为拍照停车，乘客观察，驾驶员保持行车节奏。";
+    return "不要为拍照停车，乘客在车上看，驾驶员保持行车节奏。";
   }
   if (item.parking.level === "P2") {
-    return "默认车览；只有现场明确允许且车辆能完全离开行车道时再判断。";
+    return "默认直接车览；只有现场有明确停车位置且车辆能完全离开行车道时再停。";
   }
   if (item.parking.level === "transit-only") {
-    return "仅按景区交通体系到达，不生成社会车辆停车操作。";
+    return "需要乘坐景区交通，私家车不进入。";
   }
   if (item.parking.level === "walk-only") {
-    return "仅按步道规则到达，不生成社会车辆停车操作。";
+    return "按步道规则步行前往，车辆停在允许的位置。";
   }
   if (item.parking.verificationStatus !== "verified") {
-    return "D-7 / D-3 完成坐标、入口和停车状态复核前，不提供停车导航。";
+    return undefined;
   }
-  return "入口已复核；仍以当天交通组织和现场容量为准，满位直接通过。";
+  return "入口已确认，现场满位就直接通过。";
 }
 
 function GeoDescription({ item }: { item: ScenicItem }) {
@@ -62,7 +58,7 @@ function GeoDescription({ item }: { item: ScenicItem }) {
   if (item.geoRef.kind === "exact") {
     return (
       <p className="mt-2 text-sm leading-6 text-foreground/80">
-        已核准公开位置：{item.geoRef.mapQuery}
+        地图位置：{item.geoRef.mapQuery}
       </p>
     );
   }
@@ -76,11 +72,9 @@ function GeoDescription({ item }: { item: ScenicItem }) {
 export function ScenicDetailPanel({
   item,
   selectedDayId,
-  sources,
 }: {
   item?: ScenicItem;
   selectedDayId: string;
-  sources: SourceRef[];
 }) {
   if (!item) {
     return (
@@ -100,8 +94,8 @@ export function ScenicDetailPanel({
   }
 
   const corridor = isScenicCorridor(item);
-  const itemSources = getItemSources(item, sources);
   const navigationTarget = getParkingNavigationTarget(item);
+  const parkingAction = getParkingAction(item);
 
   return (
     <section className="max-h-[calc(100dvh-2rem)] overflow-y-auto bg-background p-5 sm:p-6">
@@ -124,10 +118,7 @@ export function ScenicDetailPanel({
         ) : null}
       </div>
 
-      <p className="mt-4 font-mono text-xs text-emerald-700 dark:text-emerald-400">
-        {item.id}
-      </p>
-      <h2 className="mt-1 pr-8 text-xl font-semibold leading-7" aria-live="polite">
+      <h2 className="mt-4 pr-8 text-xl font-semibold leading-7" aria-live="polite">
         {item.title}
       </h2>
 
@@ -160,7 +151,7 @@ export function ScenicDetailPanel({
             className="size-4 text-emerald-700 dark:text-emerald-400"
             aria-hidden="true"
           />
-          位置表达
+          位置
         </h3>
         <GeoDescription item={item} />
       </div>
@@ -171,7 +162,7 @@ export function ScenicDetailPanel({
             className="size-4 text-amber-700 dark:text-amber-400"
             aria-hidden="true"
           />
-          停车结论
+          停车
         </h3>
         <p className="mt-2 text-sm font-medium">
           {scenicParkingLabels[item.parking.level]} ·{" "}
@@ -180,17 +171,19 @@ export function ScenicDetailPanel({
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {item.parking.note}
         </p>
-        <p className="mt-2 text-sm leading-6 text-amber-800 dark:text-amber-300">
-          {getParkingAction(item)}
-        </p>
+        {parkingAction ? (
+          <p className="mt-2 text-sm leading-6 text-amber-800 dark:text-amber-300">
+            {parkingAction}
+          </p>
+        ) : null}
         {item.parking.entryDirectionNote ? (
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
-            入口方向：{item.parking.entryDirectionNote}
+            进出方向：{item.parking.entryDirectionNote}
           </p>
         ) : null}
         {item.parking.capacityNote ? (
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            容量：{item.parking.capacityNote}
+            现场提示：{item.parking.capacityNote}
           </p>
         ) : null}
       </div>
@@ -206,38 +199,6 @@ export function ScenicDetailPanel({
         </div>
       </div>
 
-      <div className="mt-6 border-t pt-5">
-        <h3 className="text-sm font-semibold">来源与复核</h3>
-        {itemSources.length > 0 ? (
-          <ul className="mt-3 space-y-3">
-            {itemSources.map((source) => (
-              <li key={source.id} className="text-xs leading-5">
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium underline decoration-border underline-offset-4 hover:decoration-foreground"
-                >
-                  {source.publisher}
-                  <ArrowUpRightIcon
-                    className="ml-1 inline size-3"
-                    aria-hidden="true"
-                  />
-                </a>
-                <span className="mt-1 block text-muted-foreground">
-                  最近核实 {source.verifiedAt}
-                  {source.reviewAt ? ` · 下次复核 ${source.reviewAt}` : ""}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-xs leading-5 text-muted-foreground">
-            暂无独立来源引用，按停车说明在 D-7 / D-3 人工复核。
-          </p>
-        )}
-      </div>
-
       <div className="mt-6 grid gap-2 sm:grid-cols-2">
         {navigationTarget ? (
           <Button asChild>
@@ -246,7 +207,7 @@ export function ScenicDetailPanel({
               target="_blank"
               rel="noopener noreferrer"
             >
-              导航到核准入口
+              导航到停车点
               <ArrowUpRightIcon aria-hidden="true" />
             </a>
           </Button>

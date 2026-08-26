@@ -3,7 +3,6 @@ import type {
   ScenicCorridor,
   ScenicItem,
   ScenicSubject,
-  SourceRef,
   TravelDirection,
   VerificationStatus,
   ViewpointPriority,
@@ -105,12 +104,4 @@ export function getParkingNavigationTarget(item: ScenicItem) {
     coordinateSystem: item.geoRef.coordinateSystem,
     mapQuery,
   };
-}
-
-export function getItemSources(
-  item: ScenicItem,
-  sources: SourceRef[],
-): SourceRef[] {
-  const sourceIds = new Set(item.sourceIds);
-  return sources.filter((source) => sourceIds.has(source.id));
 }
