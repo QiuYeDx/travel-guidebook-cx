@@ -26,9 +26,9 @@ export function OverviewDashboard({ trip, scenicCatalog }: { trip: Trip; scenicC
       <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
         <div className="grid gap-8 border-b border-border bg-gradient-to-br from-emerald-50 via-background to-background px-5 py-7 text-foreground dark:from-emerald-950/45 dark:via-background dark:to-background sm:px-8 sm:py-9 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-end">
           <div className="max-w-3xl">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col items-start gap-3">
+              <Badge className="border-emerald-200/80 bg-emerald-100/70 text-emerald-950 dark:border-emerald-800/80 dark:bg-emerald-950/55 dark:text-emerald-100" variant="outline">2026 · 9/27 — 10/6</Badge>
               <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">川西大环线</h1>
-              <Badge className="ml-auto" variant="secondary">2026 · 9/27 — 10/6</Badge>
             </div>
             <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">成都集结，沿康定、新都桥、理塘、稻城亚丁，经雅江、塔公、丹巴与四姑娘山回到成都。</p>
             <div className="mt-6 flex flex-wrap gap-3">

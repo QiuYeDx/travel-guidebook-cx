@@ -33,7 +33,7 @@ export function ItineraryTimeline({
         </div>
       </header>
 
-      <div className="py-8">
+      <div>
         <section aria-labelledby="primary-timeline-title">
           <div className="flex items-center gap-2">
             <CalendarRangeIcon

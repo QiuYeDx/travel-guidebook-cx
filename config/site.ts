@@ -6,6 +6,6 @@ export const siteConfig = {
     { label: "总览", href: "/" },
     { label: "行程", href: "/itinerary" },
     { label: "观景", href: "/scenic" },
-    { label: "完整攻略", href: "/guidebook" },
+    { label: "文档", href: "/guidebook" },
   ],
 } as const;

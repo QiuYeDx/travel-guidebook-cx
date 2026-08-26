@@ -12,7 +12,7 @@
 
 本轮完成项目初始化和内容基线，前端仍处于轻量占位阶段：
 
-- 完整攻略：`content/guidebook/2026-chuanxi-grand-loop.md`
+- 文档：`content/guidebook/2026-chuanxi-grand-loop.md`
 - 临时笔记约定：`content/notes/README.md`
 - 开发设计：`docs/开发设计文档/20260825_chuanxi_roadbook/`
 

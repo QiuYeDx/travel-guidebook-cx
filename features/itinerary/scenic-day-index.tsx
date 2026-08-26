@@ -4,9 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeftIcon,
-  CalendarRangeIcon,
-  CarFrontIcon,
-  RouteIcon,
+  Clock3Icon,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +13,6 @@ import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { ScenicWorkspace } from "@/features/scenic/scenic-workspace";
 import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 
-import { formatTripDate } from "./formatters";
 import { buildDayItinerary } from "./itinerary-model";
 
 export function ScenicDayIndex({
@@ -53,7 +50,7 @@ export function ScenicDayIndex({
         </p>
       </header>
 
-      <div className="mt-6">
+      <div>
         <ResponsiveTabs
           value={selectedDay.id}
           ariaLabel="选择观景日程"
@@ -65,42 +62,29 @@ export function ScenicDayIndex({
         />
       </div>
 
-      <section className="mt-5 overflow-hidden rounded-2xl border bg-card shadow-sm">
-        <div className="grid gap-6 border-b border-border bg-gradient-to-br from-emerald-50 via-background to-background px-5 py-6 text-foreground dark:from-emerald-950/45 dark:via-background dark:to-background sm:px-6 sm:py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div>
-            <p className="flex items-center gap-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-              <CalendarRangeIcon className="size-4" aria-hidden="true" />
-              {selectedDay.id} · {formatTripDate(selectedDay.date)}
+      <section className="mt-5 rounded-2xl bg-[#17231d] px-5 py-5 text-white shadow-sm dark:bg-[#111a16] sm:px-7">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-emerald-200">
+              今天只记住这一件事
             </p>
-            <h2 className="mt-2 text-xl font-semibold leading-7">
-              {selectedDay.title}
-            </h2>
+            <p className="mt-2 text-xl font-semibold leading-8 sm:text-2xl">
+              {selectedDay.primaryGoal}
+            </p>
           </div>
-          <Button asChild>
+          <Button asChild variant="secondary">
             <Link href={`/days/${selectedDay.id}`}>
               <ArrowLeftIcon aria-hidden="true" />
-              返回每日页
+              查看当日行程
             </Link>
           </Button>
         </div>
-        <dl className="grid gap-5 px-5 py-5 sm:grid-cols-2 sm:px-6">
-          <div>
-            <dt className="flex items-center gap-2 text-xs text-muted-foreground">
-              <CarFrontIcon className="size-3.5 text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
-              当日观景条目
-            </dt>
-            <dd className="mt-1 text-sm font-semibold tabular-nums">{itinerary.scenicItems.length} 处</dd>
-          </div>
-          <div>
-            <dt className="flex items-center gap-2 text-xs text-muted-foreground">
-              <RouteIcon className="size-3.5 text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
-              当日取舍规则
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-muted-foreground">
-              {itinerary.scenicPlan?.note}
-            </dd>
-          </div>
-        </dl>
+        {itinerary.timePriority ? (
+          <p className="mt-3 flex items-start gap-2 border-t border-white/15 pt-3 text-sm leading-6 text-white/70">
+            <Clock3Icon className="mt-1 size-4 shrink-0" aria-hidden="true" />
+            {itinerary.timePriority.condition}：{itinerary.timePriority.action}
+          </p>
+        ) : null}
       </section>
 
       <ScenicWorkspace

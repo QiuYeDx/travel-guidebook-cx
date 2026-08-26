@@ -431,7 +431,7 @@ export function PlanningDashboard({
             <Button asChild>
               <Link href="/guidebook">
                 <BookOpenTextIcon aria-hidden="true" />
-                阅读完整攻略
+                阅读文档
               </Link>
             </Button>
             <Button asChild variant="outline">
