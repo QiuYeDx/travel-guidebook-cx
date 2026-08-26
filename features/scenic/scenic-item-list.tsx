@@ -4,7 +4,6 @@ import {
   BusFrontIcon,
   CameraIcon,
   CarFrontIcon,
-  ChevronRightIcon,
   MapPinIcon,
   RouteIcon,
   ShieldAlertIcon,
@@ -60,18 +59,15 @@ export function ScenicItemList({
               onClick={() => onSelect(item.id)}
               className="group flex h-full w-full cursor-pointer flex-col gap-4 rounded-2xl border border-border/65 bg-card p-4 text-left shadow-xs transition-[border-color,background-color,box-shadow,transform] duration-150 hover:border-emerald-600/35 hover:bg-emerald-50/20 hover:shadow-sm focus-visible:border-emerald-600/50 focus-visible:ring-2 focus-visible:ring-emerald-600/20 focus-visible:outline-none active:scale-[0.995] dark:hover:border-emerald-500/35 dark:hover:bg-emerald-950/15 sm:p-5"
             >
-              <div className="flex min-w-0 items-start gap-3">
-                <span className="shrink-0 pt-1 font-mono text-lg font-medium tabular-nums text-muted-foreground">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-400 dark:ring-emerald-900">
-                  <Icon className="size-5" aria-hidden="true" />
-                </span>
+              <div className="flex min-w-0 items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
-                      {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
+                    <span className="font-mono text-xs font-medium tabular-nums text-muted-foreground">
+                      {String(index + 1).padStart(2, "0")}
                     </span>
+                    <Badge variant="outline">
+                      {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
+                    </Badge>
                     <Badge
                       variant={item.priority === "core" ? "default" : "secondary"}
                       className={
@@ -87,8 +83,9 @@ export function ScenicItemList({
                     {item.title}
                   </h3>
                 </div>
-                <ChevronRightIcon
-                  className="mt-2 size-5 shrink-0 text-muted-foreground transition-[color,transform] duration-150 group-hover:translate-x-0.5 group-hover:text-emerald-700 dark:group-hover:text-emerald-400"
+                <Icon
+                  className="size-6 shrink-0 text-foreground/80 dark:text-foreground/75"
+                  strokeWidth={1.8}
                   aria-hidden="true"
                 />
               </div>
@@ -97,7 +94,7 @@ export function ScenicItemList({
                 <p className="text-sm leading-6 text-foreground/75">
                   {corridor ? item.passengerCue : item.parking.note}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
                   {item.subjects.slice(0, 4).map((subject) => (
                     <span
                       key={subject}
@@ -106,17 +103,9 @@ export function ScenicItemList({
                       {scenicSubjectLabels[subject]}
                     </span>
                   ))}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-xl bg-muted/45 px-3 py-2.5 dark:bg-muted/25">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span className="text-[11px] font-medium text-muted-foreground">
-                    停车策略
-                  </span>
                   <span
                     className={cn(
-                      "inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium ring-1 ring-inset",
+                      "ml-auto inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium ring-1 ring-inset",
                       parkingToneClasses[item.parking.level],
                     )}
                   >
@@ -126,9 +115,6 @@ export function ScenicItemList({
                     </span>
                   </span>
                 </div>
-                <span className="font-mono text-[11px] text-muted-foreground">
-                  {item.id}
-                </span>
               </div>
             </button>
           </li>
