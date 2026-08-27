@@ -133,6 +133,7 @@ const CARD_CLASS_NAME =
 
 function ScenicDetailVisual({
   item,
+  index,
   phase,
   selectedDayId,
   detailsPanelId,
@@ -142,6 +143,7 @@ function ScenicDetailVisual({
   shouldReduceMotion,
 }: {
   item: ScenicItem;
+  index: number;
   phase: "opening" | "open" | "closing";
   selectedDayId: string;
   detailsPanelId: string;
@@ -213,6 +215,7 @@ function ScenicDetailVisual({
           >
             <ScenicDetailPanel
               item={item}
+              index={index}
               selectedDayId={selectedDayId}
               titleId={titleId}
             />
@@ -465,6 +468,7 @@ export function ScenicItemList({
                   {active && overlayPhase ? (
                     <ScenicDetailVisual
                       item={item}
+                      index={index}
                       phase={overlayPhase}
                       selectedDayId={selectedDayId}
                       detailsPanelId={detailsPanelId}

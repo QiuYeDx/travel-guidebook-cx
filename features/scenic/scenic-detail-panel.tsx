@@ -67,10 +67,12 @@ function GeoDescription({ item }: { item: ScenicItem }) {
 
 export function ScenicDetailPanel({
   item,
+  index,
   selectedDayId,
   titleId,
 }: {
   item?: ScenicItem;
+  index: number;
   selectedDayId: string;
   titleId?: string;
 }) {
@@ -98,6 +100,9 @@ export function ScenicDetailPanel({
   return (
     <section className="p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
+        <span className="font-mono text-xs font-medium tabular-nums text-muted-foreground">
+          {String(index + 1).padStart(2, "0")}
+        </span>
         <Badge variant="outline">
           {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
         </Badge>
