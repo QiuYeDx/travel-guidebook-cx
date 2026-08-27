@@ -254,25 +254,49 @@ export function ScenicWorkspace({
 
       {portalHost && overlayMounted
         ? createPortal(
-            <motion.div
-              aria-hidden="true"
-              className="pointer-events-auto fixed inset-x-0 bottom-0 top-14 z-40 cursor-default bg-black/40"
-              onClick={() => closeDetails(false)}
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: overlayPhase === "closing" ? 0 : 1,
-                transition: {
-                  duration: shouldReduceMotion
-                    ? 0
-                    : overlayPhase === "closing"
-                      ? 0.18
-                      : 0.32,
-                  delay:
-                    shouldReduceMotion || overlayPhase === "closing" ? 0 : 0.12,
-                  ease: PANEL_EASE,
-                },
-              }}
-            />,
+            <>
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-auto fixed inset-0 z-40 cursor-default bg-black/40"
+                onClick={() => closeDetails(false)}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: overlayPhase === "closing" ? 0 : 1,
+                  transition: {
+                    duration: shouldReduceMotion
+                      ? 0
+                      : overlayPhase === "closing"
+                        ? 0.18
+                        : 0.32,
+                    delay:
+                      shouldReduceMotion || overlayPhase === "closing"
+                        ? 0
+                        : 0.12,
+                    ease: PANEL_EASE,
+                  },
+                }}
+              />
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none fixed inset-x-0 top-0 z-[55] h-14 bg-black/40"
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: overlayPhase === "closing" ? 0 : 1,
+                  transition: {
+                    duration: shouldReduceMotion
+                      ? 0
+                      : overlayPhase === "closing"
+                        ? 0.18
+                        : 0.32,
+                    delay:
+                      shouldReduceMotion || overlayPhase === "closing"
+                        ? 0
+                        : 0.12,
+                    ease: PANEL_EASE,
+                  },
+                }}
+              />
+            </>,
             portalHost,
           )
         : null}
