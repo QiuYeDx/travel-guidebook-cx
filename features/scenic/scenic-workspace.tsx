@@ -9,7 +9,6 @@ import type { ScenicItem } from "@/lib/trip/types";
 import { ScenicItemList } from "./scenic-item-list";
 
 const PANEL_EASE = [0.23, 1, 0.32, 1] as const;
-const SITE_HEADER_HEIGHT = 56;
 
 type OverlayPhase = "closed" | "opening" | "open" | "closing";
 type ViewportRect = {
@@ -25,10 +24,9 @@ function readPanelRect(contentHeight = 0): ViewportRect {
   const width = isMobile
     ? Math.max(0, window.innerWidth - inset * 2)
     : Math.min(640, Math.max(0, window.innerWidth - inset * 2));
-  // Keep the sticky site header outside the panel's visual travel area. The
-  // panel can still animate from a card that is above this region, but the
-  // header remains the topmost, undisturbed part of the page.
-  const availableTop = SITE_HEADER_HEIGHT + inset;
+  // Center the panel against the complete viewport. The site header is dimmed
+  // by the overlay independently and should not shift the panel downward.
+  const availableTop = inset;
   const availableBottom = Math.max(availableTop, window.innerHeight - inset);
   const maxHeight = Math.max(0, availableBottom - availableTop);
   const height = Math.min(
