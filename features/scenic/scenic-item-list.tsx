@@ -133,7 +133,6 @@ const CARD_CLASS_NAME =
 
 function ScenicDetailVisual({
   item,
-  index,
   phase,
   selectedDayId,
   detailsPanelId,
@@ -143,7 +142,6 @@ function ScenicDetailVisual({
   shouldReduceMotion,
 }: {
   item: ScenicItem;
-  index: number;
   phase: "opening" | "open" | "closing";
   selectedDayId: string;
   detailsPanelId: string;
@@ -172,38 +170,23 @@ function ScenicDetailVisual({
       aria-labelledby={titleId}
       className="pointer-events-auto relative h-full w-full overflow-hidden rounded-2xl"
     >
-      {phase !== "closing" ? (
-        <motion.button
-          type="button"
-          onClick={() => onClose()}
-          className="absolute right-3 top-3 z-40 flex size-9 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground backdrop-blur-sm transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{
-            duration: shouldReduceMotion ? 0 : 0.14,
-            ease: CARD_EASE,
-          }}
-          aria-label="关闭观景详情"
-        >
-          <XIcon className="size-4" aria-hidden="true" />
-        </motion.button>
-      ) : null}
-      <motion.div
-        className="absolute inset-0 z-30"
-        initial={false}
-        animate={{ opacity: phase === "closing" ? 1 : 0 }}
+      <motion.button
+        type="button"
+        onClick={() => onClose()}
+        className={cn(
+          "absolute right-3 top-3 z-40 flex size-9 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground backdrop-blur-sm transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
+          phase === "closing" && "pointer-events-none",
+        )}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: phase === "closing" ? 0 : 1 }}
         transition={{
-          duration: shouldReduceMotion ? 0 : 0.24,
-          delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.04,
+          duration: shouldReduceMotion ? 0 : 0.16,
           ease: CARD_EASE,
         }}
+        aria-label="关闭观景详情"
       >
-        <ScenicCardVisual
-          item={item}
-          index={index}
-          active={false}
-        />
-      </motion.div>
+        <XIcon className="size-4" aria-hidden="true" />
+      </motion.button>
 
       <motion.div
         className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border bg-background"
@@ -458,10 +441,30 @@ export function ScenicItemList({
                     shouldReduceMotion ? { duration: 0 } : CARD_TRANSITION
                   }
                 >
+                  <motion.div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 z-30"
+                    initial={false}
+                    animate={{
+                      opacity:
+                        active && overlayPhase && overlayPhase !== "closing"
+                          ? 0
+                          : 1,
+                    }}
+                    transition={{
+                      duration: shouldReduceMotion ? 0 : 0.24,
+                      ease: CARD_EASE,
+                    }}
+                  >
+                    <ScenicCardVisual
+                      item={item}
+                      index={index}
+                      active={false}
+                    />
+                  </motion.div>
                   {active && overlayPhase ? (
                     <ScenicDetailVisual
                       item={item}
-                      index={index}
                       phase={overlayPhase}
                       selectedDayId={selectedDayId}
                       detailsPanelId={detailsPanelId}
@@ -470,13 +473,7 @@ export function ScenicItemList({
                       onContentHeightChange={onContentHeightChange}
                       shouldReduceMotion={shouldReduceMotion}
                     />
-                  ) : (
-                    <ScenicCardVisual
-                      item={item}
-                      index={index}
-                      active={active}
-                    />
-                  )}
+                  ) : null}
                 </motion.div>
               </>
             ) : null}
