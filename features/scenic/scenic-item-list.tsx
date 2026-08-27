@@ -403,7 +403,7 @@ export function ScenicItemList({
               onClick={(event) => onSelect(item.id, event.currentTarget)}
               className={cn(
                 CARD_CLASS_NAME,
-                "cursor-pointer opacity-0 focus-visible:opacity-100 focus-visible:outline-none",
+                "cursor-pointer opacity-0 focus-visible:outline-none",
               )}
               aria-label={`打开 ${item.title} 详情`}
             >
