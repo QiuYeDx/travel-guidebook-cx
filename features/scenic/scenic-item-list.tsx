@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { ParkingLevel, ScenicItem, Viewpoint } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 import { motion, useReducedMotion } from "motion/react";
@@ -201,29 +200,27 @@ function ScenicDetailVisual({
           ease: CARD_EASE,
         }}
       >
-        <ScrollArea
-          type="auto"
-          className="min-h-0 min-w-0 flex-1 overscroll-contain"
+        <div
+          ref={contentRef}
+          className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          <div ref={contentRef} className="min-w-0">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: phase === "closing" ? 0 : 1 }}
-              transition={{
-                duration: shouldReduceMotion ? 0 : 0.26,
-                delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.06,
-                ease: CARD_EASE,
-              }}
-            >
-              <ScenicDetailPanel
-                item={item}
-                index={index}
-                selectedDayId={selectedDayId}
-                titleId={titleId}
-              />
-            </motion.div>
-          </div>
-        </ScrollArea>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: phase === "closing" ? 0 : 1 }}
+            transition={{
+              duration: shouldReduceMotion ? 0 : 0.26,
+              delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.06,
+              ease: CARD_EASE,
+            }}
+          >
+            <ScenicDetailPanel
+              item={item}
+              index={index}
+              selectedDayId={selectedDayId}
+              titleId={titleId}
+            />
+          </motion.div>
+        </div>
       </motion.div>
     </div>
   );
