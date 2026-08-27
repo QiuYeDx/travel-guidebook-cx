@@ -278,7 +278,7 @@ export function ScenicWorkspace({
               />
               <motion.div
                 aria-hidden="true"
-                className="pointer-events-none fixed inset-x-0 top-0 z-[55] h-14 bg-black/40"
+                className="pointer-events-none fixed inset-x-0 top-0 z-[55] h-[57px] bg-black/40"
                 initial={{ opacity: 0 }}
                 animate={{
                   opacity: overlayPhase === "closing" ? 0 : 1,
