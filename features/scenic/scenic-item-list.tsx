@@ -129,7 +129,7 @@ function ScenicCardContent({
 }
 
 const CARD_CLASS_NAME =
-  "flex h-full w-full flex-col gap-4 rounded-2xl border border-border/65 bg-card p-4 text-left shadow-xs sm:p-5";
+  "flex min-h-44 w-full flex-col gap-4 rounded-2xl border border-border/65 bg-card p-4 text-left shadow-xs sm:p-5";
 
 function ScenicDetailVisual({
   item,
@@ -254,7 +254,7 @@ function ScenicCardVisual({
       aria-hidden="true"
       className={cn(
         CARD_CLASS_NAME,
-        "pointer-events-none",
+        "h-full pointer-events-none",
         active &&
           "border-emerald-600/50 bg-emerald-50/35 ring-2 ring-emerald-600/15 dark:border-emerald-500/45 dark:bg-emerald-950/20",
       )}
