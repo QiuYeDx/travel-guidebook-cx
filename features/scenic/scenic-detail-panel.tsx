@@ -11,11 +11,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CopyAction } from "@/features/navigation/copy-action";
-import {
-  buildScenicItemCopyText,
-  createAmapNavigationUrl,
-} from "@/lib/navigation/map-links";
+import { createAmapNavigationUrl } from "@/lib/navigation/map-links";
 import type { ScenicItem } from "@/lib/trip/types";
 
 import {
@@ -72,9 +68,11 @@ function GeoDescription({ item }: { item: ScenicItem }) {
 export function ScenicDetailPanel({
   item,
   selectedDayId,
+  titleId,
 }: {
   item?: ScenicItem;
   selectedDayId: string;
+  titleId?: string;
 }) {
   if (!item) {
     return (
@@ -98,7 +96,7 @@ export function ScenicDetailPanel({
   const parkingAction = getParkingAction(item);
 
   return (
-    <section className="max-h-[calc(100dvh-2rem)] overflow-y-auto bg-background p-5 sm:p-6">
+    <section className="p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="outline">
           {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
@@ -118,7 +116,11 @@ export function ScenicDetailPanel({
         ) : null}
       </div>
 
-      <h2 className="mt-4 pr-8 text-xl font-semibold leading-7" aria-live="polite">
+      <h2
+        id={titleId}
+        className="mt-4 text-xl font-semibold leading-7"
+        aria-live="polite"
+      >
         {item.title}
       </h2>
 
@@ -199,8 +201,8 @@ export function ScenicDetailPanel({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-2 sm:grid-cols-2">
-        {navigationTarget ? (
+      {navigationTarget ? (
+        <div className="mt-6">
           <Button asChild>
             <a
               href={createAmapNavigationUrl(navigationTarget)}
@@ -211,13 +213,8 @@ export function ScenicDetailPanel({
               <ArrowUpRightIcon aria-hidden="true" />
             </a>
           </Button>
-        ) : null}
-        <CopyAction
-          text={buildScenicItemCopyText(item)}
-          label={corridor ? "复制走廊" : "复制观景信息"}
-          className={navigationTarget ? undefined : "sm:col-span-2"}
-        />
-      </div>
+        </div>
+      ) : null}
     </section>
   );
 }
