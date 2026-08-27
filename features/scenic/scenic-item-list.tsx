@@ -201,7 +201,10 @@ function ScenicDetailVisual({
           ease: CARD_EASE,
         }}
       >
-        <ScrollArea className="min-h-0 min-w-0 flex-1 overscroll-contain">
+        <ScrollArea
+          type="auto"
+          className="min-h-0 min-w-0 flex-1 overscroll-contain"
+        >
           <div ref={contentRef} className="min-w-0">
             <motion.div
               initial={{ opacity: 0 }}
