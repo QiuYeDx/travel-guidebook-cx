@@ -1,8 +1,14 @@
 import Link from "next/link";
-import { ArrowRightIcon, CalendarRangeIcon, MapPinHouseIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  CalendarRangeIcon,
+  Clock3Icon,
+  MapPinHouseIcon,
+  RouteIcon,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import type { Trip } from "@/lib/trip/types";
+import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 
 import { buildDayItinerary } from "./itinerary-model";
 import {
@@ -11,7 +17,6 @@ import {
   formatTripDate,
   intensityLabels,
 } from "./formatters";
-import type { ScenicCatalog } from "@/lib/trip/types";
 
 export function ItineraryTimeline({
   trip,
@@ -49,13 +54,16 @@ export function ItineraryTimeline({
             {trip.days.map((day) => {
               const itinerary = buildDayItinerary(trip, scenicCatalog, day.id);
               if (!itinerary) return null;
+              const hasDrivingEstimate = Boolean(
+                itinerary.distanceKmEstimate || itinerary.driveMinutesEstimate,
+              );
               return (
                 <li key={day.id}>
                   <Link
                     href={`/days/${day.id}`}
-                    className="group grid min-h-28 gap-4 py-5 transition-colors hover:bg-muted/45 focus-visible:bg-muted/45 sm:grid-cols-[5rem_minmax(0,1fr)_9rem_1.5rem] sm:items-center sm:px-3"
+                    className="group grid grid-cols-[3.75rem_minmax(0,1fr)_1.25rem] items-start gap-x-3 gap-y-2 px-1 py-4 transition-colors hover:bg-muted/45 focus-visible:bg-muted/45 sm:px-3 sm:py-3.5 lg:grid-cols-[4.75rem_minmax(0,1fr)_auto_1.25rem] lg:items-center lg:gap-x-4"
                   >
-                    <div>
+                    <div className="row-span-2 self-start lg:row-span-1 lg:self-center">
                       <p className="font-mono text-sm font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
                         {day.id}
                       </p>
@@ -65,48 +73,71 @@ export function ItineraryTimeline({
                       >
                         {formatTripDate(day.date)}
                       </time>
+                      <Badge
+                        variant="outline"
+                        className="mt-2 h-5 px-1.5 text-[11px] sm:hidden"
+                        aria-label={`强度 ${intensityLabels[day.intensity]}`}
+                      >
+                        {intensityLabels[day.intensity]}
+                      </Badge>
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-base font-semibold leading-6">
                           {day.title}
                         </h3>
-                        <Badge variant="outline">
+                        <Badge
+                          variant="outline"
+                          className="hidden h-5 px-1.5 text-[11px] sm:inline-flex"
+                        >
                           强度 {intensityLabels[day.intensity]}
                         </Badge>
                       </div>
-                      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground sm:line-clamp-1 sm:text-sm">
                         {day.primaryGoal}
                       </p>
                     </div>
-                    <div className="grid grid-cols-2 gap-3 text-xs sm:block sm:text-right">
-                      <div>
-                        <p className="text-muted-foreground">里程 / 驾驶</p>
-                        <p className="mt-1 font-medium text-foreground/80">
-                          {formatNumberRange(
-                            itinerary.distanceKmEstimate,
-                            "km",
-                          )}
-                        </p>
-                        <p className="mt-0.5 text-muted-foreground">
-                          {formatDriveTime(itinerary.driveMinutesEstimate)}
-                        </p>
-                      </div>
-                      <div className="sm:mt-3">
-                        <p className="flex items-center gap-1 text-muted-foreground sm:justify-end">
-                          <MapPinHouseIcon
-                            className="size-3.5"
-                            aria-hidden="true"
-                          />
-                          住宿
-                        </p>
-                        <p className="mt-1 font-medium text-foreground/80">
+                    <dl className="col-start-2 col-end-4 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground lg:col-auto lg:flex-nowrap lg:justify-end lg:gap-x-4">
+                      {itinerary.distanceKmEstimate ? (
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          <dt className="sr-only">里程</dt>
+                          <RouteIcon className="size-3.5" aria-hidden="true" />
+                          <dd className="font-medium tabular-nums text-foreground/75">
+                            {formatNumberRange(
+                              itinerary.distanceKmEstimate,
+                              "km",
+                            )}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {itinerary.driveMinutesEstimate ? (
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          <dt className="sr-only">驾驶时间</dt>
+                          <Clock3Icon className="size-3.5" aria-hidden="true" />
+                          <dd className="font-medium tabular-nums text-foreground/75">
+                            {formatDriveTime(itinerary.driveMinutesEstimate)}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {!hasDrivingEstimate ? (
+                        <div className="shrink-0">
+                          <dt className="sr-only">驾驶安排</dt>
+                          <dd>非驾驶日</dd>
+                        </div>
+                      ) : null}
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <dt className="sr-only">住宿</dt>
+                        <MapPinHouseIcon
+                          className="size-3.5 shrink-0"
+                          aria-hidden="true"
+                        />
+                        <dd className="truncate font-medium text-foreground/75 lg:max-w-28">
                           {day.overnight.place}
-                        </p>
+                        </dd>
                       </div>
-                    </div>
+                    </dl>
                     <ArrowRightIcon
-                      className="hidden size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 sm:block"
+                      className="col-start-3 row-start-1 size-4 self-center text-muted-foreground transition-transform group-hover:translate-x-0.5 lg:col-auto lg:row-auto"
                       aria-hidden="true"
                     />
                   </Link>
