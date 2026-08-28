@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 
 import { buildDayItinerary } from "./itinerary-model";
+import { buildDayHref, type DayGuideTab } from "./day-guide-state";
 import {
   formatDriveTime,
   formatNumberRange,
@@ -21,9 +22,11 @@ import {
 export function ItineraryTimeline({
   trip,
   scenicCatalog,
+  dayTab,
 }: {
   trip: Trip;
   scenicCatalog: ScenicCatalog;
+  dayTab: DayGuideTab;
 }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
@@ -33,7 +36,8 @@ export function ItineraryTimeline({
             D0-D9 行程
           </h1>
           <p className="mt-3 text-base leading-7 text-muted-foreground">
-            从成都集结到返蓉的 10 天执行顺序。每天只保留一个主目标，现场情况不适合时直接删减当日次要安排。
+            从成都集结到返蓉的 10
+            天执行顺序。每天只保留一个主目标，现场情况不适合时直接删减当日次要安排。
           </p>
         </div>
       </header>
@@ -60,7 +64,7 @@ export function ItineraryTimeline({
               return (
                 <li key={day.id}>
                   <Link
-                    href={`/days/${day.id}`}
+                    href={buildDayHref(day.id, dayTab)}
                     className="group grid grid-cols-[3.75rem_minmax(0,1fr)_1.25rem] items-baseline gap-x-3 gap-y-2 px-1 py-4 transition-colors hover:bg-muted/45 focus-visible:bg-muted/45 sm:px-3 sm:py-3.5 lg:grid-cols-[4.75rem_minmax(0,1fr)_auto_1.25rem] lg:gap-x-4"
                   >
                     <p className="col-start-1 row-start-1 font-mono text-sm font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">

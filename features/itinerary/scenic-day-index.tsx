@@ -11,17 +11,24 @@ import { ScenicWorkspace } from "@/features/scenic/scenic-workspace";
 import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 
 import { buildDayItinerary } from "./itinerary-model";
+import {
+  buildDayHref,
+  buildScenicHref,
+  type DayGuideTab,
+} from "./day-guide-state";
 
 export function ScenicDayIndex({
   trip,
   catalog,
   selectedDayId,
   selectedItemId,
+  returnTab,
 }: {
   trip: Trip;
   catalog: ScenicCatalog;
   selectedDayId: string;
   selectedItemId?: string;
+  returnTab: DayGuideTab;
 }) {
   const router = useRouter();
   const availableDays = trip.days.filter((day) =>
@@ -57,7 +64,9 @@ export function ScenicDayIndex({
             value: day.id,
             label: day.id,
           }))}
-          onValueChange={(value) => router.replace(`/scenic?day=${value}`)}
+          onValueChange={(value) =>
+            router.replace(buildScenicHref(value, returnTab))
+          }
         />
       </div>
 
@@ -72,7 +81,7 @@ export function ScenicDayIndex({
             </p>
           </div>
           <Button asChild variant="secondary">
-            <Link href={`/days/${selectedDay.id}`}>
+            <Link href={buildDayHref(selectedDay.id, returnTab)}>
               <ArrowLeftIcon aria-hidden="true" />
               返回 {selectedDay.id} 行程
             </Link>

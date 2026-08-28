@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { chuanxiTrip } from "@/data/trips/2026-chuanxi/trip";
 import { chuanxiScenicCatalog } from "@/data/trips/2026-chuanxi/viewpoints";
 import { ScenicDayIndex } from "@/features/itinerary/scenic-day-index";
+import { normalizeDayGuideTab } from "@/features/itinerary/day-guide-state";
 
 export const metadata: Metadata = {
   title: "观景清单",
@@ -12,14 +13,19 @@ export const metadata: Metadata = {
 export default async function ScenicPage({
   searchParams,
 }: {
-  searchParams: Promise<{ day?: string; item?: string }>;
+  searchParams: Promise<{
+    day?: string;
+    item?: string;
+    returnTab?: string | string[];
+  }>;
 }) {
-  const { day, item } = await searchParams;
+  const { day, item, returnTab } = await searchParams;
   return (
     <ScenicDayIndex
       catalog={chuanxiScenicCatalog}
       selectedDayId={day ?? "D1"}
       selectedItemId={item}
+      returnTab={normalizeDayGuideTab(returnTab)}
       trip={chuanxiTrip}
     />
   );

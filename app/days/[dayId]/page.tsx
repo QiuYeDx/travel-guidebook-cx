@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { chuanxiTrip } from "@/data/trips/2026-chuanxi/trip";
 import { chuanxiScenicCatalog } from "@/data/trips/2026-chuanxi/viewpoints";
 import { DayGuide } from "@/features/itinerary/day-guide";
+import { normalizeDayGuideTab } from "@/features/itinerary/day-guide-state";
 import {
   buildDayItinerary,
   getTripDayIds,
@@ -11,6 +12,7 @@ import {
 
 type DayPageProps = {
   params: Promise<{ dayId: string }>;
+  searchParams: Promise<{ tab?: string | string[] }>;
 };
 
 export function generateStaticParams() {
@@ -29,9 +31,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function DayPage({ params }: DayPageProps) {
-  const { dayId } = await params;
+export default async function DayPage({ params, searchParams }: DayPageProps) {
+  const [{ dayId }, { tab }] = await Promise.all([params, searchParams]);
   const itinerary = buildDayItinerary(chuanxiTrip, chuanxiScenicCatalog, dayId);
   if (!itinerary) notFound();
-  return <DayGuide itinerary={itinerary} />;
+  return (
+    <DayGuide itinerary={itinerary} initialTab={normalizeDayGuideTab(tab)} />
+  );
 }

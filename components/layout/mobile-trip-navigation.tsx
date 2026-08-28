@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { BookOpenTextIcon, FileTextIcon, MapPinnedIcon } from "lucide-react";
 
 import { ClipPathTabs } from "@/components/qiuye-ui/clip-path-tabs";
+import { preserveDayGuideTabForNav } from "@/features/itinerary/day-guide-state";
 
 const navItems = [
   { value: "/", label: "总览", icon: <MapPinnedIcon aria-hidden="true" /> },
@@ -54,7 +55,13 @@ export function MobileTripNavigation() {
         onValueChange={setSelectedNavValue}
         onItemClick={(value) => {
           setSelectedNavValue(value);
-          router.push(value);
+          router.push(
+            preserveDayGuideTabForNav(
+              value,
+              window.location.pathname,
+              window.location.search,
+            ),
+          );
         }}
         size="sm"
         shape="rounded"

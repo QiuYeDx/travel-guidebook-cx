@@ -15,6 +15,7 @@ import { ClipPathTabs } from "@/components/qiuye-ui/clip-path-tabs";
 import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { siteConfig } from "@/config/site";
+import { preserveDayGuideTabForNav } from "@/features/itinerary/day-guide-state";
 
 const headerNavItems = siteConfig.navItems.map(({ href, label }) => ({
   value: href,
@@ -72,7 +73,13 @@ export function SiteHeader() {
               onValueChange={setSelectedNavValue}
               onItemClick={(value) => {
                 setSelectedNavValue(value);
-                router.push(value);
+                router.push(
+                  preserveDayGuideTabForNav(
+                    value,
+                    window.location.pathname,
+                    window.location.search,
+                  ),
+                );
               }}
               size="sm"
               shape="rounded"

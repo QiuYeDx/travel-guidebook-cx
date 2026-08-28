@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
 import {
   ArrowLeftIcon,
@@ -29,17 +32,36 @@ import {
   intensityLabels,
 } from "./formatters";
 import type { DayItinerary } from "./itinerary-model";
+import {
+  buildDayHref,
+  buildScenicHref,
+  type DayGuideTab,
+} from "./day-guide-state";
 
-function DayNavigation({ itinerary }: { itinerary: DayItinerary }) {
+function DayNavigation({
+  itinerary,
+  selectedTab,
+}: {
+  itinerary: DayItinerary;
+  selectedTab: DayGuideTab;
+}) {
   return (
     <nav aria-label="前后日切换" className="grid grid-cols-2 gap-3 md:gap-4">
       {itinerary.previousDay ? (
-        <DayLink day={itinerary.previousDay} direction="previous" />
+        <DayLink
+          day={itinerary.previousDay}
+          direction="previous"
+          selectedTab={selectedTab}
+        />
       ) : (
         <span aria-hidden="true" />
       )}
       {itinerary.nextDay ? (
-        <DayLink day={itinerary.nextDay} direction="next" />
+        <DayLink
+          day={itinerary.nextDay}
+          direction="next"
+          selectedTab={selectedTab}
+        />
       ) : (
         <span aria-hidden="true" />
       )}
@@ -50,9 +72,11 @@ function DayNavigation({ itinerary }: { itinerary: DayItinerary }) {
 function DayLink({
   day,
   direction,
+  selectedTab,
 }: {
   day: TripDay;
   direction: "previous" | "next";
+  selectedTab: DayGuideTab;
 }) {
   const previous = direction === "previous";
   const alignment = previous ? "text-left" : "text-right";
@@ -63,7 +87,7 @@ function DayLink({
 
   return (
     <Link
-      href={`/days/${day.id}`}
+      href={buildDayHref(day.id, selectedTab)}
       className={`group flex min-w-0 w-full items-center gap-2 rounded-lg border px-3 py-2 transition-colors hover:bg-accent focus-visible:bg-accent ${alignment}`}
     >
       {previous ? (
@@ -229,7 +253,13 @@ function RouteStops({ itinerary }: { itinerary: DayItinerary }) {
   );
 }
 
-function ScenicDaySummary({ itinerary }: { itinerary: DayItinerary }) {
+function ScenicDaySummary({
+  itinerary,
+  selectedTab,
+}: {
+  itinerary: DayItinerary;
+  selectedTab: DayGuideTab;
+}) {
   const { day, scenicItems } = itinerary;
 
   if (!scenicItems.length) {
@@ -270,7 +300,7 @@ function ScenicDaySummary({ itinerary }: { itinerary: DayItinerary }) {
           <h2 className="mt-1 text-xl font-semibold">今日观景</h2>
         </div>
         <Button asChild variant="outline" size="sm">
-          <Link href={`/scenic?day=${day.id}`}>
+          <Link href={buildScenicHref(day.id, selectedTab)}>
             查看全部 {scenicItems.length} 处
             <ArrowRightIcon aria-hidden="true" />
           </Link>
@@ -347,8 +377,31 @@ function NoteList({
   );
 }
 
-export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
+export function DayGuide({
+  itinerary,
+  initialTab,
+}: {
+  itinerary: DayItinerary;
+  initialTab: DayGuideTab;
+}) {
   const { day } = itinerary;
+  const [selectedTab, setSelectedTab] = React.useState(initialTab);
+
+  React.useEffect(() => {
+    setSelectedTab(initialTab);
+  }, [day.id, initialTab]);
+
+  function handleTabChange(value: string) {
+    const nextTab = value as DayGuideTab;
+    setSelectedTab(nextTab);
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", nextTab);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${window.location.pathname}?${params.toString()}${window.location.hash}`,
+    );
+  }
   const tabItems = [
     { value: "overview", label: "总览", icon: <MapPinnedIcon /> },
     { value: "route", label: "路线", icon: <RouteIcon /> },
@@ -372,7 +425,7 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
         </p>
       </header>
       <div className="mt-3 md:mt-4">
-        <DayNavigation itinerary={itinerary} />
+        <DayNavigation itinerary={itinerary} selectedTab={selectedTab} />
       </div>
       <section className="mt-3 rounded-2xl bg-[#17231d] px-5 py-5 text-white shadow-sm dark:bg-[#111a16] sm:px-7 md:mt-4">
         <p className="text-xs font-medium text-emerald-200">
@@ -391,7 +444,8 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
       <div className="mt-3 md:mt-4">
         <ClipPathTabs
           items={tabItems}
-          defaultValue="overview"
+          value={selectedTab}
+          onValueChange={handleTabChange}
           shape="rounded"
           smoothCorners
           transitionMode="continuous"
@@ -403,7 +457,10 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
           <TabsContent value="route" className="mt-0">
             <div className="space-y-3 md:space-y-4">
               <RouteStops itinerary={itinerary} />
-              <ScenicDaySummary itinerary={itinerary} />
+              <ScenicDaySummary
+                itinerary={itinerary}
+                selectedTab={selectedTab}
+              />
             </div>
           </TabsContent>
           <TabsContent value="notes" className="mt-0">
