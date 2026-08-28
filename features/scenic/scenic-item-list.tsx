@@ -13,7 +13,12 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import type { ParkingLevel, ScenicItem, Viewpoint } from "@/lib/trip/types";
+import type {
+  ParkingLevel,
+  ScenicItem,
+  ScenicSubject,
+  Viewpoint,
+} from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 
@@ -21,10 +26,13 @@ import {
   scenicKindLabels,
   scenicParkingLabels,
   scenicPriorityLabels,
-  scenicSubjectLabels,
 } from "./scenic-labels";
 import { isScenicCorridor } from "./scenic-model";
 import { ScenicDetailPanel } from "./scenic-detail-panel";
+import {
+  ScenicSubjectTag,
+  type ScenicSubjectRects,
+} from "./scenic-subject-tag";
 
 const CARD_TRANSITION = {
   type: "spring" as const,
@@ -47,9 +55,12 @@ type ScenicItemListProps = {
   selectedDayId: string;
   titleId: string;
   expandedViewportRect?: ScenicVisualRect;
+  detailViewportRect?: ScenicVisualRect;
   overlayPhase?: "opening" | "open" | "closing";
+  hiddenSubjects?: readonly ScenicSubject[];
   onClose: (restoreFocus?: boolean) => void;
   onContentHeightChange: (height: number) => void;
+  onSubjectTargetRectsChange: (rects: ScenicSubjectRects) => void;
   onSelect: (id: string, trigger: HTMLButtonElement) => void;
 };
 
@@ -168,26 +179,49 @@ function ScenicCardHeader({
   );
 }
 
-function ScenicCardBody({ item }: { item: ScenicItem }) {
+function ScenicCardBody({
+  item,
+  fadeNonShared = false,
+  shouldReduceMotion = false,
+  hiddenSubjects = [],
+}: {
+  item: ScenicItem;
+  fadeNonShared?: boolean;
+  shouldReduceMotion?: boolean | null;
+  hiddenSubjects?: readonly ScenicSubject[];
+}) {
   const corridor = isScenicCorridor(item);
   const ParkingIcon =
     item.parking.level === "P0" ? ShieldCheckIcon : ShieldAlertIcon;
 
   return (
     <div className="min-w-0">
-      <p className="text-sm leading-6 text-foreground/75">
+      <motion.p
+        initial={false}
+        animate={{ opacity: fadeNonShared ? 0 : 1 }}
+        transition={{
+          duration: shouldReduceMotion ? 0 : 0.2,
+          ease: CARD_EASE,
+        }}
+        className="text-sm leading-6 text-foreground/75"
+      >
         {corridor ? item.passengerCue : item.parking.note}
-      </p>
+      </motion.p>
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
         {item.subjects.slice(0, 4).map((subject) => (
-          <span
+          <ScenicSubjectTag
             key={subject}
-            className="rounded-full bg-muted/70 px-2.5 py-1 text-[11px] leading-4 text-muted-foreground"
-          >
-            {scenicSubjectLabels[subject]}
-          </span>
+            subject={subject}
+            invisible={hiddenSubjects.includes(subject)}
+          />
         ))}
-        <span
+        <motion.span
+          initial={false}
+          animate={{ opacity: fadeNonShared ? 0 : 1 }}
+          transition={{
+            duration: shouldReduceMotion ? 0 : 0.2,
+            ease: CARD_EASE,
+          }}
           className={cn(
             "ml-auto inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium ring-1 ring-inset",
             parkingToneClasses[item.parking.level],
@@ -197,7 +231,7 @@ function ScenicCardBody({ item }: { item: ScenicItem }) {
           <span className="truncate">
             {scenicParkingLabels[item.parking.level]}
           </span>
-        </span>
+        </motion.span>
       </div>
     </div>
   );
@@ -232,6 +266,9 @@ function ScenicDetailVisual({
   titleId,
   onClose,
   onContentHeightChange,
+  detailViewportRect,
+  hiddenSubjects,
+  onSubjectTargetRectsChange,
   shouldReduceMotion,
 }: {
   item: ScenicItem;
@@ -242,6 +279,9 @@ function ScenicDetailVisual({
   titleId: string;
   onClose: (restoreFocus?: boolean) => void;
   onContentHeightChange: (height: number) => void;
+  detailViewportRect?: ScenicVisualRect;
+  hiddenSubjects: readonly ScenicSubject[];
+  onSubjectTargetRectsChange: (rects: ScenicSubjectRects) => void;
   shouldReduceMotion: boolean | null;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -282,7 +322,17 @@ function ScenicDetailVisual({
         <XIcon className="size-4" aria-hidden="true" />
       </motion.button>
 
-      <div className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl">
+      <div
+        className="absolute left-0 top-0 z-20 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl"
+        style={
+          detailViewportRect
+            ? {
+                width: detailViewportRect.width,
+                height: detailViewportRect.height,
+              }
+            : { width: "100%", height: "100%" }
+        }
+      >
         <motion.div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-2xl border bg-background"
@@ -306,6 +356,9 @@ function ScenicDetailVisual({
             layoutPrefix={`scenic-${item.id}`}
             supportingPhase={phase}
             shouldReduceMotion={shouldReduceMotion}
+            subjectTargetViewportRect={detailViewportRect}
+            hiddenSubjects={hiddenSubjects}
+            onSubjectTargetRectsChange={onSubjectTargetRectsChange}
           />
         </div>
       </div>
@@ -317,11 +370,13 @@ function ScenicCardVisual({
   item,
   index,
   fadeBody,
+  hiddenSubjects,
   shouldReduceMotion,
 }: {
   item: ScenicItem;
   index: number;
   fadeBody: boolean;
+  hiddenSubjects: readonly ScenicSubject[];
   shouldReduceMotion: boolean | null;
 }) {
   return (
@@ -336,16 +391,12 @@ function ScenicCardVisual({
         fadeNonShared={fadeBody}
         shouldReduceMotion={shouldReduceMotion}
       />
-      <motion.div
-        initial={false}
-        animate={{ opacity: fadeBody ? 0 : 1 }}
-        transition={{
-          duration: shouldReduceMotion ? 0 : 0.2,
-          ease: CARD_EASE,
-        }}
-      >
-        <ScenicCardBody item={item} />
-      </motion.div>
+      <ScenicCardBody
+        item={item}
+        fadeNonShared={fadeBody}
+        shouldReduceMotion={shouldReduceMotion}
+        hiddenSubjects={hiddenSubjects}
+      />
     </div>
   );
 }
@@ -375,9 +426,12 @@ export function ScenicItemList({
   selectedDayId,
   titleId,
   expandedViewportRect,
+  detailViewportRect,
   overlayPhase,
+  hiddenSubjects = [],
   onClose,
   onContentHeightChange,
+  onSubjectTargetRectsChange,
   onSelect,
 }: ScenicItemListProps) {
   const shouldReduceMotion = useReducedMotion();
@@ -517,7 +571,8 @@ export function ScenicItemList({
                   {active && overlayPhase ? (
                     <motion.div
                       aria-hidden="true"
-                      className="pointer-events-none absolute z-[44] rounded-2xl bg-black/20 blur-xl"
+                      className="pointer-events-none absolute rounded-2xl bg-black/20 blur-xl"
+                      style={{ zIndex: 44 }}
                       initial={{ opacity: 0 }}
                       animate={{
                         ...visualRect,
@@ -536,9 +591,9 @@ export function ScenicItemList({
                   <motion.div
                     className={cn(
                       "absolute",
-                      active ? "z-[45]" : "z-10",
                       active ? "pointer-events-auto" : "pointer-events-none",
                     )}
+                    style={{ zIndex: active ? 45 : 10 }}
                     initial={false}
                     animate={visualRect}
                     transition={
@@ -553,6 +608,7 @@ export function ScenicItemList({
                         item={item}
                         index={index}
                         shouldReduceMotion={shouldReduceMotion}
+                        hiddenSubjects={active ? hiddenSubjects : []}
                         fadeBody={Boolean(
                           active && overlayPhase && overlayPhase !== "closing",
                         )}
@@ -568,6 +624,11 @@ export function ScenicItemList({
                         titleId={titleId}
                         onClose={onClose}
                         onContentHeightChange={onContentHeightChange}
+                        detailViewportRect={detailViewportRect}
+                        hiddenSubjects={hiddenSubjects}
+                        onSubjectTargetRectsChange={
+                          onSubjectTargetRectsChange
+                        }
                         shouldReduceMotion={shouldReduceMotion}
                       />
                     ) : null}

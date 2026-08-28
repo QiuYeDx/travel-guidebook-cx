@@ -1,10 +1,13 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import {
   ArrowUpRightIcon,
   Clock3Icon,
   CompassIcon,
+  CornerDownRightIcon,
   MapPinnedIcon,
+  ParkingCircleIcon,
   RouteIcon,
   ShieldCheckIcon,
 } from "lucide-react";
@@ -12,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createAmapNavigationUrl } from "@/lib/navigation/map-links";
-import type { ScenicItem } from "@/lib/trip/types";
+import type { ScenicItem, ScenicSubject } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 
@@ -21,49 +24,78 @@ import {
   scenicKindLabels,
   scenicParkingLabels,
   scenicPriorityLabels,
-  scenicSubjectLabels,
   scenicVerificationLabels,
 } from "./scenic-labels";
 import { getParkingNavigationTarget, isScenicCorridor } from "./scenic-model";
+import {
+  readScenicSubjectRects,
+  ScenicSubjectTag,
+  type ScenicSubjectRects,
+} from "./scenic-subject-tag";
 
-function getParkingAction(item: ScenicItem): string | undefined {
-  if (item.parking.level === "prohibited") {
-    return "不要为拍照停车，乘客在车上看，驾驶员保持行车节奏。";
+function getParkingLevelTone(level: ScenicItem["parking"]["level"]): string {
+  switch (level) {
+    case "P0":
+      return "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300";
+    case "P1":
+      return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-300";
+    case "prohibited":
+      return "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/60 dark:text-red-300";
+    case "transit-only":
+      return "border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950/60 dark:text-sky-300";
+    case "P2":
+    case "walk-only":
+      return "border-border bg-muted text-foreground/80";
   }
-  if (item.parking.level === "P2") {
-    return "默认直接车览；只有现场有明确停车位置且车辆能完全离开行车道时再停。";
+}
+
+function getVerificationTone(
+  status: ScenicItem["parking"]["verificationStatus"],
+): string {
+  switch (status) {
+    case "verified":
+      return "border-emerald-200 text-emerald-700 dark:border-emerald-900 dark:text-emerald-400";
+    case "needs-review":
+      return "border-border text-muted-foreground";
+    case "expired":
+      return "border-red-200 text-red-700 dark:border-red-900 dark:text-red-400";
   }
-  if (item.parking.level === "transit-only") {
-    return "需要乘坐景区交通，私家车不进入。";
-  }
-  if (item.parking.level === "walk-only") {
-    return "按步道规则步行前往，车辆停在允许的位置。";
-  }
-  if (item.parking.verificationStatus !== "verified") {
-    return undefined;
-  }
-  return "入口已确认，现场满位就直接通过。";
 }
 
 function GeoDescription({ item }: { item: ScenicItem }) {
   if (item.geoRef.kind === "route-interval") {
     return (
-      <p className="mt-2 text-sm leading-6 text-foreground/80">
-        {item.geoRef.fromLabel} → {item.geoRef.toLabel}
-      </p>
+      <div className="mt-2.5 flex items-start gap-3">
+        <span className="mt-0.5 shrink-0 text-xs font-medium text-muted-foreground">
+          路线区间
+        </span>
+        <p className="min-w-0 text-sm font-medium leading-5 text-foreground/85">
+          {item.geoRef.fromLabel} → {item.geoRef.toLabel}
+        </p>
+      </div>
     );
   }
   if (item.geoRef.kind === "exact") {
     return (
-      <p className="mt-2 text-sm leading-6 text-foreground/80">
-        地图位置：{item.geoRef.mapQuery}
-      </p>
+      <div className="mt-2.5 flex items-start gap-3">
+        <span className="mt-0.5 shrink-0 text-xs font-medium text-muted-foreground">
+          精确位置
+        </span>
+        <p className="min-w-0 text-sm font-medium leading-5 text-foreground/85">
+          {item.geoRef.mapQuery}
+        </p>
+      </div>
     );
   }
   return (
-    <p className="mt-2 text-sm leading-6 text-foreground/80">
-      {item.geoRef.reason}
-    </p>
+    <div className="mt-2.5 flex items-start gap-3">
+      <span className="mt-0.5 shrink-0 text-xs font-medium text-amber-700 dark:text-amber-400">
+        待核准
+      </span>
+      <p className="min-w-0 text-sm leading-5 text-foreground/75">
+        {item.geoRef.reason}
+      </p>
+    </div>
   );
 }
 
@@ -75,6 +107,9 @@ export function ScenicDetailPanel({
   layoutPrefix,
   supportingPhase,
   shouldReduceMotion = false,
+  subjectTargetViewportRect,
+  hiddenSubjects = [],
+  onSubjectTargetRectsChange,
 }: {
   item?: ScenicItem;
   index: number;
@@ -83,7 +118,38 @@ export function ScenicDetailPanel({
   layoutPrefix?: string;
   supportingPhase?: "opening" | "open" | "closing";
   shouldReduceMotion?: boolean | null;
+  subjectTargetViewportRect?: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
+  hiddenSubjects?: readonly ScenicSubject[];
+  onSubjectTargetRectsChange?: (rects: ScenicSubjectRects) => void;
 }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const subjectListRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const subjectList = subjectListRef.current;
+    if (!section || !subjectList || !subjectTargetViewportRect) return;
+
+    const sectionRect = section.getBoundingClientRect();
+    const measuredRects = readScenicSubjectRects(subjectList);
+    const targetRects: ScenicSubjectRects = {};
+    for (const [subject, rect] of Object.entries(measuredRects)) {
+      if (!rect) continue;
+      targetRects[subject as ScenicSubject] = {
+        top: subjectTargetViewportRect.top + rect.top - sectionRect.top,
+        left: subjectTargetViewportRect.left + rect.left - sectionRect.left,
+        width: rect.width,
+        height: rect.height,
+      };
+    }
+    onSubjectTargetRectsChange?.(targetRects);
+  }, [item?.id, onSubjectTargetRectsChange, subjectTargetViewportRect]);
+
   if (!item) {
     return (
       <section className="flex h-[34rem] items-center justify-center rounded-2xl border p-6 text-center lg:h-auto lg:min-h-[38rem]">
@@ -103,14 +169,13 @@ export function ScenicDetailPanel({
 
   const corridor = isScenicCorridor(item);
   const navigationTarget = getParkingNavigationTarget(item);
-  const parkingAction = getParkingAction(item);
   const sharedElementsClosing = Boolean(
     layoutPrefix && supportingPhase === "closing",
   );
   const activeLayoutPrefix = sharedElementsClosing ? undefined : layoutPrefix;
 
   return (
-    <section className="p-5 sm:p-6">
+    <section ref={sectionRef} className="p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
         {activeLayoutPrefix ? (
           <motion.span
@@ -224,22 +289,22 @@ export function ScenicDetailPanel({
           ease: [0.23, 1, 0.32, 1],
         }}
       >
-        <dl className="mt-5 grid grid-cols-2 gap-4 border-y py-4 text-sm">
-          <div>
+        <dl className="mt-5 grid grid-cols-2 divide-x border-y py-3.5 text-sm">
+          <div className="pr-4">
             <dt className="flex items-center gap-2 text-xs text-muted-foreground">
               <CompassIcon className="size-3.5" aria-hidden="true" />
               行驶方向
             </dt>
-            <dd className="mt-1 font-medium">
+            <dd className="mt-1.5 font-semibold">
               {scenicDirectionLabels[item.direction]}
             </dd>
           </div>
-          <div>
+          <div className="pl-4">
             <dt className="flex items-center gap-2 text-xs text-muted-foreground">
               <Clock3Icon className="size-3.5" aria-hidden="true" />
               预计停留
             </dt>
-            <dd className="mt-1 font-medium tabular-nums">
+            <dd className="mt-1.5 font-semibold tabular-nums">
               {!corridor && item.stayMinutesEstimate
                 ? `${item.stayMinutesEstimate[0]}-${item.stayMinutesEstimate[1]} min`
                 : "连续车览"}
@@ -258,64 +323,134 @@ export function ScenicDetailPanel({
           <GeoDescription item={item} />
         </div>
 
-        <div className="mt-5">
-          <h3 className="flex items-center gap-2 text-sm font-semibold">
-            <ShieldCheckIcon
-              className="size-4 text-amber-700 dark:text-amber-400"
-              aria-hidden="true"
-            />
-            停车
-          </h3>
-          <p className="mt-2 text-sm font-medium">
-            {scenicParkingLabels[item.parking.level]} ·{" "}
-            {scenicVerificationLabels[item.parking.verificationStatus]}
-          </p>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        <div className="mt-5 border-t pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-2.5">
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+              <ParkingCircleIcon
+                className="size-4 text-amber-700 dark:text-amber-400"
+                aria-hidden="true"
+              />
+              停车决策
+            </h3>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge
+                variant="outline"
+                className={cn(
+                  "h-6 px-2 text-xs font-medium",
+                  getParkingLevelTone(item.parking.level),
+                )}
+              >
+                {scenicParkingLabels[item.parking.level]}
+              </Badge>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "h-6 px-2 text-xs font-medium",
+                  getVerificationTone(item.parking.verificationStatus),
+                )}
+              >
+                {scenicVerificationLabels[item.parking.verificationStatus]}
+              </Badge>
+            </div>
+          </div>
+
+          <p className="mt-3 text-sm font-medium leading-6 text-foreground/90">
             {item.parking.note}
           </p>
-          {parkingAction ? (
-            <p className="mt-2 text-sm leading-6 text-amber-800 dark:text-amber-300">
-              {parkingAction}
-            </p>
-          ) : null}
-          {item.parking.entryDirectionNote ? (
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              进出方向：{item.parking.entryDirectionNote}
-            </p>
-          ) : null}
-          {item.parking.capacityNote ? (
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              现场提示：{item.parking.capacityNote}
-            </p>
+          {item.parking.entryDirectionNote || item.parking.capacityNote ? (
+            <dl className="mt-3 divide-y border-y text-xs">
+              {item.parking.entryDirectionNote ? (
+                <div
+                  className="grid gap-3 py-2.5"
+                  style={{ gridTemplateColumns: "4.5rem minmax(0, 1fr)" }}
+                >
+                  <dt className="flex items-center gap-1.5 text-muted-foreground">
+                    <CornerDownRightIcon
+                      className="size-3.5"
+                      aria-hidden="true"
+                    />
+                    进出方向
+                  </dt>
+                  <dd className="leading-5 text-foreground/75">
+                    {item.parking.entryDirectionNote}
+                  </dd>
+                </div>
+              ) : null}
+              {item.parking.capacityNote ? (
+                <div
+                  className="grid gap-3 py-2.5"
+                  style={{ gridTemplateColumns: "4.5rem minmax(0, 1fr)" }}
+                >
+                  <dt className="flex items-center gap-1.5 text-muted-foreground">
+                    <ShieldCheckIcon className="size-3.5" aria-hidden="true" />
+                    现场条件
+                  </dt>
+                  <dd className="leading-5 text-foreground/75">
+                    {item.parking.capacityNote}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
           ) : null}
         </div>
-
-        <div className="mt-5">
-          <h3 className="text-sm font-semibold">拍摄对象</h3>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {item.subjects.map((subject) => (
-              <Badge key={subject} variant="secondary">
-                {scenicSubjectLabels[subject]}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        {navigationTarget ? (
-          <div className="mt-6">
-            <Button asChild>
-              <a
-                href={createAmapNavigationUrl(navigationTarget)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                导航到停车点
-                <ArrowUpRightIcon aria-hidden="true" />
-              </a>
-            </Button>
-          </div>
-        ) : null}
       </motion.div>
+
+      <div
+        ref={subjectListRef}
+        className="relative mt-4 flex flex-wrap gap-1.5 pt-4"
+      >
+        <motion.div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-px bg-border"
+          initial={false}
+          animate={{ opacity: supportingPhase === "closing" ? 0 : 1 }}
+          transition={{
+            duration: shouldReduceMotion ? 0 : 0.18,
+            ease: [0.23, 1, 0.32, 1],
+          }}
+        />
+        {item.subjects.map((subject) => (
+          <ScenicSubjectTag
+            key={subject}
+            subject={subject}
+            invisible={
+              (supportingPhase === "opening" &&
+                item.subjects.slice(0, 4).includes(subject)) ||
+              hiddenSubjects.includes(subject)
+            }
+          />
+        ))}
+      </div>
+
+      {navigationTarget ? (
+        <motion.div
+          className="mt-6"
+          initial={
+            supportingPhase === "opening" && !shouldReduceMotion
+              ? { opacity: 0, y: 5 }
+              : false
+          }
+          animate={{
+            opacity: supportingPhase === "closing" ? 0 : 1,
+            y: 0,
+          }}
+          transition={{
+            duration: shouldReduceMotion ? 0 : 0.22,
+            ease: [0.23, 1, 0.32, 1],
+          }}
+        >
+          <Button asChild>
+            <a
+              href={createAmapNavigationUrl(navigationTarget)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              导航到停车点
+              <ArrowUpRightIcon aria-hidden="true" />
+            </a>
+          </Button>
+        </motion.div>
+      ) : null}
     </section>
   );
 }
