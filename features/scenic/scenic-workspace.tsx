@@ -214,13 +214,13 @@ export function ScenicWorkspace({
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
-            {dayId} · 按行驶顺序
+            {dayId} · 完整清单
           </p>
           <h2
             id="scenic-workspace-title"
             className="mt-1 text-2xl font-semibold"
           >
-            沿途观景
+            当天沿途条目
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             优先看能安全停车的点；连续车览走廊只在乘客侧记录，驾驶员不为拍照临停。

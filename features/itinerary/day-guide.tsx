@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { ClipPathTabs } from "@/components/qiuye-ui/clip-path-tabs";
 import { TabsContent } from "@/components/ui/tabs";
 import { CopyAction } from "@/features/navigation/copy-action";
+import { isScenicCorridor } from "@/features/scenic/scenic-model";
 import { createAmapSearchUrl } from "@/lib/navigation/map-links";
 import type { TripDay } from "@/lib/trip/types";
 
@@ -28,7 +29,6 @@ import {
   intensityLabels,
 } from "./formatters";
 import type { DayItinerary } from "./itinerary-model";
-import { ScenicRouteList } from "./scenic-route-list";
 
 function DayNavigation({ itinerary }: { itinerary: DayItinerary }) {
   return (
@@ -229,6 +229,83 @@ function RouteStops({ itinerary }: { itinerary: DayItinerary }) {
   );
 }
 
+function ScenicDaySummary({ itinerary }: { itinerary: DayItinerary }) {
+  const { day, scenicItems } = itinerary;
+
+  if (!scenicItems.length) {
+    return (
+      <section className="rounded-xl border bg-card p-4 sm:p-5">
+        <p className="text-xs text-muted-foreground">今日观景摘要</p>
+        <h2 className="mt-1 text-lg font-semibold">无沿途观景安排</h2>
+      </section>
+    );
+  }
+
+  const corridors = scenicItems.filter(isScenicCorridor);
+  const coreStops = scenicItems.filter(
+    (item) => !isScenicCorridor(item) && item.priority === "core",
+  );
+  const coreItems = scenicItems.filter((item) => item.priority === "core");
+  const highlightedItems = (
+    coreItems.length ? coreItems : corridors.length ? corridors : scenicItems
+  ).slice(0, 3);
+  const highlightedTotal = coreItems.length
+    ? coreItems.length
+    : corridors.length
+      ? corridors.length
+      : scenicItems.length;
+  const highlightedNames = highlightedItems
+    .map((item) => item.title)
+    .join("、");
+  const highlightedText =
+    highlightedTotal > highlightedItems.length
+      ? `${highlightedNames}等 ${highlightedTotal} 处`
+      : highlightedNames;
+
+  return (
+    <section className="rounded-xl border bg-card p-4 sm:p-5">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground">路线执行摘要</p>
+          <h2 className="mt-1 text-xl font-semibold">今日观景</h2>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/scenic?day=${day.id}`}>
+            查看全部 {scenicItems.length} 处
+            <ArrowRightIcon aria-hidden="true" />
+          </Link>
+        </Button>
+      </div>
+
+      <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-y py-3 text-sm sm:grid-cols-3">
+        <div>
+          <dt className="text-xs text-muted-foreground">核心停靠</dt>
+          <dd className="mt-1 font-semibold tabular-nums">
+            {coreStops.length} 处
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">车览走廊</dt>
+          <dd className="mt-1 font-semibold tabular-nums">
+            {corridors.length} 段
+          </dd>
+        </div>
+        <div className="col-span-2 sm:col-span-1">
+          <dt className="text-xs text-muted-foreground">停靠预算</dt>
+          <dd className="mt-1 font-semibold">{itinerary.parkingBudgetLabel}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-3 grid gap-1 sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:gap-3">
+        <p className="text-xs leading-5 text-muted-foreground">今日重点</p>
+        <p className="text-sm font-medium leading-5 text-foreground/85">
+          {highlightedText}
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function NoteList({
   title,
   items,
@@ -323,26 +400,7 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
           <TabsContent value="route" className="mt-0">
             <div className="space-y-3 md:space-y-4">
               <RouteStops itinerary={itinerary} />
-              <section>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border bg-card p-4 sm:gap-4 sm:p-5">
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">
-                      沿行驶方向排列
-                    </p>
-                    <h2 className="mt-1 text-xl font-semibold">
-                      核心停靠与车览
-                    </h2>
-                  </div>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/scenic?day=${day.id}`}>
-                      打开观景页 <ArrowRightIcon aria-hidden="true" />
-                    </Link>
-                  </Button>
-                </div>
-                <div className="mt-3">
-                  <ScenicRouteList items={itinerary.scenicSummary} compact />
-                </div>
-              </section>
+              <ScenicDaySummary itinerary={itinerary} />
             </div>
           </TabsContent>
           <TabsContent value="notes" className="mt-0">

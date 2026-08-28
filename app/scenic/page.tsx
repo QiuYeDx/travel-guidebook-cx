@@ -5,7 +5,7 @@ import { chuanxiScenicCatalog } from "@/data/trips/2026-chuanxi/viewpoints";
 import { ScenicDayIndex } from "@/features/itinerary/scenic-day-index";
 
 export const metadata: Metadata = {
-  title: "沿途观景",
+  title: "观景清单",
   description: "按 D1-D9 行驶顺序查看川西大环线停靠点与车览走廊",
 };
 

@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowLeftIcon,
-  Clock3Icon,
-} from "lucide-react";
+import { ArrowLeftIcon, Clock3Icon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,12 +38,14 @@ export function ScenicDayIndex({
       <header className="pb-7">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-            沿途观景
+            观景清单
           </h1>
-          <Badge className="ml-auto" variant="secondary">按行驶顺序</Badge>
+          <Badge className="ml-auto" variant="secondary">
+            完整清单
+          </Badge>
         </div>
         <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
-          按真实行驶顺序查看停靠点、景交站和连续车览走廊，了解位置和停车提示。
+          按真实行驶顺序整理停靠点、景交站和连续车览走廊。
         </p>
       </header>
 
@@ -75,7 +74,7 @@ export function ScenicDayIndex({
           <Button asChild variant="secondary">
             <Link href={`/days/${selectedDay.id}`}>
               <ArrowLeftIcon aria-hidden="true" />
-              查看当日行程
+              返回 {selectedDay.id} 行程
             </Link>
           </Button>
         </div>

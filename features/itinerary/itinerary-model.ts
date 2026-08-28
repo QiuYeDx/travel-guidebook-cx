@@ -13,7 +13,6 @@ export type DayItinerary = {
   nextDay?: TripDay;
   scenicPlan?: ScenicDayPlan;
   scenicItems: ScenicItem[];
-  scenicSummary: ScenicItem[];
   distanceKmEstimate?: [number, number];
   driveMinutesEstimate?: [number, number];
   timePriority?: FallbackTrigger;
@@ -44,10 +43,6 @@ export function getScenicItemsForDay(
   return catalog.items
     .filter((item) => item.dayId === dayId)
     .sort((a, b) => a.sequence - b.sequence);
-}
-
-function isCorridor(item: ScenicItem): boolean {
-  return item.id.startsWith("SC-");
 }
 
 function formatParkingBudget(plan?: ScenicDayPlan): string {
@@ -85,9 +80,6 @@ export function buildDayItinerary(
   const day = trip.days[index];
   const scenicPlan = getScenicPlan(catalog, dayId);
   const scenicItems = getScenicItemsForDay(catalog, dayId);
-  const scenicSummary = scenicItems.filter(
-    (item) => item.priority === "core" || isCorridor(item),
-  );
   const timePriority = day.fallbackTriggers.find(
     (trigger) => trigger.category === "time",
   );
@@ -100,7 +92,6 @@ export function buildDayItinerary(
     nextDay: trip.days[index + 1],
     scenicPlan,
     scenicItems,
-    scenicSummary,
     distanceKmEstimate: addRanges(
       day.legs.map((leg) => leg.distanceKmEstimate),
     ),
