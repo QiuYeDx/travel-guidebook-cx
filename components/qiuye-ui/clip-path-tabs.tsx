@@ -45,6 +45,8 @@ export interface ClipPathTabsProps extends Omit<
   defaultValue?: string;
   /** 标签值变化回调 */
   onValueChange?: (value: string) => void;
+  /** 点击标签项时触发，包括再次点击当前选中项 */
+  onItemClick?: (value: string) => void;
   /**
    * 选中区域形状
    * - `"pill"`：纯圆胶囊
@@ -212,6 +214,7 @@ export const ClipPathTabs = React.forwardRef<
     value: controlledValue,
     defaultValue,
     onValueChange,
+    onItemClick,
     shape = "pill",
     cornerRadius,
     smoothCorners = false,
@@ -447,6 +450,7 @@ export const ClipPathTabs = React.forwardRef<
                 }}
                 value={item.value}
                 disabled={disabled || item.disabled}
+                onClick={() => onItemClick?.(item.value)}
                 aria-label={item.ariaLabel}
                 data-slot="clip-path-tabs-trigger"
                 className={cn(

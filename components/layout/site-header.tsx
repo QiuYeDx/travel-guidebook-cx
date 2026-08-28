@@ -69,7 +69,8 @@ export function SiteHeader() {
               ariaLabel="主导航"
               items={headerNavItems}
               value={selectedNavValue}
-              onValueChange={(value) => {
+              onValueChange={setSelectedNavValue}
+              onItemClick={(value) => {
                 setSelectedNavValue(value);
                 router.push(value);
               }}

@@ -185,7 +185,7 @@ function RouteStops({ itinerary }: { itinerary: DayItinerary }) {
         <p className="text-xs text-muted-foreground">按行驶顺序逐点使用</p>
         <h2 className="mt-1 text-xl font-semibold">路线地点</h2>
       </div>
-      <ol className="mt-4 divide-y border-y">
+      <ol className="mt-4 divide-y border-t">
         {points.map((point, index) => {
           const role =
             index === 0
@@ -197,7 +197,7 @@ function RouteStops({ itinerary }: { itinerary: DayItinerary }) {
           return (
             <li
               key={`${point}-${index}`}
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3"
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 last:pb-0"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted font-mono text-[0.6875rem] tabular-nums text-muted-foreground">

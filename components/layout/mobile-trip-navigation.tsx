@@ -51,7 +51,8 @@ export function MobileTripNavigation() {
         ariaLabel="移动端主导航"
         items={navItems}
         value={selectedNavValue}
-        onValueChange={(value) => {
+        onValueChange={setSelectedNavValue}
+        onItemClick={(value) => {
           setSelectedNavValue(value);
           router.push(value);
         }}
