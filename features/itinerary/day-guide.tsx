@@ -275,6 +275,9 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
           className="w-full gap-3 md:gap-4"
         >
           <TabsContent value="overview" className="mt-0">
+            <RoutePanel itinerary={itinerary} />
+          </TabsContent>
+          <TabsContent value="route" className="mt-0">
             <section>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border bg-card p-4 sm:gap-4 sm:p-5">
                 <div className="min-w-0">
@@ -293,9 +296,6 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
                 <ScenicRouteList items={itinerary.scenicSummary} compact />
               </div>
             </section>
-          </TabsContent>
-          <TabsContent value="route" className="mt-0">
-            <RoutePanel itinerary={itinerary} />
           </TabsContent>
           <TabsContent value="notes" className="mt-0">
             <div className="grid gap-4 sm:grid-cols-2">
