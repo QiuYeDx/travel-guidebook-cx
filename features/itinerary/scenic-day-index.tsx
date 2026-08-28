@@ -62,7 +62,7 @@ export function ScenicDayIndex({
       </div>
 
       <section className="mt-5 rounded-2xl bg-[#17231d] px-5 py-5 text-white shadow-sm dark:bg-[#111a16] sm:px-7">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4 sm:items-center">
           <div className="min-w-0">
             <p className="text-xs font-medium text-emerald-200">
               今天只记住这一件事

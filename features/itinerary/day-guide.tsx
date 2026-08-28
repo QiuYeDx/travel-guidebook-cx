@@ -392,6 +392,9 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
         <ClipPathTabs
           items={tabItems}
           defaultValue="overview"
+          shape="rounded"
+          smoothCorners
+          transitionMode="continuous"
           className="w-full gap-3 md:gap-4"
         >
           <TabsContent value="overview" className="mt-0">
