@@ -4,14 +4,9 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "motion/react";
 
-import type { ScenicItem, ScenicSubject } from "@/lib/trip/types";
+import type { ScenicItem } from "@/lib/trip/types";
 
 import { ScenicItemList } from "./scenic-item-list";
-import {
-  readScenicSubjectRects,
-  ScenicSubjectTag,
-  type ScenicSubjectRects,
-} from "./scenic-subject-tag";
 
 const PANEL_EASE = [0.23, 1, 0.32, 1] as const;
 
@@ -80,12 +75,6 @@ export function ScenicWorkspace({
   const [returnRect, setReturnRect] = useState<ViewportRect | null>(null);
   const [panelRect, setPanelRect] = useState<ViewportRect | null>(null);
   const [detailContentHeight, setDetailContentHeight] = useState(0);
-  const [originSubjectRects, setOriginSubjectRects] =
-    useState<ScenicSubjectRects>({});
-  const [targetSubjectRects, setTargetSubjectRects] =
-    useState<ScenicSubjectRects>({});
-  const [returnSubjectRects, setReturnSubjectRects] =
-    useState<ScenicSubjectRects>({});
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const closeTimerRef = useRef<number | null>(null);
   const openTimerRef = useRef<number | null>(null);
@@ -132,10 +121,7 @@ export function ScenicWorkspace({
     (restoreFocus = true) => {
       shouldRestoreFocusRef.current = restoreFocus;
       const trigger = triggerRef.current;
-      if (trigger) {
-        setReturnRect(readElementRect(trigger));
-        setReturnSubjectRects(readScenicSubjectRects(trigger));
-      }
+      if (trigger) setReturnRect(readElementRect(trigger));
       if (openTimerRef.current !== null) {
         window.clearTimeout(openTimerRef.current);
         openTimerRef.current = null;
@@ -146,9 +132,6 @@ export function ScenicWorkspace({
         () => {
           closeTimerRef.current = null;
           setOverlayPhase("closed");
-          setOriginSubjectRects({});
-          setTargetSubjectRects({});
-          setReturnSubjectRects({});
           if (!shouldRestoreFocusRef.current) return;
           shouldRestoreFocusRef.current = false;
           window.requestAnimationFrame(() =>
@@ -214,10 +197,6 @@ export function ScenicWorkspace({
     setReturnRect(nextOriginRect);
     setPanelRect(readPanelRect());
     setDetailContentHeight(0);
-    const nextSubjectRects = readScenicSubjectRects(trigger);
-    setOriginSubjectRects(nextSubjectRects);
-    setReturnSubjectRects(nextSubjectRects);
-    setTargetSubjectRects({});
     setSelectedId(itemId);
     setOverlayPhase("opening");
     openTimerRef.current = window.setTimeout(
@@ -229,18 +208,6 @@ export function ScenicWorkspace({
     );
     syncUrl(itemId);
   }
-
-  const selectedItem = items.find((item) => item.id === selectedId);
-  const subjectFromRects =
-    overlayPhase === "closing" ? targetSubjectRects : originSubjectRects;
-  const subjectToRects =
-    overlayPhase === "closing" ? returnSubjectRects : targetSubjectRects;
-  const transitioningSubjects =
-    overlayPhase === "opening" || overlayPhase === "closing"
-      ? (selectedItem?.subjects.slice(0, 4).filter(
-          (subject) => subjectFromRects[subject] && subjectToRects[subject],
-        ) ?? [])
-      : [];
 
   return (
     <section className="py-7" aria-labelledby="scenic-workspace-title">
@@ -276,12 +243,9 @@ export function ScenicWorkspace({
               ? (returnRect ?? originRect ?? panelRect ?? undefined)
               : (panelRect ?? undefined)
           }
-          detailViewportRect={panelRect ?? undefined}
           overlayPhase={overlayMounted ? overlayPhase : undefined}
-          hiddenSubjects={transitioningSubjects}
           onClose={closeDetails}
           onContentHeightChange={setDetailContentHeight}
-          onSubjectTargetRectsChange={setTargetSubjectRects}
           onSelect={selectItem}
         />
       </div>
@@ -331,28 +295,6 @@ export function ScenicWorkspace({
                   },
                 }}
               />
-              {transitioningSubjects.map((subject: ScenicSubject) => {
-                const fromRect = subjectFromRects[subject];
-                const toRect = subjectToRects[subject];
-                if (!fromRect || !toRect) return null;
-                return (
-                  <motion.div
-                    key={`${selectedId}-${overlayPhase}-${subject}`}
-                    aria-hidden="true"
-                    className="pointer-events-none fixed flex items-start justify-start"
-                    style={{ zIndex: 60 }}
-                    initial={fromRect}
-                    animate={toRect}
-                    transition={
-                      shouldReduceMotion
-                        ? { duration: 0 }
-                        : { duration: 0.48, ease: PANEL_EASE }
-                    }
-                  >
-                    <ScenicSubjectTag subject={subject} />
-                  </motion.div>
-                );
-              })}
             </>,
             portalHost,
           )

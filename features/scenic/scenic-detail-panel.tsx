@@ -1,6 +1,5 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
 import {
   ArrowUpRightIcon,
   Clock3Icon,
@@ -15,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createAmapNavigationUrl } from "@/lib/navigation/map-links";
-import type { ScenicItem, ScenicSubject } from "@/lib/trip/types";
+import type { ScenicItem } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 
@@ -27,11 +26,7 @@ import {
   scenicVerificationLabels,
 } from "./scenic-labels";
 import { getParkingNavigationTarget, isScenicCorridor } from "./scenic-model";
-import {
-  readScenicSubjectRects,
-  ScenicSubjectTag,
-  type ScenicSubjectRects,
-} from "./scenic-subject-tag";
+import { ScenicSubjectTag } from "./scenic-subject-tag";
 
 function getParkingLevelTone(level: ScenicItem["parking"]["level"]): string {
   switch (level) {
@@ -107,9 +102,6 @@ export function ScenicDetailPanel({
   layoutPrefix,
   supportingPhase,
   shouldReduceMotion = false,
-  subjectTargetViewportRect,
-  hiddenSubjects = [],
-  onSubjectTargetRectsChange,
 }: {
   item?: ScenicItem;
   index: number;
@@ -118,38 +110,7 @@ export function ScenicDetailPanel({
   layoutPrefix?: string;
   supportingPhase?: "opening" | "open" | "closing";
   shouldReduceMotion?: boolean | null;
-  subjectTargetViewportRect?: {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  };
-  hiddenSubjects?: readonly ScenicSubject[];
-  onSubjectTargetRectsChange?: (rects: ScenicSubjectRects) => void;
 }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const subjectListRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    const subjectList = subjectListRef.current;
-    if (!section || !subjectList || !subjectTargetViewportRect) return;
-
-    const sectionRect = section.getBoundingClientRect();
-    const measuredRects = readScenicSubjectRects(subjectList);
-    const targetRects: ScenicSubjectRects = {};
-    for (const [subject, rect] of Object.entries(measuredRects)) {
-      if (!rect) continue;
-      targetRects[subject as ScenicSubject] = {
-        top: subjectTargetViewportRect.top + rect.top - sectionRect.top,
-        left: subjectTargetViewportRect.left + rect.left - sectionRect.left,
-        width: rect.width,
-        height: rect.height,
-      };
-    }
-    onSubjectTargetRectsChange?.(targetRects);
-  }, [item?.id, onSubjectTargetRectsChange, subjectTargetViewportRect]);
-
   if (!item) {
     return (
       <section className="flex h-[34rem] items-center justify-center rounded-2xl border p-6 text-center lg:h-auto lg:min-h-[38rem]">
@@ -175,7 +136,7 @@ export function ScenicDetailPanel({
   const activeLayoutPrefix = sharedElementsClosing ? undefined : layoutPrefix;
 
   return (
-    <section ref={sectionRef} className="p-5 sm:p-6">
+    <section className="p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
         {activeLayoutPrefix ? (
           <motion.span
@@ -393,34 +354,17 @@ export function ScenicDetailPanel({
             </dl>
           ) : null}
         </div>
-      </motion.div>
 
-      <div
-        ref={subjectListRef}
-        className="relative mt-4 flex flex-wrap gap-1.5 pt-4"
-      >
-        <motion.div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-px bg-border"
-          initial={false}
-          animate={{ opacity: supportingPhase === "closing" ? 0 : 1 }}
-          transition={{
-            duration: shouldReduceMotion ? 0 : 0.18,
-            ease: [0.23, 1, 0.32, 1],
-          }}
-        />
-        {item.subjects.map((subject) => (
-          <ScenicSubjectTag
-            key={subject}
-            subject={subject}
-            invisible={
-              (supportingPhase === "opening" &&
-                item.subjects.slice(0, 4).includes(subject)) ||
-              hiddenSubjects.includes(subject)
-            }
+        <div className="relative mt-4 flex flex-wrap gap-1.5 pt-4">
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-px bg-border"
           />
-        ))}
-      </div>
+          {item.subjects.map((subject) => (
+            <ScenicSubjectTag key={subject} subject={subject} />
+          ))}
+        </div>
+      </motion.div>
 
       {navigationTarget ? (
         <motion.div
