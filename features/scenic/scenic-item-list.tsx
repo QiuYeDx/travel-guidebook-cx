@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import type { ParkingLevel, ScenicItem, Viewpoint } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
-import { motion, useReducedMotion } from "motion/react";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 
 import {
   scenicKindLabels,
@@ -53,29 +53,75 @@ type ScenicItemListProps = {
   onSelect: (id: string, trigger: HTMLButtonElement) => void;
 };
 
-function ScenicCardContent({
+function ScenicCardHeader({
   item,
   index,
+  layoutPrefix,
+  fadeNonShared = false,
+  shouldReduceMotion = false,
 }: {
   item: ScenicItem;
   index: number;
+  layoutPrefix?: string;
+  fadeNonShared?: boolean;
+  shouldReduceMotion?: boolean | null;
 }) {
   const corridor = isScenicCorridor(item);
   const Icon = corridor ? RouteIcon : kindIcons[item.kind];
-  const ParkingIcon =
-    item.parking.level === "P0" ? ShieldCheckIcon : ShieldAlertIcon;
 
   return (
-    <>
-      <div className="flex min-w-0 items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+    <div className="flex min-w-0 items-start justify-between gap-4">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          {layoutPrefix ? (
+            <motion.span
+              layoutId={`${layoutPrefix}-index`}
+              layoutCrossfade={false}
+              transition={CARD_TRANSITION}
+              className="font-mono text-xs font-medium tabular-nums text-muted-foreground"
+            >
+              {String(index + 1).padStart(2, "0")}
+            </motion.span>
+          ) : (
             <span className="font-mono text-xs font-medium tabular-nums text-muted-foreground">
               {String(index + 1).padStart(2, "0")}
             </span>
+          )}
+          {layoutPrefix ? (
+            <motion.span
+              layoutId={`${layoutPrefix}-kind`}
+              layoutCrossfade={false}
+              transition={CARD_TRANSITION}
+              className="inline-flex"
+            >
+              <Badge variant="outline">
+                {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
+              </Badge>
+            </motion.span>
+          ) : (
             <Badge variant="outline">
               {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
             </Badge>
+          )}
+          {layoutPrefix ? (
+            <motion.span
+              layoutId={`${layoutPrefix}-priority`}
+              layoutCrossfade={false}
+              transition={CARD_TRANSITION}
+              className="inline-flex"
+            >
+              <Badge
+                variant={item.priority === "core" ? "default" : "secondary"}
+                className={
+                  item.priority === "core"
+                    ? "bg-emerald-700 text-white hover:bg-emerald-700"
+                    : undefined
+                }
+              >
+                {scenicPriorityLabels[item.priority]}
+              </Badge>
+            </motion.span>
+          ) : (
             <Badge
               variant={item.priority === "core" ? "default" : "secondary"}
               className={
@@ -86,50 +132,96 @@ function ScenicCardContent({
             >
               {scenicPriorityLabels[item.priority]}
             </Badge>
-          </div>
-          <h3 className="mt-1 text-lg font-semibold leading-7 sm:text-xl">
+          )}
+        </div>
+        {layoutPrefix ? (
+          <motion.h3
+            layoutId={`${layoutPrefix}-title`}
+            layoutCrossfade={false}
+            transition={CARD_TRANSITION}
+            className="mt-2 text-lg font-semibold leading-7 sm:text-xl"
+          >
+            {item.title}
+          </motion.h3>
+        ) : (
+          <h3 className="mt-2 text-lg font-semibold leading-7 sm:text-xl">
             {item.title}
           </h3>
-        </div>
+        )}
+      </div>
+      <motion.span
+        initial={false}
+        animate={{ opacity: fadeNonShared ? 0 : 1 }}
+        transition={{
+          duration: shouldReduceMotion ? 0 : 0.18,
+          ease: CARD_EASE,
+        }}
+        className="shrink-0"
+      >
         <Icon
-          className="size-6 shrink-0 text-foreground/80 dark:text-foreground/75"
+          className="size-6 text-foreground/80 dark:text-foreground/75"
           strokeWidth={1.8}
           aria-hidden="true"
         />
-      </div>
+      </motion.span>
+    </div>
+  );
+}
 
-      <div className="min-w-0">
-        <p className="text-sm leading-6 text-foreground/75">
-          {corridor ? item.passengerCue : item.parking.note}
-        </p>
-        <div className="mt-3 flex flex-wrap items-center gap-1.5">
-          {item.subjects.slice(0, 4).map((subject) => (
-            <span
-              key={subject}
-              className="rounded-full bg-muted/70 px-2.5 py-1 text-[11px] leading-4 text-muted-foreground"
-            >
-              {scenicSubjectLabels[subject]}
-            </span>
-          ))}
+function ScenicCardBody({ item }: { item: ScenicItem }) {
+  const corridor = isScenicCorridor(item);
+  const ParkingIcon =
+    item.parking.level === "P0" ? ShieldCheckIcon : ShieldAlertIcon;
+
+  return (
+    <div className="min-w-0">
+      <p className="text-sm leading-6 text-foreground/75">
+        {corridor ? item.passengerCue : item.parking.note}
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+        {item.subjects.slice(0, 4).map((subject) => (
           <span
-            className={cn(
-              "ml-auto inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium ring-1 ring-inset",
-              parkingToneClasses[item.parking.level],
-            )}
+            key={subject}
+            className="rounded-full bg-muted/70 px-2.5 py-1 text-[11px] leading-4 text-muted-foreground"
           >
-            <ParkingIcon className="size-3.5 shrink-0" aria-hidden="true" />
-            <span className="truncate">
-              {scenicParkingLabels[item.parking.level]}
-            </span>
+            {scenicSubjectLabels[subject]}
           </span>
-        </div>
+        ))}
+        <span
+          className={cn(
+            "ml-auto inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium ring-1 ring-inset",
+            parkingToneClasses[item.parking.level],
+          )}
+        >
+          <ParkingIcon className="size-3.5 shrink-0" aria-hidden="true" />
+          <span className="truncate">
+            {scenicParkingLabels[item.parking.level]}
+          </span>
+        </span>
       </div>
+    </div>
+  );
+}
+
+function ScenicCardContent({
+  item,
+  index,
+  layoutPrefix,
+}: {
+  item: ScenicItem;
+  index: number;
+  layoutPrefix?: string;
+}) {
+  return (
+    <>
+      <ScenicCardHeader item={item} index={index} layoutPrefix={layoutPrefix} />
+      <ScenicCardBody item={item} />
     </>
   );
 }
 
 const CARD_CLASS_NAME =
-  "flex min-h-44 w-full flex-col gap-4 rounded-2xl border border-border/65 bg-card p-4 text-left shadow-xs sm:p-5";
+  "flex min-h-44 w-full flex-col gap-3 rounded-2xl border border-border/65 bg-card p-4 text-left shadow-xs sm:p-5";
 
 function ScenicDetailVisual({
   item,
@@ -190,38 +282,33 @@ function ScenicDetailVisual({
         <XIcon className="size-4" aria-hidden="true" />
       </motion.button>
 
-      <motion.div
-        className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border bg-background"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase === "closing" ? 0 : 1 }}
-        transition={{
-          duration: shouldReduceMotion ? 0 : 0.24,
-          delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.04,
-          ease: CARD_EASE,
-        }}
-      >
+      <div className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl">
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-2xl border bg-background"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: phase === "closing" ? 0 : 1 }}
+          transition={{
+            duration: shouldReduceMotion ? 0 : 0.24,
+            delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.04,
+            ease: CARD_EASE,
+          }}
+        />
         <div
           ref={contentRef}
-          className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          className="relative z-10 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: phase === "closing" ? 0 : 1 }}
-            transition={{
-              duration: shouldReduceMotion ? 0 : 0.26,
-              delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.06,
-              ease: CARD_EASE,
-            }}
-          >
-            <ScenicDetailPanel
-              item={item}
-              index={index}
-              selectedDayId={selectedDayId}
-              titleId={titleId}
-            />
-          </motion.div>
+          <ScenicDetailPanel
+            item={item}
+            index={index}
+            selectedDayId={selectedDayId}
+            titleId={titleId}
+            layoutPrefix={`scenic-${item.id}`}
+            supportingPhase={phase}
+            shouldReduceMotion={shouldReduceMotion}
+          />
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -229,23 +316,36 @@ function ScenicDetailVisual({
 function ScenicCardVisual({
   item,
   index,
-  active,
+  fadeBody,
+  shouldReduceMotion,
 }: {
   item: ScenicItem;
   index: number;
-  active: boolean;
+  fadeBody: boolean;
+  shouldReduceMotion: boolean | null;
 }) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        CARD_CLASS_NAME,
-        "h-full pointer-events-none",
-        active &&
-          "border-emerald-600/50 bg-emerald-50/35 ring-2 ring-emerald-600/15 dark:border-emerald-500/45 dark:bg-emerald-950/20",
-      )}
+      className={cn(CARD_CLASS_NAME, "h-full pointer-events-none")}
     >
-      <ScenicCardContent item={item} index={index} />
+      <ScenicCardHeader
+        item={item}
+        index={index}
+        layoutPrefix={`scenic-${item.id}`}
+        fadeNonShared={fadeBody}
+        shouldReduceMotion={shouldReduceMotion}
+      />
+      <motion.div
+        initial={false}
+        animate={{ opacity: fadeBody ? 0 : 1 }}
+        transition={{
+          duration: shouldReduceMotion ? 0 : 0.2,
+          ease: CARD_EASE,
+        }}
+      >
+        <ScenicCardBody item={item} />
+      </motion.div>
     </div>
   );
 }
@@ -380,110 +480,104 @@ export function ScenicItemList({
       : undefined;
 
   return (
-    <ol ref={listRef} className="relative grid gap-4 lg:grid-cols-2">
-      {items.map((item, index) => {
-        const active = item.id === activeItemId;
-        const itemRect = itemRects.get(item.id);
-        const visualRect = active && expandedRect ? expandedRect : itemRect;
-        return (
-          <li
-            key={item.id}
-            id={`scenic-list-${item.id}`}
-            ref={(node) => {
-              if (node) itemRefs.current.set(item.id, node);
-              else itemRefs.current.delete(item.id);
-            }}
-            className="h-full min-w-0"
-          >
-            <button
-              type="button"
-              aria-controls={detailsPanelId}
-              aria-expanded={active}
-              onPointerDown={(event) => event.preventDefault()}
-              onClick={(event) => onSelect(item.id, event.currentTarget)}
-              className={cn(
-                CARD_CLASS_NAME,
-                "cursor-pointer opacity-0 focus-visible:outline-none",
-              )}
-              aria-label={`打开 ${item.title} 详情`}
+    <LayoutGroup id={detailsPanelId}>
+      <ol ref={listRef} className="relative grid gap-4 lg:grid-cols-2">
+        {items.map((item, index) => {
+          const active = item.id === activeItemId;
+          const itemRect = itemRects.get(item.id);
+          const visualRect = active && expandedRect ? expandedRect : itemRect;
+          return (
+            <li
+              key={item.id}
+              id={`scenic-list-${item.id}`}
+              ref={(node) => {
+                if (node) itemRefs.current.set(item.id, node);
+                else itemRefs.current.delete(item.id);
+              }}
+              className="h-full min-w-0"
             >
-              <span aria-hidden="true">
-                <ScenicCardContent item={item} index={index} />
-              </span>
-            </button>
-            {visualRect ? (
-              <>
-                {active && overlayPhase ? (
-                  <motion.div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute z-[44] rounded-2xl bg-black/20 blur-xl"
-                    initial={{ opacity: 0 }}
-                    animate={{
-                      ...visualRect,
-                      opacity: overlayPhase === "closing" ? 0 : 1,
-                    }}
-                    transition={
-                      shouldReduceMotion
-                        ? { duration: 0 }
-                        : {
-                            ...CARD_TRANSITION,
-                            delay: overlayPhase === "opening" ? 0.04 : 0,
-                          }
-                    }
-                  />
-                ) : null}
-                <motion.div
-                  className={cn(
-                    "absolute",
-                    active ? "z-[45]" : "z-10",
-                    active ? "pointer-events-auto" : "pointer-events-none",
-                  )}
-                  initial={false}
-                  animate={visualRect}
-                  transition={
-                    shouldReduceMotion ? { duration: 0 } : CARD_TRANSITION
-                  }
-                >
-                  <motion.div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 z-30"
-                    initial={false}
-                    animate={{
-                      opacity:
-                        active && overlayPhase && overlayPhase !== "closing"
-                          ? 0
-                          : 1,
-                    }}
-                    transition={{
-                      duration: shouldReduceMotion ? 0 : 0.24,
-                      ease: CARD_EASE,
-                    }}
-                  >
-                    <ScenicCardVisual
-                      item={item}
-                      index={index}
-                      active={false}
-                    />
-                  </motion.div>
+              <button
+                type="button"
+                aria-controls={detailsPanelId}
+                aria-expanded={active}
+                onPointerDown={(event) => event.preventDefault()}
+                onClick={(event) => onSelect(item.id, event.currentTarget)}
+                className={cn(
+                  CARD_CLASS_NAME,
+                  "cursor-pointer opacity-0 focus-visible:outline-none",
+                )}
+                aria-label={`打开 ${item.title} 详情`}
+              >
+                <span aria-hidden="true">
+                  <ScenicCardContent item={item} index={index} />
+                </span>
+              </button>
+              {visualRect ? (
+                <>
                   {active && overlayPhase ? (
-                    <ScenicDetailVisual
-                      item={item}
-                      index={index}
-                      phase={overlayPhase}
-                      selectedDayId={selectedDayId}
-                      detailsPanelId={detailsPanelId}
-                      titleId={titleId}
-                      onClose={onClose}
-                      onContentHeightChange={onContentHeightChange}
-                      shouldReduceMotion={shouldReduceMotion}
+                    <motion.div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute z-[44] rounded-2xl bg-black/20 blur-xl"
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        ...visualRect,
+                        opacity: overlayPhase === "closing" ? 0 : 1,
+                      }}
+                      transition={
+                        shouldReduceMotion
+                          ? { duration: 0 }
+                          : {
+                              ...CARD_TRANSITION,
+                              delay: overlayPhase === "opening" ? 0.04 : 0,
+                            }
+                      }
                     />
                   ) : null}
-                </motion.div>
-              </>
-            ) : null}
-          </li>
-        );
-      })}
-    </ol>
+                  <motion.div
+                    className={cn(
+                      "absolute",
+                      active ? "z-[45]" : "z-10",
+                      active ? "pointer-events-auto" : "pointer-events-none",
+                    )}
+                    initial={false}
+                    animate={visualRect}
+                    transition={
+                      shouldReduceMotion ? { duration: 0 } : CARD_TRANSITION
+                    }
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 z-10"
+                    >
+                      <ScenicCardVisual
+                        item={item}
+                        index={index}
+                        shouldReduceMotion={shouldReduceMotion}
+                        fadeBody={Boolean(
+                          active && overlayPhase && overlayPhase !== "closing",
+                        )}
+                      />
+                    </div>
+                    {active && overlayPhase ? (
+                      <ScenicDetailVisual
+                        item={item}
+                        index={index}
+                        phase={overlayPhase}
+                        selectedDayId={selectedDayId}
+                        detailsPanelId={detailsPanelId}
+                        titleId={titleId}
+                        onClose={onClose}
+                        onContentHeightChange={onContentHeightChange}
+                        shouldReduceMotion={shouldReduceMotion}
+                      />
+                    ) : null}
+                  </motion.div>
+                </>
+              ) : null}
+            </li>
+          );
+        })}
+      </ol>
+    </LayoutGroup>
   );
 }

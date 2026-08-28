@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { createAmapNavigationUrl } from "@/lib/navigation/map-links";
 import type { ScenicItem } from "@/lib/trip/types";
+import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 
 import {
   scenicDirectionLabels,
@@ -70,11 +72,17 @@ export function ScenicDetailPanel({
   index,
   selectedDayId,
   titleId,
+  layoutPrefix,
+  supportingPhase,
+  shouldReduceMotion = false,
 }: {
   item?: ScenicItem;
   index: number;
   selectedDayId: string;
   titleId?: string;
+  layoutPrefix?: string;
+  supportingPhase?: "opening" | "open" | "closing";
+  shouldReduceMotion?: boolean | null;
 }) {
   if (!item) {
     return (
@@ -96,130 +104,218 @@ export function ScenicDetailPanel({
   const corridor = isScenicCorridor(item);
   const navigationTarget = getParkingNavigationTarget(item);
   const parkingAction = getParkingAction(item);
+  const sharedElementsClosing = Boolean(
+    layoutPrefix && supportingPhase === "closing",
+  );
+  const activeLayoutPrefix = sharedElementsClosing ? undefined : layoutPrefix;
 
   return (
     <section className="p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-xs font-medium tabular-nums text-muted-foreground">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-        <Badge variant="outline">
-          {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
-        </Badge>
-        <Badge
-          className={
-            item.priority === "core"
-              ? "bg-emerald-700 text-white hover:bg-emerald-700"
-              : undefined
-          }
-          variant={item.priority === "core" ? "default" : "secondary"}
-        >
-          {scenicPriorityLabels[item.priority]}
-        </Badge>
+        {activeLayoutPrefix ? (
+          <motion.span
+            layoutId={`${activeLayoutPrefix}-index`}
+            layoutCrossfade={false}
+            transition={{ type: "spring", duration: 0.48, bounce: 0 }}
+            className="font-mono text-xs font-medium tabular-nums text-muted-foreground"
+          >
+            {String(index + 1).padStart(2, "0")}
+          </motion.span>
+        ) : (
+          <span
+            className={cn(
+              "font-mono text-xs font-medium tabular-nums text-muted-foreground",
+              sharedElementsClosing && "invisible",
+            )}
+          >
+            {String(index + 1).padStart(2, "0")}
+          </span>
+        )}
+        {activeLayoutPrefix ? (
+          <motion.span
+            layoutId={`${activeLayoutPrefix}-kind`}
+            layoutCrossfade={false}
+            transition={{ type: "spring", duration: 0.48, bounce: 0 }}
+            className="inline-flex"
+          >
+            <Badge variant="outline">
+              {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
+            </Badge>
+          </motion.span>
+        ) : (
+          <Badge
+            variant="outline"
+            className={cn(sharedElementsClosing && "invisible")}
+          >
+            {corridor ? "车览走廊" : scenicKindLabels[item.kind]}
+          </Badge>
+        )}
+        {activeLayoutPrefix ? (
+          <motion.span
+            layoutId={`${activeLayoutPrefix}-priority`}
+            layoutCrossfade={false}
+            transition={{ type: "spring", duration: 0.48, bounce: 0 }}
+            className="inline-flex"
+          >
+            <Badge
+              className={
+                item.priority === "core"
+                  ? "bg-emerald-700 text-white hover:bg-emerald-700"
+                  : undefined
+              }
+              variant={item.priority === "core" ? "default" : "secondary"}
+            >
+              {scenicPriorityLabels[item.priority]}
+            </Badge>
+          </motion.span>
+        ) : (
+          <Badge
+            className={cn(
+              item.priority === "core" &&
+                "bg-emerald-700 text-white hover:bg-emerald-700",
+              sharedElementsClosing && "invisible",
+            )}
+            variant={item.priority === "core" ? "default" : "secondary"}
+          >
+            {scenicPriorityLabels[item.priority]}
+          </Badge>
+        )}
         {item.dayId !== selectedDayId ? (
           <Badge variant="secondary">源自 {item.dayId} 返程补拍</Badge>
         ) : null}
       </div>
 
-      <h2
-        id={titleId}
-        className="mt-4 text-xl font-semibold leading-7"
-        aria-live="polite"
+      {activeLayoutPrefix ? (
+        <motion.h2
+          id={titleId}
+          layoutId={`${activeLayoutPrefix}-title`}
+          layoutCrossfade={false}
+          transition={{ type: "spring", duration: 0.48, bounce: 0 }}
+          className="mt-4 text-xl font-semibold leading-7"
+          aria-live="polite"
+        >
+          {item.title}
+        </motion.h2>
+      ) : (
+        <h2
+          id={titleId}
+          className={cn(
+            "mt-4 text-xl font-semibold leading-7",
+            sharedElementsClosing && "invisible",
+          )}
+          aria-live="polite"
+        >
+          {item.title}
+        </h2>
+      )}
+
+      <motion.div
+        initial={
+          supportingPhase === "opening" && !shouldReduceMotion
+            ? { opacity: 0, y: 5 }
+            : false
+        }
+        animate={{
+          opacity: supportingPhase === "closing" ? 0 : 1,
+          y: 0,
+        }}
+        transition={{
+          duration: shouldReduceMotion ? 0 : 0.22,
+          ease: [0.23, 1, 0.32, 1],
+        }}
       >
-        {item.title}
-      </h2>
+        <dl className="mt-5 grid grid-cols-2 gap-4 border-y py-4 text-sm">
+          <div>
+            <dt className="flex items-center gap-2 text-xs text-muted-foreground">
+              <CompassIcon className="size-3.5" aria-hidden="true" />
+              行驶方向
+            </dt>
+            <dd className="mt-1 font-medium">
+              {scenicDirectionLabels[item.direction]}
+            </dd>
+          </div>
+          <div>
+            <dt className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Clock3Icon className="size-3.5" aria-hidden="true" />
+              预计停留
+            </dt>
+            <dd className="mt-1 font-medium tabular-nums">
+              {!corridor && item.stayMinutesEstimate
+                ? `${item.stayMinutesEstimate[0]}-${item.stayMinutesEstimate[1]} min`
+                : "连续车览"}
+            </dd>
+          </div>
+        </dl>
 
-      <dl className="mt-5 grid grid-cols-2 gap-4 border-y py-4 text-sm">
-        <div>
-          <dt className="flex items-center gap-2 text-xs text-muted-foreground">
-            <CompassIcon className="size-3.5" aria-hidden="true" />
-            行驶方向
-          </dt>
-          <dd className="mt-1 font-medium">
-            {scenicDirectionLabels[item.direction]}
-          </dd>
+        <div className="mt-5">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <MapPinnedIcon
+              className="size-4 text-emerald-700 dark:text-emerald-400"
+              aria-hidden="true"
+            />
+            位置
+          </h3>
+          <GeoDescription item={item} />
         </div>
-        <div>
-          <dt className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Clock3Icon className="size-3.5" aria-hidden="true" />
-            预计停留
-          </dt>
-          <dd className="mt-1 font-medium tabular-nums">
-            {!corridor && item.stayMinutesEstimate
-              ? `${item.stayMinutesEstimate[0]}-${item.stayMinutesEstimate[1]} min`
-              : "连续车览"}
-          </dd>
-        </div>
-      </dl>
 
-      <div className="mt-5">
-        <h3 className="flex items-center gap-2 text-sm font-semibold">
-          <MapPinnedIcon
-            className="size-4 text-emerald-700 dark:text-emerald-400"
-            aria-hidden="true"
-          />
-          位置
-        </h3>
-        <GeoDescription item={item} />
-      </div>
-
-      <div className="mt-5">
-        <h3 className="flex items-center gap-2 text-sm font-semibold">
-          <ShieldCheckIcon
-            className="size-4 text-amber-700 dark:text-amber-400"
-            aria-hidden="true"
-          />
-          停车
-        </h3>
-        <p className="mt-2 text-sm font-medium">
-          {scenicParkingLabels[item.parking.level]} ·{" "}
-          {scenicVerificationLabels[item.parking.verificationStatus]}
-        </p>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          {item.parking.note}
-        </p>
-        {parkingAction ? (
-          <p className="mt-2 text-sm leading-6 text-amber-800 dark:text-amber-300">
-            {parkingAction}
+        <div className="mt-5">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <ShieldCheckIcon
+              className="size-4 text-amber-700 dark:text-amber-400"
+              aria-hidden="true"
+            />
+            停车
+          </h3>
+          <p className="mt-2 text-sm font-medium">
+            {scenicParkingLabels[item.parking.level]} ·{" "}
+            {scenicVerificationLabels[item.parking.verificationStatus]}
           </p>
-        ) : null}
-        {item.parking.entryDirectionNote ? (
-          <p className="mt-2 text-xs leading-5 text-muted-foreground">
-            进出方向：{item.parking.entryDirectionNote}
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {item.parking.note}
           </p>
-        ) : null}
-        {item.parking.capacityNote ? (
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            现场提示：{item.parking.capacityNote}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="mt-5">
-        <h3 className="text-sm font-semibold">拍摄对象</h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {item.subjects.map((subject) => (
-            <Badge key={subject} variant="secondary">
-              {scenicSubjectLabels[subject]}
-            </Badge>
-          ))}
+          {parkingAction ? (
+            <p className="mt-2 text-sm leading-6 text-amber-800 dark:text-amber-300">
+              {parkingAction}
+            </p>
+          ) : null}
+          {item.parking.entryDirectionNote ? (
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              进出方向：{item.parking.entryDirectionNote}
+            </p>
+          ) : null}
+          {item.parking.capacityNote ? (
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              现场提示：{item.parking.capacityNote}
+            </p>
+          ) : null}
         </div>
-      </div>
 
-      {navigationTarget ? (
-        <div className="mt-6">
-          <Button asChild>
-            <a
-              href={createAmapNavigationUrl(navigationTarget)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              导航到停车点
-              <ArrowUpRightIcon aria-hidden="true" />
-            </a>
-          </Button>
+        <div className="mt-5">
+          <h3 className="text-sm font-semibold">拍摄对象</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {item.subjects.map((subject) => (
+              <Badge key={subject} variant="secondary">
+                {scenicSubjectLabels[subject]}
+              </Badge>
+            ))}
+          </div>
         </div>
-      ) : null}
+
+        {navigationTarget ? (
+          <div className="mt-6">
+            <Button asChild>
+              <a
+                href={createAmapNavigationUrl(navigationTarget)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                导航到停车点
+                <ArrowUpRightIcon aria-hidden="true" />
+              </a>
+            </Button>
+          </div>
+        ) : null}
+      </motion.div>
     </section>
   );
 }
