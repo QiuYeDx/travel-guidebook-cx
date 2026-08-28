@@ -276,8 +276,8 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
         >
           <TabsContent value="overview" className="mt-0">
             <section>
-              <div className="flex flex-col items-start gap-4 rounded-xl border bg-card p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
-                <div>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border bg-card p-4 sm:gap-4 sm:p-5">
+                <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">
                     沿行驶方向排列
                   </p>
