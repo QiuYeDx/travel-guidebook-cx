@@ -4,24 +4,23 @@ import test from "node:test";
 import type { ScenicCorridor, Viewpoint } from "@/lib/trip/types";
 
 import {
-  buildRouteLegCopyText,
   buildScenicItemCopyText,
   createAmapNavigationUrl,
   createAmapSearchUrl,
 } from "./map-links";
 
-test("Amap search URI safely carries Chinese places and multiple waypoints", () => {
-  const url = new URL(createAmapSearchUrl("新都桥 → 雅江 → 理塘 → 香格里拉镇"));
+test("Amap search URI safely carries one Chinese place", () => {
+  const url = new URL(createAmapSearchUrl("新都桥"));
 
   assert.equal(url.origin, "https://uri.amap.com");
   assert.equal(url.pathname, "/search");
   assert.equal(
     url.searchParams.get("keyword"),
-    "新都桥 → 雅江 → 理塘 → 香格里拉镇",
+    "新都桥",
   );
   assert.equal(url.searchParams.get("view"), "map");
   assert.equal(url.searchParams.get("callnative"), "1");
-  assert.doesNotMatch(url.toString(), /新都桥|香格里拉镇/);
+  assert.doesNotMatch(url.toString(), /新都桥/);
 });
 
 test("Amap links reject empty text and invalid coordinates", () => {
@@ -65,20 +64,6 @@ test("exact parking navigation uses reviewed GCJ-02 coordinates", () => {
   );
   assert.equal(url.searchParams.get("mode"), "car");
   assert.equal(url.searchParams.get("coordinate"), "gaode");
-});
-
-test("route copy text preserves waypoint order without live position", () => {
-  const text = buildRouteLegCopyText({
-    id: "LEG-D3-01",
-    from: "新都桥",
-    to: "香格里拉镇",
-    via: ["雅江", "理塘", "稻城"],
-    navigationQuery: "新都桥 → 雅江 → 理塘 → 稻城 → 香格里拉镇",
-  });
-
-  assert.match(text, /路线：新都桥 → 雅江 → 理塘 → 稻城 → 香格里拉镇/);
-  assert.match(text, /不替代实时导航/);
-  assert.doesNotMatch(text, /当前位置|实时位置/);
 });
 
 test("scenic copy text distinguishes corridors and exact entrances", () => {

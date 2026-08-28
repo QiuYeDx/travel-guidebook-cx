@@ -18,10 +18,7 @@ import { Button } from "@/components/ui/button";
 import { ClipPathTabs } from "@/components/qiuye-ui/clip-path-tabs";
 import { TabsContent } from "@/components/ui/tabs";
 import { CopyAction } from "@/features/navigation/copy-action";
-import {
-  buildRouteLegCopyText,
-  createAmapSearchUrl,
-} from "@/lib/navigation/map-links";
+import { createAmapSearchUrl } from "@/lib/navigation/map-links";
 import type { TripDay } from "@/lib/trip/types";
 
 import {
@@ -135,30 +132,16 @@ function RoutePanel({ itinerary }: { itinerary: DayItinerary }) {
     <div className="space-y-3">
       {day.legs.map((leg) => (
         <article key={leg.id} className="rounded-xl border p-4 sm:p-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
-                {leg.id}
-              </p>
-              <h3 className="mt-1 text-base font-semibold">
-                {leg.from} → {leg.to}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {leg.via.join(" · ") || "直达"}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild variant="outline" size="sm">
-                <a
-                  href={createAmapSearchUrl(leg.navigationQuery)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  高德导航 <ArrowUpRightIcon aria-hidden="true" />
-                </a>
-              </Button>
-              <CopyAction text={buildRouteLegCopyText(leg)} label="复制路线" />
-            </div>
+          <div>
+            <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+              {leg.id}
+            </p>
+            <h3 className="mt-1 text-base font-semibold">
+              {leg.from} → {leg.to}
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {leg.via.join(" · ") || "直达"}
+            </p>
           </div>
           <dl className="mt-4 grid grid-cols-2 gap-3 border-t pt-4 text-sm sm:grid-cols-3">
             <div>
@@ -183,6 +166,66 @@ function RoutePanel({ itinerary }: { itinerary: DayItinerary }) {
         </article>
       ))}
     </div>
+  );
+}
+
+function RouteStops({ itinerary }: { itinerary: DayItinerary }) {
+  const points = itinerary.day.legs.reduce<string[]>((result, leg) => {
+    for (const point of [leg.from, ...leg.via, leg.to]) {
+      if (result.at(-1) !== point) result.push(point);
+    }
+    return result;
+  }, []);
+
+  if (!points.length) return null;
+
+  return (
+    <section className="rounded-xl border bg-card p-4 sm:p-5">
+      <div>
+        <p className="text-xs text-muted-foreground">按行驶顺序逐点使用</p>
+        <h2 className="mt-1 text-xl font-semibold">路线地点</h2>
+      </div>
+      <ol className="mt-4 divide-y border-y">
+        {points.map((point, index) => {
+          const role =
+            index === 0
+              ? "起点"
+              : index === points.length - 1
+                ? "终点"
+                : "途经";
+
+          return (
+            <li
+              key={`${point}-${index}`}
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted font-mono text-[0.6875rem] tabular-nums text-muted-foreground">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{point}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{role}</p>
+                </div>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button asChild variant="outline" size="sm">
+                  <a
+                    href={createAmapSearchUrl(point)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`在高德地图搜索${point}`}
+                  >
+                    高德 <ArrowUpRightIcon aria-hidden="true" />
+                  </a>
+                </Button>
+                <CopyAction text={point} label="复制" />
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
   );
 }
 
@@ -278,24 +321,29 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
             <RoutePanel itinerary={itinerary} />
           </TabsContent>
           <TabsContent value="route" className="mt-0">
-            <section>
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border bg-card p-4 sm:gap-4 sm:p-5">
-                <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground">
-                    沿行驶方向排列
-                  </p>
-                  <h2 className="mt-1 text-xl font-semibold">核心停靠与车览</h2>
+            <div className="space-y-3 md:space-y-4">
+              <RouteStops itinerary={itinerary} />
+              <section>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border bg-card p-4 sm:gap-4 sm:p-5">
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">
+                      沿行驶方向排列
+                    </p>
+                    <h2 className="mt-1 text-xl font-semibold">
+                      核心停靠与车览
+                    </h2>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/scenic?day=${day.id}`}>
+                      打开观景页 <ArrowRightIcon aria-hidden="true" />
+                    </Link>
+                  </Button>
                 </div>
-                <Button asChild variant="outline" size="sm">
-                  <Link href={`/scenic?day=${day.id}`}>
-                    打开观景页 <ArrowRightIcon aria-hidden="true" />
-                  </Link>
-                </Button>
-              </div>
-              <div className="mt-3">
-                <ScenicRouteList items={itinerary.scenicSummary} compact />
-              </div>
-            </section>
+                <div className="mt-3">
+                  <ScenicRouteList items={itinerary.scenicSummary} compact />
+                </div>
+              </section>
+            </div>
           </TabsContent>
           <TabsContent value="notes" className="mt-0">
             <div className="grid gap-4 sm:grid-cols-2">

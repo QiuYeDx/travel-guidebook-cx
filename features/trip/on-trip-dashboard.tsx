@@ -22,10 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { CopyAction } from "@/features/navigation/copy-action";
-import {
-  buildRouteLegCopyText,
-  createAmapSearchUrl,
-} from "@/lib/navigation/map-links";
+import { createAmapSearchUrl } from "@/lib/navigation/map-links";
 import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 
@@ -128,10 +125,7 @@ export function OnTripDashboard({
         </div>
       </section>
 
-      <section
-        aria-label="手动切换行程日期"
-        className="mt-4 border-y py-3"
-      >
+      <section aria-label="手动切换行程日期" className="mt-4 border-y py-3">
         <div className="min-w-0 text-center">
           <ResponsiveTabs
             value={day.id}
@@ -178,18 +172,15 @@ export function OnTripDashboard({
                 <div className="flex flex-wrap justify-end gap-2">
                   <Button asChild variant="outline" size="sm">
                     <a
-                      href={createAmapSearchUrl(primaryLeg.navigationQuery)}
+                      href={createAmapSearchUrl(primaryLeg.to)}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      打开高德
+                      高德查终点
                       <ArrowUpRightIcon aria-hidden="true" />
                     </a>
                   </Button>
-                  <CopyAction
-                    text={buildRouteLegCopyText(primaryLeg)}
-                    label="复制路线"
-                  />
+                  <CopyAction text={primaryLeg.to} label="复制终点" />
                 </div>
               ) : null}
             </div>

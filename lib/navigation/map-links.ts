@@ -1,4 +1,4 @@
-import type { RouteLeg, ScenicItem } from "@/lib/trip/types";
+import type { ScenicItem } from "@/lib/trip/types";
 
 const AMAP_SOURCE = "travel-guidebook-cx";
 
@@ -54,18 +54,6 @@ export function createAmapNavigationUrl({
   url.searchParams.set("src", AMAP_SOURCE);
   url.searchParams.set("callnative", "1");
   return url.toString();
-}
-
-export function buildRouteLegCopyText(leg: RouteLeg): string {
-  const points = [leg.from, ...leg.via, leg.to].map((point) =>
-    requireText(point, "Route point"),
-  );
-
-  return [
-    `路线：${points.join(" → ")}`,
-    `地图搜索词：${requireText(leg.navigationQuery, "Map search query")}`,
-    "提示：逐点加入车机并复核当天道路；本路书不替代实时导航。",
-  ].join("\n");
 }
 
 const directionLabels = {
