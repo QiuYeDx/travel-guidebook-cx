@@ -61,43 +61,41 @@ export function ItineraryTimeline({
                 <li key={day.id}>
                   <Link
                     href={`/days/${day.id}`}
-                    className="group grid grid-cols-[3.75rem_minmax(0,1fr)_1.25rem] items-start gap-x-3 gap-y-2 px-1 py-4 transition-colors hover:bg-muted/45 focus-visible:bg-muted/45 sm:px-3 sm:py-3.5 lg:grid-cols-[4.75rem_minmax(0,1fr)_auto_1.25rem] lg:items-center lg:gap-x-4"
+                    className="group grid grid-cols-[3.75rem_minmax(0,1fr)_1.25rem] items-baseline gap-x-3 gap-y-2 px-1 py-4 transition-colors hover:bg-muted/45 focus-visible:bg-muted/45 sm:px-3 sm:py-3.5 lg:grid-cols-[4.75rem_minmax(0,1fr)_auto_1.25rem] lg:gap-x-4"
                   >
-                    <div className="row-span-2 self-start lg:row-span-1 lg:self-center">
-                      <p className="font-mono text-sm font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
-                        {day.id}
-                      </p>
-                      <time
-                        className="mt-1 block text-xs text-muted-foreground"
-                        dateTime={day.date}
-                      >
-                        {formatTripDate(day.date)}
-                      </time>
+                    <p className="col-start-1 row-start-1 font-mono text-sm font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
+                      {day.id}
+                    </p>
+                    <time
+                      className="col-start-1 row-start-2 text-xs text-muted-foreground"
+                      dateTime={day.date}
+                    >
+                      {formatTripDate(day.date)}
+                    </time>
+                    <Badge
+                      variant="outline"
+                      className="col-start-1 row-start-3 h-5 self-center px-1.5 text-[11px] sm:hidden"
+                      aria-label={`强度 ${intensityLabels[day.intensity]}`}
+                    >
+                      {intensityLabels[day.intensity]}
+                    </Badge>
+
+                    <div className="col-start-2 row-start-1 flex min-w-0 flex-wrap items-center gap-2">
+                      <h3 className="min-w-0 w-full max-w-full break-words text-base font-semibold leading-6 sm:w-auto">
+                        {day.title}
+                      </h3>
                       <Badge
                         variant="outline"
-                        className="mt-2 h-5 px-1.5 text-[11px] sm:hidden"
-                        aria-label={`强度 ${intensityLabels[day.intensity]}`}
+                        className="hidden h-5 px-1.5 text-[11px] sm:inline-flex"
                       >
-                        {intensityLabels[day.intensity]}
+                        强度 {intensityLabels[day.intensity]}
                       </Badge>
                     </div>
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold leading-6">
-                          {day.title}
-                        </h3>
-                        <Badge
-                          variant="outline"
-                          className="hidden h-5 px-1.5 text-[11px] sm:inline-flex"
-                        >
-                          强度 {intensityLabels[day.intensity]}
-                        </Badge>
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground sm:line-clamp-1 sm:text-sm">
-                        {day.primaryGoal}
-                      </p>
-                    </div>
-                    <dl className="col-start-2 col-end-4 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground lg:col-auto lg:flex-nowrap lg:justify-end lg:gap-x-4">
+                    <p className="col-start-2 col-end-4 row-start-2 line-clamp-2 min-w-0 text-xs leading-5 text-muted-foreground sm:line-clamp-1 sm:text-sm lg:col-end-3">
+                      {day.primaryGoal}
+                    </p>
+
+                    <dl className="col-start-2 col-end-4 row-start-3 flex min-w-0 self-center flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-3 lg:flex-nowrap lg:justify-end lg:gap-x-4">
                       {itinerary.distanceKmEstimate ? (
                         <div className="flex shrink-0 items-center gap-1.5">
                           <dt className="sr-only">里程</dt>
@@ -137,7 +135,7 @@ export function ItineraryTimeline({
                       </div>
                     </dl>
                     <ArrowRightIcon
-                      className="col-start-3 row-start-1 size-4 self-center text-muted-foreground transition-transform group-hover:translate-x-0.5 lg:col-auto lg:row-auto"
+                      className="col-start-3 row-start-1 size-4 self-center text-muted-foreground transition-transform group-hover:translate-x-0.5 lg:col-start-4 lg:row-start-1 lg:row-end-3"
                       aria-hidden="true"
                     />
                   </Link>
