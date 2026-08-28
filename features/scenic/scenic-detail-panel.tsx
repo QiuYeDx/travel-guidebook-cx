@@ -4,11 +4,9 @@ import {
   ArrowUpRightIcon,
   Clock3Icon,
   CompassIcon,
-  CornerDownRightIcon,
   MapPinnedIcon,
   ParkingCircleIcon,
   RouteIcon,
-  ShieldCheckIcon,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -318,41 +316,6 @@ export function ScenicDetailPanel({
           <p className="mt-3 text-sm font-medium leading-6 text-foreground/90">
             {item.parking.note}
           </p>
-          {item.parking.entryDirectionNote || item.parking.capacityNote ? (
-            <dl className="mt-3 divide-y border-y text-xs">
-              {item.parking.entryDirectionNote ? (
-                <div
-                  className="grid gap-3 py-2.5"
-                  style={{ gridTemplateColumns: "4.5rem minmax(0, 1fr)" }}
-                >
-                  <dt className="flex items-center gap-1.5 text-muted-foreground">
-                    <CornerDownRightIcon
-                      className="size-3.5"
-                      aria-hidden="true"
-                    />
-                    进出方向
-                  </dt>
-                  <dd className="leading-5 text-foreground/75">
-                    {item.parking.entryDirectionNote}
-                  </dd>
-                </div>
-              ) : null}
-              {item.parking.capacityNote ? (
-                <div
-                  className="grid gap-3 py-2.5"
-                  style={{ gridTemplateColumns: "4.5rem minmax(0, 1fr)" }}
-                >
-                  <dt className="flex items-center gap-1.5 text-muted-foreground">
-                    <ShieldCheckIcon className="size-3.5" aria-hidden="true" />
-                    现场条件
-                  </dt>
-                  <dd className="leading-5 text-foreground/75">
-                    {item.parking.capacityNote}
-                  </dd>
-                </div>
-              ) : null}
-            </dl>
-          ) : null}
         </div>
 
         <div className="relative mt-4 flex flex-wrap gap-1.5 pt-4">
