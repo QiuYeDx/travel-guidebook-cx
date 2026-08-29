@@ -73,8 +73,8 @@ export function MobileTripNavigation() {
         inactiveForeground="var(--muted-foreground)"
         className="w-full"
         listClassName="h-14 items-center gap-1 py-1"
-        triggerClassName="h-12 rounded-lg px-2 [&>span]:flex-col [&>span]:gap-0.5 [&>span]:leading-none [&>span>span:last-child]:text-[0.6875rem]"
-        activeItemClassName="h-12 self-center rounded-lg px-2 [&>span]:flex-col [&>span]:gap-0.5 [&>span]:leading-none [&>span>span:last-child]:text-[0.6875rem]"
+        triggerClassName="mx-1 h-11 w-auto rounded-lg px-2 [&>span]:flex-col [&>span]:gap-0.5 [&>span]:leading-none [&>span>span:last-child]:text-[0.6875rem]"
+        activeItemClassName="mx-1 h-11 w-auto self-center rounded-lg px-2 [&>span]:flex-col [&>span]:gap-0.5 [&>span]:leading-none [&>span>span:last-child]:text-[0.6875rem]"
       />
     </nav>
   );
