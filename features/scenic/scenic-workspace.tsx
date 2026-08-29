@@ -1,14 +1,38 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "motion/react";
+import { useTheme } from "next-themes";
 
 import type { ScenicItem } from "@/lib/trip/types";
 
 import { ScenicItemList } from "./scenic-item-list";
 
 const PANEL_EASE = [0.23, 1, 0.32, 1] as const;
+const CLEAR_BACKDROP_FILTER = "blur(0px)";
+const DARK_BACKDROP_FILTER = "blur(6px)";
+const OVERLAY_BACKDROP_PROPERTY = "--scenic-overlay-backdrop-filter";
+const FOCUSABLE_ELEMENT_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+const OVERLAY_BACKDROP_STYLE = {
+  [OVERLAY_BACKDROP_PROPERTY]: CLEAR_BACKDROP_FILTER,
+  backdropFilter: `var(${OVERLAY_BACKDROP_PROPERTY})`,
+  WebkitBackdropFilter: `var(${OVERLAY_BACKDROP_PROPERTY})`,
+} satisfies CSSProperties & Record<typeof OVERLAY_BACKDROP_PROPERTY, string>;
 
 type OverlayPhase = "closed" | "opening" | "open" | "closing";
 type ViewportRect = {
@@ -63,6 +87,7 @@ export function ScenicWorkspace({
 }) {
   const instanceId = useId();
   const shouldReduceMotion = useReducedMotion();
+  const { resolvedTheme } = useTheme();
   const initialItem = items.find((item) => item.id === initialSelectedItemId);
   const [selectedId, setSelectedId] = useState<string | undefined>(
     initialItem?.id,
@@ -82,6 +107,10 @@ export function ScenicWorkspace({
   const panelId = `${instanceId}-scenic-details`;
   const panelTitleId = `${instanceId}-scenic-details-title`;
   const overlayMounted = overlayPhase !== "closed";
+  const overlayBackdropFilter =
+    resolvedTheme === "dark" && overlayPhase !== "closing"
+      ? DARK_BACKDROP_FILTER
+      : CLEAR_BACKDROP_FILTER;
 
   useEffect(() => {
     setPortalHost(document.body);
@@ -164,9 +193,45 @@ export function ScenicWorkspace({
     window.addEventListener("wheel", preventScroll, { passive: false });
     window.addEventListener("touchmove", preventScroll, { passive: false });
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      closeDetails();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeDetails();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+      const focusableElements = Array.from(
+        panel.querySelectorAll<HTMLElement>(FOCUSABLE_ELEMENT_SELECTOR),
+      ).filter((element) => element.getClientRects().length > 0);
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements.at(-1);
+      const activeElement = document.activeElement;
+
+      if (!firstElement || !lastElement) {
+        event.preventDefault();
+        panel.focus({ preventScroll: true });
+        return;
+      }
+
+      if (
+        event.shiftKey &&
+        (activeElement === firstElement || !panel.contains(activeElement))
+      ) {
+        event.preventDefault();
+        lastElement.focus({ preventScroll: true });
+        return;
+      }
+
+      if (
+        !event.shiftKey &&
+        (activeElement === lastElement || !panel.contains(activeElement))
+      ) {
+        event.preventDefault();
+        firstElement.focus({ preventScroll: true });
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -176,6 +241,20 @@ export function ScenicWorkspace({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [closeDetails, overlayMounted, panelId]);
+
+  useEffect(() => {
+    if (!overlayMounted) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const panel = document.getElementById(panelId);
+      const closeButton = panel?.querySelector<HTMLElement>(
+        "[data-scenic-detail-close]",
+      );
+      (closeButton ?? panel)?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [overlayMounted, panelId, selectedId]);
 
   useEffect(
     () => () => {
@@ -236,7 +315,6 @@ export function ScenicWorkspace({
           items={items}
           activeItemId={overlayMounted ? selectedId : undefined}
           detailsPanelId={panelId}
-          selectedDayId={dayId}
           titleId={panelTitleId}
           expandedViewportRect={
             overlayPhase === "closing"
@@ -252,50 +330,33 @@ export function ScenicWorkspace({
 
       {portalHost && overlayMounted
         ? createPortal(
-            <>
-              <motion.div
-                aria-hidden="true"
-                className="pointer-events-auto fixed inset-0 z-40 cursor-default bg-black/40"
-                onClick={() => closeDetails(false)}
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: overlayPhase === "closing" ? 0 : 1,
-                  transition: {
-                    duration: shouldReduceMotion
+            <motion.div
+              data-scenic-overlay=""
+              aria-hidden="true"
+              className="pointer-events-auto fixed inset-0 cursor-default bg-black/40"
+              style={{ ...OVERLAY_BACKDROP_STYLE, zIndex: 60 }}
+              onClick={() => closeDetails(false)}
+              initial={{
+                opacity: 0,
+                [OVERLAY_BACKDROP_PROPERTY]: CLEAR_BACKDROP_FILTER,
+              }}
+              animate={{
+                opacity: overlayPhase === "closing" ? 0 : 1,
+                [OVERLAY_BACKDROP_PROPERTY]: overlayBackdropFilter,
+                transition: {
+                  duration: shouldReduceMotion
+                    ? 0
+                    : overlayPhase === "closing"
+                      ? 0.18
+                      : 0.32,
+                  delay:
+                    shouldReduceMotion || overlayPhase === "closing"
                       ? 0
-                      : overlayPhase === "closing"
-                        ? 0.18
-                        : 0.32,
-                    delay:
-                      shouldReduceMotion || overlayPhase === "closing"
-                        ? 0
-                        : 0.12,
-                    ease: PANEL_EASE,
-                  },
-                }}
-              />
-              <motion.div
-                aria-hidden="true"
-                className="pointer-events-none fixed inset-x-0 top-0 bg-black/40"
-                style={{ zIndex: 55, height: 57 }}
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: overlayPhase === "closing" ? 0 : 1,
-                  transition: {
-                    duration: shouldReduceMotion
-                      ? 0
-                      : overlayPhase === "closing"
-                        ? 0.18
-                        : 0.32,
-                    delay:
-                      shouldReduceMotion || overlayPhase === "closing"
-                        ? 0
-                        : 0.12,
-                    ease: PANEL_EASE,
-                  },
-                }}
-              />
-            </>,
+                      : 0.12,
+                  ease: PANEL_EASE,
+                },
+              }}
+            />,
             portalHost,
           )
         : null}

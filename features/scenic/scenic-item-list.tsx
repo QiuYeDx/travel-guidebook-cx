@@ -44,7 +44,6 @@ type ScenicItemListProps = {
   items: ScenicItem[];
   activeItemId?: string;
   detailsPanelId: string;
-  selectedDayId: string;
   titleId: string;
   expandedViewportRect?: ScenicVisualRect;
   overlayPhase?: "opening" | "open" | "closing";
@@ -244,7 +243,6 @@ function ScenicDetailVisual({
   item,
   index,
   phase,
-  selectedDayId,
   detailsPanelId,
   titleId,
   onClose,
@@ -254,7 +252,6 @@ function ScenicDetailVisual({
   item: ScenicItem;
   index: number;
   phase: "opening" | "open" | "closing";
-  selectedDayId: string;
   detailsPanelId: string;
   titleId: string;
   onClose: (restoreFocus?: boolean) => void;
@@ -277,11 +274,14 @@ function ScenicDetailVisual({
   return (
     <div
       id={detailsPanelId}
-      role="region"
+      role="dialog"
+      aria-modal="true"
       aria-labelledby={titleId}
+      tabIndex={-1}
       className="pointer-events-auto relative h-full w-full overflow-hidden rounded-2xl"
     >
       <motion.button
+        data-scenic-detail-close=""
         type="button"
         onClick={() => onClose()}
         className={cn(
@@ -318,7 +318,6 @@ function ScenicDetailVisual({
           <ScenicDetailPanel
             item={item}
             index={index}
-            selectedDayId={selectedDayId}
             titleId={titleId}
             layoutPrefix={`scenic-${item.id}`}
             supportingPhase={phase}
@@ -384,7 +383,6 @@ export function ScenicItemList({
   items,
   activeItemId,
   detailsPanelId,
-  selectedDayId,
   titleId,
   expandedViewportRect,
   overlayPhase,
@@ -530,7 +528,7 @@ export function ScenicItemList({
                     <motion.div
                       aria-hidden="true"
                       className="pointer-events-none absolute rounded-2xl bg-black/20 blur-xl"
-                      style={{ zIndex: 44 }}
+                      style={{ zIndex: 64 }}
                       initial={{ opacity: 0 }}
                       animate={{
                         ...visualRect,
@@ -551,7 +549,7 @@ export function ScenicItemList({
                       "absolute",
                       active ? "pointer-events-auto" : "pointer-events-none",
                     )}
-                    style={{ zIndex: active ? 45 : 10 }}
+                    style={{ zIndex: active ? 65 : 10 }}
                     initial={false}
                     animate={visualRect}
                     transition={
@@ -576,7 +574,6 @@ export function ScenicItemList({
                         item={item}
                         index={index}
                         phase={overlayPhase}
-                        selectedDayId={selectedDayId}
                         detailsPanelId={detailsPanelId}
                         titleId={titleId}
                         onClose={onClose}

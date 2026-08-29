@@ -95,7 +95,6 @@ function GeoDescription({ item }: { item: ScenicItem }) {
 export function ScenicDetailPanel({
   item,
   index,
-  selectedDayId,
   titleId,
   layoutPrefix,
   supportingPhase,
@@ -103,7 +102,6 @@ export function ScenicDetailPanel({
 }: {
   item?: ScenicItem;
   index: number;
-  selectedDayId: string;
   titleId?: string;
   layoutPrefix?: string;
   supportingPhase?: "opening" | "open" | "closing";
@@ -204,9 +202,6 @@ export function ScenicDetailPanel({
             {scenicPriorityLabels[item.priority]}
           </Badge>
         )}
-        {item.dayId !== selectedDayId ? (
-          <Badge variant="secondary">源自 {item.dayId} 返程补拍</Badge>
-        ) : null}
       </div>
 
       {activeLayoutPrefix ? (
