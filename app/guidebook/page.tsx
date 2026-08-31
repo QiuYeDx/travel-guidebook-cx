@@ -8,6 +8,7 @@ import {
 
 import { MarkdownRenderer } from "@/components/content/markdown-renderer";
 import { GuidebookMobileToc } from "@/components/content/guidebook-mobile-toc";
+import { ScrollEdgeFades } from "@/components/content/scroll-edge-fades";
 import { TableOfContents } from "@/components/content/table-of-contents";
 import { Badge } from "@/components/ui/badge";
 import { getPrimaryGuidebook } from "@/lib/content/guidebook";
@@ -48,12 +49,19 @@ export default async function GuidebookPage() {
         </article>
 
         <aside className="hidden min-w-0 border-l pl-6 lg:block">
-          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pb-8">
+          <div className="sticky top-20">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
               <ListTreeIcon className="size-4 text-muted-foreground" />
               本页目录
             </div>
-            <TableOfContents entries={guidebook.tableOfContents} />
+            <ScrollEdgeFades
+              ariaLabel="本页目录"
+              axis="vertical"
+              role="region"
+              viewportClassName="max-h-[calc(100vh-8.5rem)] pb-8"
+            >
+              <TableOfContents entries={guidebook.tableOfContents} />
+            </ScrollEdgeFades>
           </div>
         </aside>
       </div>

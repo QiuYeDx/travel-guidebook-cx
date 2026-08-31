@@ -3,6 +3,8 @@ import Markdown, { type Components } from "react-markdown";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
+import { ScrollEdgeFades } from "@/components/content/scroll-edge-fades";
+
 function HeadingLink({
   id,
   children,
@@ -115,16 +117,17 @@ const components: Components = {
     </pre>
   ),
   table: ({ children }) => (
-    <div
-      aria-label="攻略数据表格"
-      className="relative my-6 max-w-full overflow-x-auto rounded-md border bg-background after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-10 after:bg-gradient-to-l after:from-background after:to-transparent after:content-[''] overscroll-x-contain"
+    <ScrollEdgeFades
+      ariaLabel="攻略数据表格"
+      axis="horizontal"
+      className="my-6 max-w-full rounded-md border bg-background"
       role="region"
       tabIndex={0}
     >
       <table className="w-max min-w-full border-collapse text-left text-sm leading-6">
         {children}
       </table>
-    </div>
+    </ScrollEdgeFades>
   ),
   thead: ({ children }) => <thead className="bg-muted/70">{children}</thead>,
   tbody: ({ children }) => (

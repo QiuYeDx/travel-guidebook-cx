@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ListTreeIcon } from "lucide-react";
 import { motion } from "motion/react";
 
+import { ScrollEdgeFades } from "@/components/content/scroll-edge-fades";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { TableOfContentsEntry } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
@@ -26,13 +27,18 @@ export function GuidebookMobileToc({ entries }: { entries: TableOfContentsEntry[
       <PopoverTrigger asChild><button type="button" className="flex h-11 items-center gap-2 rounded-full border bg-background/95 px-4 text-sm font-medium shadow-lg backdrop-blur-xl"><ListTreeIcon className="size-4" aria-hidden="true" />目录 <span className="max-w-44 truncate text-muted-foreground">{entries.find((entry) => entry.id === activeId)?.title}</span></button></PopoverTrigger>
       <PopoverContent side="top" align="start" sideOffset={10} className="w-[calc(100vw-2rem)] rounded-2xl p-0 shadow-2xl">
         <div className="border-b px-4 py-3 text-sm font-semibold">本页目录</div>
-        <div className="relative max-h-[min(60vh,28rem)] overflow-y-auto px-2 py-2">
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-gradient-to-b from-background to-transparent" aria-hidden="true" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8 bg-gradient-to-t from-background to-transparent" aria-hidden="true" />
+        <ScrollEdgeFades
+          ariaLabel="本页目录"
+          axis="vertical"
+          role="region"
+          viewportClassName="max-h-[min(60vh,28rem)] px-2 py-2"
+          startFadeClassName="from-popover via-popover/90"
+          endFadeClassName="from-popover via-popover/90"
+        >
           <ol className="relative z-0 space-y-1">
             {entries.map((entry) => <li key={entry.id}><a href={`#${entry.id}`} className={cn("block rounded-lg px-3 py-2 text-sm leading-5 transition-colors", entry.depth === 3 && "pl-7 text-xs", activeId === entry.id ? "bg-accent font-medium text-foreground" : "text-muted-foreground hover:bg-accent/70 hover:text-foreground")}><motion.span layout="position">{entry.title}</motion.span></a></li>)}
           </ol>
-        </div>
+        </ScrollEdgeFades>
       </PopoverContent>
     </Popover>
   </div>;
