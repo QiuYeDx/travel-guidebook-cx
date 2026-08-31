@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ArrowLeftIcon, Clock3Icon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -14,29 +15,40 @@ import { buildDayItinerary } from "./itinerary-model";
 import {
   buildDayHref,
   buildScenicHref,
+  normalizeDayGuideTab,
   type DayGuideTab,
 } from "./day-guide-state";
 
 export function ScenicDayIndex({
   trip,
   catalog,
-  selectedDayId,
-  selectedItemId,
-  returnTab,
 }: {
   trip: Trip;
   catalog: ScenicCatalog;
-  selectedDayId: string;
-  selectedItemId?: string;
-  returnTab: DayGuideTab;
 }) {
   const router = useRouter();
+  const [selectedDayId, setSelectedDayId] = useState("D1");
+  const [selectedItemId, setSelectedItemId] = useState<string>();
+  const [returnTab, setReturnTab] = useState<DayGuideTab>("overview");
   const availableDays = trip.days.filter((day) =>
     catalog.dayPlans.some((plan) => plan.dayId === day.id),
   );
   const selectedDay =
     availableDays.find((day) => day.id === selectedDayId) ?? availableDays[0];
   const itinerary = buildDayItinerary(trip, catalog, selectedDay.id);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setSelectedDayId(params.get("day") ?? "D1");
+    setSelectedItemId(params.get("item") ?? undefined);
+    setReturnTab(normalizeDayGuideTab(params.get("returnTab")));
+  }, []);
+
+  function handleDayChange(dayId: string) {
+    setSelectedDayId(dayId);
+    setSelectedItemId(undefined);
+    router.replace(buildScenicHref(dayId, returnTab));
+  }
 
   if (!itinerary) return null;
 
@@ -64,9 +76,7 @@ export function ScenicDayIndex({
             value: day.id,
             label: day.id,
           }))}
-          onValueChange={(value) =>
-            router.replace(buildScenicHref(value, returnTab))
-          }
+          onValueChange={handleDayChange}
         />
       </div>
 
@@ -96,7 +106,7 @@ export function ScenicDayIndex({
       </section>
 
       <ScenicWorkspace
-        key={selectedDay.id}
+        key={`${selectedDay.id}:${selectedItemId ?? ""}`}
         dayId={selectedDay.id}
         items={itinerary.scenicItems}
         initialSelectedItemId={selectedItemId}

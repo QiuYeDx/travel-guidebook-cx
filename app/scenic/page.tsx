@@ -3,29 +3,16 @@ import type { Metadata } from "next";
 import { chuanxiTrip } from "@/data/trips/2026-chuanxi/trip";
 import { chuanxiScenicCatalog } from "@/data/trips/2026-chuanxi/viewpoints";
 import { ScenicDayIndex } from "@/features/itinerary/scenic-day-index";
-import { normalizeDayGuideTab } from "@/features/itinerary/day-guide-state";
 
 export const metadata: Metadata = {
   title: "观景清单",
   description: "按 D1-D9 行驶顺序查看深圳往返川西短环线的停靠点与车览走廊",
 };
 
-export default async function ScenicPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    day?: string;
-    item?: string;
-    returnTab?: string | string[];
-  }>;
-}) {
-  const { day, item, returnTab } = await searchParams;
+export default function ScenicPage() {
   return (
     <ScenicDayIndex
       catalog={chuanxiScenicCatalog}
-      selectedDayId={day ?? "D1"}
-      selectedItemId={item}
-      returnTab={normalizeDayGuideTab(returnTab)}
       trip={chuanxiTrip}
     />
   );

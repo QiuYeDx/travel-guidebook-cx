@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
 import {
   ArrowRightIcon,
@@ -11,7 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import type { ScenicCatalog, Trip } from "@/lib/trip/types";
 
 import { buildDayItinerary } from "./itinerary-model";
-import { buildDayHref, type DayGuideTab } from "./day-guide-state";
+import {
+  buildDayHref,
+  normalizeDayGuideTab,
+  type DayGuideTab,
+} from "./day-guide-state";
 import {
   formatDriveTime,
   formatNumberRange,
@@ -22,12 +29,17 @@ import {
 export function ItineraryTimeline({
   trip,
   scenicCatalog,
-  dayTab,
 }: {
   trip: Trip;
   scenicCatalog: ScenicCatalog;
-  dayTab: DayGuideTab;
 }) {
+  const [dayTab, setDayTab] = React.useState<DayGuideTab>("overview");
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setDayTab(normalizeDayGuideTab(params.get("tab")));
+  }, []);
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
       <header className="pb-7">

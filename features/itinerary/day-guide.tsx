@@ -35,6 +35,7 @@ import type { DayItinerary } from "./itinerary-model";
 import {
   buildDayHref,
   buildScenicHref,
+  normalizeDayGuideTab,
   type DayGuideTab,
 } from "./day-guide-state";
 
@@ -375,19 +376,15 @@ function NoteList({
   );
 }
 
-export function DayGuide({
-  itinerary,
-  initialTab,
-}: {
-  itinerary: DayItinerary;
-  initialTab: DayGuideTab;
-}) {
+export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
   const { day } = itinerary;
-  const [selectedTab, setSelectedTab] = React.useState(initialTab);
+  const [selectedTab, setSelectedTab] =
+    React.useState<DayGuideTab>("overview");
 
   React.useEffect(() => {
-    setSelectedTab(initialTab);
-  }, [day.id, initialTab]);
+    const params = new URLSearchParams(window.location.search);
+    setSelectedTab(normalizeDayGuideTab(params.get("tab")));
+  }, [day.id]);
 
   function handleTabChange(value: string) {
     const nextTab = value as DayGuideTab;
