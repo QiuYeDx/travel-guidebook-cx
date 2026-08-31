@@ -34,25 +34,25 @@ test("all trip days can build stable previous and next navigation", () => {
   }
 });
 
-test("D5 reuses D3 candidates and keeps the two-stop budget", () => {
-  const d5 = buildDayItinerary(chuanxiTrip, chuanxiScenicCatalog, "D5");
-  assert.ok(d5);
-  assert.equal(d5.scenicPlan?.mode, "reuse");
-  assert.equal(d5.parkingBudgetLabel, "最多 2 次");
-  assert.equal(d5.scenicItems.length, 4);
-  assert.ok(d5.scenicItems.every((item) => item.dayId === "D3"));
-  assert.ok(d5.degradeAction?.includes("其余候选自动改为车览"));
+test("D6 keeps the three-stop ceiling and route-order scenic items", () => {
+  const d6 = buildDayItinerary(chuanxiTrip, chuanxiScenicCatalog, "D6");
+  assert.ok(d6);
+  assert.equal(d6.scenicPlan?.mode, "road-stops");
+  assert.equal(d6.parkingBudgetLabel, "1-3 次");
+  assert.equal(d6.scenicItems.length, 8);
+  assert.ok(d6.scenicItems.every((item) => item.dayId === "D6"));
+  assert.ok(d6.degradeAction?.includes("其余候选自动改为车览"));
 });
 
-test("D3, D5, and D9 expose parking budgets and downgrade actions", () => {
-  for (const dayId of ["D3", "D5", "D9"]) {
+test("road-stop days expose parking budgets and downgrade actions", () => {
+  for (const dayId of ["D3", "D6", "D7"]) {
     const itinerary = buildDayItinerary(
       chuanxiTrip,
       chuanxiScenicCatalog,
       dayId,
     );
     assert.ok(itinerary);
-    assert.match(itinerary.parkingBudgetLabel, /最多/);
+    assert.match(itinerary.parkingBudgetLabel, /次/);
     assert.ok(itinerary.degradeAction);
   }
 });
@@ -66,10 +66,10 @@ test("scenic items stay in route order", () => {
 });
 
 test("map search links encode the public route query", () => {
-  const url = new URL(createAmapSearchUrl("成都 → 泸定 → 康定"));
+  const url = new URL(createAmapSearchUrl("深圳 → 贵阳"));
   assert.equal(url.origin, "https://uri.amap.com");
   assert.equal(url.pathname, "/search");
-  assert.equal(url.searchParams.get("keyword"), "成都 → 泸定 → 康定");
+  assert.equal(url.searchParams.get("keyword"), "深圳 → 贵阳");
   assert.equal(url.searchParams.get("callnative"), "1");
   assert.throws(() => createAmapSearchUrl("  "));
 });

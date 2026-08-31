@@ -33,11 +33,11 @@ export function ItineraryTimeline({
       <header className="pb-7">
         <div className="max-w-3xl">
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-            D0-D9 行程
+            D0-D9 · 10 天行程
           </h1>
           <p className="mt-3 text-base leading-7 text-muted-foreground">
-            从成都集结到返蓉的 10
-            天执行顺序。每天只保留一个主目标，现场情况不适合时直接删减当日次要安排。
+            从深圳出发，经贵阳与川西短环线回到深圳。每天只保留一个主目标，
+            10 月 4 日到雅安、10 月 5 日到贵阳是返程硬边界。
           </p>
         </div>
       </header>

@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "川西同行路书",
   shortName: "川西路书",
-  description: "2026 中秋国庆川西大环线的路线讨论、行前准备与旅途中执行手册。",
+  description: "2026 年 3 人驾驶蔚来 EC6，从深圳往返川西短环线的行前与行中执行手册。",
   author: {
     name: "QiuYeDx",
     url: "https://qiuvision.com",

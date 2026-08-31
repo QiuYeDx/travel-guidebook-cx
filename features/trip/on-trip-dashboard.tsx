@@ -163,9 +163,7 @@ export function OnTripDashboard({
                 <h2 id="next-leg-title" className="mt-1 text-xl font-semibold">
                   {primaryLeg
                     ? `${primaryLeg.from} → ${primaryLeg.to}`
-                    : day.id === "D0"
-                      ? "成都集结与实车装载"
-                      : "按景区交通执行"}
+                    : "当天无公路路线"}
                 </h2>
               </div>
               {primaryLeg ? (
@@ -207,9 +205,7 @@ export function OnTripDashboard({
               </div>
             ) : (
               <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                {day.id === "D0"
-                  ? "不生成公路导航；先完成人车到齐、车辆权限、满载演练、补给和离线地图。"
-                  : "社会车辆不进入核心游览线路，以景区当天观光车、开放站点和步道规则为准。"}
+                当前日没有可生成的公路导航，按当天景区或住宿安排执行。
               </p>
             )}
           </section>

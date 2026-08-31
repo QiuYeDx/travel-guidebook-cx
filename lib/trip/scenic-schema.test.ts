@@ -28,53 +28,47 @@ test("the scenic catalog satisfies the data contract", () => {
   );
 });
 
-test("all 43 guidebook ids are migrated in route order", () => {
+test("all 37 guidebook ids are migrated in route order", () => {
   assert.deepEqual(
     chuanxiScenicCatalog.items.map((item) => item.id),
     [
-      "VP-D1-01",
-      "VP-D1-02",
       "SC-D1-01",
-      "SC-D1-02",
-      "VP-D2-01",
+      "VP-D1-01",
       "SC-D2-01",
+      "VP-D2-01",
       "SC-D2-02",
+      "VP-D2-02",
       "VP-D2-03",
       "SC-D3-01",
       "VP-D3-01",
-      "VP-D3-02",
-      "VP-D3-03",
-      "VP-D3-04",
       "SC-D3-02",
-      "VP-D3-05",
-      "VP-D3-06",
-      "VP-D3-07",
-      "VP-D3-08",
-      "VP-D3-09",
+      "SC-D3-03",
+      "VP-D3-02",
       "VP-D4-01",
       "VP-D4-02",
       "VP-D4-03",
       "VP-D4-04",
+      "SC-D5-01",
+      "VP-D5-01",
+      "SC-D5-02",
+      "VP-D5-02",
       "SC-D6-01",
       "VP-D6-01",
+      "SC-D6-02",
       "VP-D6-02",
       "VP-D6-03",
-      "SC-D6-02",
       "VP-D6-04",
+      "SC-D6-03",
+      "SC-D6-04",
       "VP-D7-01",
-      "SC-D7-01",
       "VP-D7-02",
+      "SC-D7-01",
+      "VP-D7-03",
       "SC-D7-02",
       "VP-D8-01",
-      "VP-D8-02",
-      "VP-D8-03",
-      "VP-D8-04",
-      "VP-D8-05",
-      "VP-D8-06",
+      "SC-D8-01",
       "VP-D9-01",
       "SC-D9-01",
-      "SC-D9-02",
-      "VP-D9-02",
     ],
   );
 });
@@ -98,23 +92,16 @@ test("each day has stable sequence order and no pre-verified parking navigation"
   );
 });
 
-test("D5 reuses at most two D3 viewpoints without duplicating items", () => {
-  const plan = chuanxiScenicCatalog.dayPlans.find(
-    (item) => item.dayId === "D5",
-  );
-  assert.ok(plan?.reuse);
-  assert.equal(plan.mode, "reuse");
-  assert.equal(plan.reuse.sourceDayId, "D3");
-  assert.equal(plan.reuse.maxSelections, 2);
-  assert.deepEqual(plan.reuse.itemIds, [
-    "VP-D3-07",
-    "VP-D3-06",
-    "VP-D3-04",
-    "VP-D3-01",
-  ]);
+test("D4 is a scenic-transit day and D6 keeps a three-stop ceiling", () => {
+  const d4 = chuanxiScenicCatalog.dayPlans.find((item) => item.dayId === "D4");
+  const d6 = chuanxiScenicCatalog.dayPlans.find((item) => item.dayId === "D6");
+  assert.equal(d4?.mode, "scenic-transit");
+  assert.equal(d4?.photoStopBudget, undefined);
+  assert.equal(d6?.mode, "road-stops");
+  assert.deepEqual(d6?.photoStopBudget, [1, 3]);
   assert.equal(
-    chuanxiScenicCatalog.items.some((item) => item.dayId === "D5"),
-    false,
+    chuanxiScenicCatalog.items.filter((item) => item.dayId === "D6").length,
+    8,
   );
 });
 
@@ -134,9 +121,9 @@ test("P2 and prohibited corridors cannot expose parking navigation", () => {
 
 test("pending P1 points require exact coordinates and verified parking before navigation", () => {
   const catalog = cloneCatalog();
-  const viewpoint = catalog.items.find((item) => item.id === "VP-D2-01");
+  const viewpoint = catalog.items.find((item) => item.id === "VP-D6-02");
   assert.ok(viewpoint);
-  viewpoint.parking.parkingNavigationQuery = "折多山观雪台停车入口";
+  viewpoint.parking.parkingNavigationQuery = "雅拉雪山观景台停车入口";
 
   const messages = messagesFor(catalog);
   assert.match(messages, /parking navigation requires an exact geo reference/);
@@ -145,7 +132,7 @@ test("pending P1 points require exact coordinates and verified parking before na
 
 test("exact points require an explicit GCJ-02 coordinate contract", () => {
   const catalog = cloneCatalog();
-  const viewpoint = catalog.items.find((item) => item.id === "VP-D2-01");
+  const viewpoint = catalog.items.find((item) => item.id === "VP-D6-02");
   assert.ok(viewpoint);
   Object.assign(viewpoint, {
     geoRef: {
@@ -175,19 +162,10 @@ test("corridors reject fake point geometry", () => {
   );
 });
 
-test("D5 reuse references must resolve to D3 viewpoints", () => {
-  const catalog = cloneCatalog();
-  const plan = catalog.dayPlans.find((item) => item.dayId === "D5");
-  assert.ok(plan?.reuse);
-  plan.reuse.itemIds[0] = "VP-D9-01";
-
-  assert.match(messagesFor(catalog), /VP-D9-01 belongs to D9, not D3/);
-});
-
 test("duplicate sequence values within a day fail validation", () => {
   const catalog = cloneCatalog();
-  const first = catalog.items.find((item) => item.id === "VP-D1-01");
-  const second = catalog.items.find((item) => item.id === "VP-D1-02");
+  const first = catalog.items.find((item) => item.id === "SC-D1-01");
+  const second = catalog.items.find((item) => item.id === "VP-D1-01");
   assert.ok(first && second);
   second.sequence = first.sequence;
 

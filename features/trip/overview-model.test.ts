@@ -16,15 +16,15 @@ test("the planning dashboard is derived from structured trip data", () => {
   );
 
   assert.equal(overview.durationDays, 10);
-  assert.equal(overview.drivingDays, 7);
-  assert.deepEqual(overview.distanceKmEstimate, [1660, 1860]);
-  assert.equal(overview.scenicItemCount, 43);
+  assert.equal(overview.drivingDays, 10);
+  assert.deepEqual(overview.distanceKmEstimate, [4380, 5080]);
+  assert.equal(overview.scenicItemCount, 37);
   assert.equal(overview.routeNodes.at(0)?.id, "D0");
   assert.equal(overview.routeNodes.at(-1)?.id, "D9");
-  assert.equal(overview.openDecisionCount, 6);
+  assert.equal(overview.openDecisionCount, 2);
   assert.equal(overview.confirmedTaskCount, 0);
   assert.equal(overview.taskCount, 5);
-  assert.equal(overview.lastVerifiedAt, "2026-08-25");
+  assert.equal(overview.lastVerifiedAt, "2026-08-31");
   assert.equal(overview.nextReviewAt, "2026-09-20");
   assert.ok(overview.criticalRisks.length >= 3);
   assert.equal(overview.criticalRisks[0]?.severity, "stop");

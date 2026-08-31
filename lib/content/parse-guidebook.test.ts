@@ -17,18 +17,18 @@ test("the primary guidebook parses with stable metadata and anchors", async () =
   );
   const guidebook = parseGuidebook(raw, "2026-chuanxi-grand-loop");
 
-  assert.equal(guidebook.title, "2026 中秋国庆川西大环线自驾路书");
-  assert.equal(guidebook.version, "0.2");
-  assert.equal(guidebook.lastUpdated, "2026-08-25");
-  assert.ok(guidebook.tableOfContents.length > 50);
+  assert.equal(guidebook.title, "2026 深圳往返川西短环线自驾路书");
+  assert.equal(guidebook.version, "1.0");
+  assert.equal(guidebook.lastUpdated, "2026-08-31");
+  assert.ok(guidebook.tableOfContents.length > 40);
   assert.ok(
     guidebook.tableOfContents.some(
-      (entry) => entry.id === "最终路线沿途观景路线" && entry.depth === 2,
+      (entry) => entry.id === "最终路线总表" && entry.depth === 2,
     ),
   );
   assert.ok(
     guidebook.tableOfContents.some(
-      (entry) => entry.id === "d3新都桥--雅江--理塘--稻城--香格里拉镇",
+      (entry) => entry.id === "ec6-补能策略",
     ),
   );
 });

@@ -28,9 +28,9 @@ export function OverviewDashboard({ trip, scenicCatalog }: { trip: Trip; scenicC
           <div className="max-w-3xl">
             <div className="flex flex-col items-start gap-3">
               <Badge className="border-emerald-200/80 bg-emerald-100/70 text-emerald-950 dark:border-emerald-800/80 dark:bg-emerald-950/55 dark:text-emerald-100" variant="outline">2026 · 9/27 — 10/6</Badge>
-              <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">川西大环线</h1>
+              <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">深圳往返川西短环线</h1>
             </div>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">成都集结，沿康定、新都桥、理塘、稻城亚丁，经雅江、塔公、丹巴与四姑娘山回到成都。</p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">深圳出发，经贵阳进入都江堰、毕棚沟、达古冰川、丹巴、塔公与折多山，10 月 6 日回到深圳。</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild><Link href="/itinerary">查看完整行程 <ArrowRightIcon aria-hidden="true" /></Link></Button>
               <Button asChild variant="outline" className="bg-background/70"><Link href="/scenic">浏览沿途观景 <MapPinnedIcon aria-hidden="true" /></Link></Button>
@@ -44,9 +44,9 @@ export function OverviewDashboard({ trip, scenicCatalog }: { trip: Trip; scenicC
           </div>
         </div>
         <div className="grid gap-4 px-5 py-5 sm:grid-cols-3 sm:px-8">
-          <QuickFact icon={<CarFrontIcon />} label="车辆" value="蔚来 ES8 · 6–7 人" />
-          <QuickFact icon={<MountainSnowIcon />} label="节奏" value="轻量观景 · 不夜驾" />
-          <QuickFact icon={<SparklesIcon />} label="核心" value="亚丁可取消，优先舒适" />
+          <QuickFact icon={<CarFrontIcon />} label="人车" value="3 人 · 蔚来 EC6" />
+          <QuickFact icon={<MountainSnowIcon />} label="节奏" value="三人轮换 · 不夜驾" />
+          <QuickFact icon={<SparklesIcon />} label="核心" value="达古与塔公 · 10/6 返深" />
         </div>
       </section>
 

@@ -143,12 +143,10 @@ function RoutePanel({ itinerary }: { itinerary: DayItinerary }) {
             className="size-4 text-emerald-700 dark:text-emerald-400"
             aria-hidden="true"
           />
-          {day.id === "D0" ? "成都集结日" : "景区交通日"}
+          当天无公路路线
         </p>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          {day.id === "D0"
-            ? "完成人员集合、车辆装载和补给，不生成公路导航。"
-            : "社会车辆不进入核心游览线路，按当天开放站点和景交规则执行。"}
+          按当天景区交通、开放站点和住宿安排执行。
         </p>
       </div>
     );

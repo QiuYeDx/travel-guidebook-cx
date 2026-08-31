@@ -14,22 +14,22 @@ import {
   type ScenicFilters,
 } from "./scenic-model";
 
-const d3Items = getScenicItemsForDay(chuanxiScenicCatalog, "D3");
+const d6Items = getScenicItemsForDay(chuanxiScenicCatalog, "D6");
 
 test("scenic filters combine without changing route order", () => {
   const filters: ScenicFilters = {
     ...defaultScenicFilters,
     priority: "core",
     parking: "P1",
-    subject: "mountain",
+    subject: "snow-mountain",
     direction: "outbound",
     verification: "needs-review",
   };
-  const filtered = filterScenicItems(d3Items, filters);
+  const filtered = filterScenicItems(d6Items, filters);
 
   assert.deepEqual(
     filtered.map((item) => item.id),
-    ["VP-D3-01", "VP-D3-06", "VP-D3-07"],
+    ["VP-D6-02", "VP-D6-03"],
   );
   assert.deepEqual(
     filtered.map((item) => item.sequence),
@@ -39,18 +39,18 @@ test("scenic filters combine without changing route order", () => {
 });
 
 test("direction filtering treats bidirectional items as usable both ways", () => {
-  const d6Items = getScenicItemsForDay(chuanxiScenicCatalog, "D6");
+  const d4Items = getScenicItemsForDay(chuanxiScenicCatalog, "D4");
   assert.equal(
-    filterScenicItems(d3Items, {
+    filterScenicItems(d4Items, {
       ...defaultScenicFilters,
-      direction: "return",
+      direction: "outbound",
     }).length,
-    d3Items.length,
+    d4Items.length,
   );
   assert.equal(
     filterScenicItems(d6Items, {
       ...defaultScenicFilters,
-      direction: "outbound",
+      direction: "return",
     }).length,
     0,
   );
@@ -62,26 +62,27 @@ test("available subjects are stable and limited to the selected day", () => {
   );
   assert.deepEqual(subjects, [
     "snow-mountain",
+    "mountain",
     "valley",
-    "grassland",
     "forest",
     "lake",
-    "architecture",
+    "geology",
+    "culture",
   ]);
 });
 
 test("selection keeps a requested stable id and falls back after filtering", () => {
-  assert.equal(resolveSelectedScenicItem(d3Items, "VP-D3-06")?.id, "VP-D3-06");
+  assert.equal(resolveSelectedScenicItem(d6Items, "VP-D6-02")?.id, "VP-D6-02");
   assert.equal(
-    resolveSelectedScenicItem(d3Items, "VP-NOT-FOUND")?.id,
-    d3Items[0]?.id,
+    resolveSelectedScenicItem(d6Items, "VP-NOT-FOUND")?.id,
+    d6Items[0]?.id,
   );
-  assert.equal(resolveSelectedScenicItem([], "VP-D3-06"), undefined);
+  assert.equal(resolveSelectedScenicItem([], "VP-D6-02"), undefined);
 });
 
 test("parking navigation requires verified exact P0 or P1 data", () => {
-  const base = d3Items.find(
-    (item): item is Viewpoint => item.id === "VP-D3-01",
+  const base = d6Items.find(
+    (item): item is Viewpoint => item.id === "VP-D6-02",
   );
   assert.ok(base);
   const eligible = {
@@ -91,14 +92,14 @@ test("parking navigation requires verified exact P0 or P1 data", () => {
       lat: 30.1,
       lng: 101.2,
       coordinateSystem: "gcj02" as const,
-      mapQuery: "天路十八弯观景台",
+      mapQuery: "雅拉雪山观景台",
       verifiedAt: "2026-09-20",
     },
     parking: {
       ...base.parking,
       level: "P1" as const,
       verificationStatus: "verified" as const,
-      parkingNavigationQuery: "天路十八弯观景台 停车场",
+      parkingNavigationQuery: "雅拉雪山观景台 停车场",
     },
   };
 
@@ -106,7 +107,7 @@ test("parking navigation requires verified exact P0 or P1 data", () => {
     lat: 30.1,
     lng: 101.2,
     coordinateSystem: "gcj02",
-    mapQuery: "天路十八弯观景台 停车场",
+    mapQuery: "雅拉雪山观景台 停车场",
   });
   assert.equal(
     getParkingNavigationTarget({
