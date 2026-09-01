@@ -63,7 +63,7 @@ export interface ClipPathTabsProps extends Omit<
   /**
    * 是否为圆角矩形启用 Figma/iOS 风格平滑圆角
    * - 仅在 `shape="rounded"` 时生效
-   * - 配合 `transitionMode="segmented"` 可让选中项保持完整平滑轮廓
+   * - `continuous` 与 `segmented` 两种过渡模式均支持
    * @default false
    */
   smoothCorners?: boolean;
@@ -253,6 +253,7 @@ export const ClipPathTabs = React.forwardRef<
 
   const stageRef = React.useRef<HTMLDivElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
+  const activeIndicatorRef = React.useRef<HTMLSpanElement>(null);
   const activeLayerRef = React.useRef<HTMLDivElement>(null);
   const triggerRefs = React.useRef(new Map<string, HTMLButtonElement>());
   const hasMeasuredRef = React.useRef(false);
@@ -266,8 +267,9 @@ export const ClipPathTabs = React.forwardRef<
   const smoothCornerRadius = toPixelNumber(resolvedCornerRadius);
   const shouldSmoothCorners =
     smoothCorners && shape === "rounded" && smoothCornerRadius !== null;
-  const clipRadius =
-    shouldSmoothCorners && transitionMode === "segmented" ? "0px" : radius;
+  const shouldUseSmoothContinuousIndicator =
+    shouldSmoothCorners && transitionMode === "continuous";
+  const clipRadius = shouldSmoothCorners ? "0px" : radius;
   const columns = `repeat(${Math.max(items.length, 1)}, minmax(0, 1fr))`;
   const itemValuesKey = items.map((item) => item.value).join("\u0000");
 
@@ -287,6 +289,9 @@ export const ClipPathTabs = React.forwardRef<
     (animate: boolean) => {
       const stage = stageRef.current;
       const list = listRef.current;
+      const activeIndicator = shouldUseSmoothContinuousIndicator
+        ? activeIndicatorRef.current
+        : null;
       const activeLayer = activeLayerRef.current;
       const activeTrigger = triggerRefs.current.get(resolvedValue);
       if (!stage || !list || !activeLayer) return;
@@ -298,6 +303,7 @@ export const ClipPathTabs = React.forwardRef<
       stage.dataset.clipSupported = String(supportsClipPath);
 
       if (!supportsClipPath) {
+        if (activeIndicator) activeIndicator.style.visibility = "hidden";
         activeLayer.style.visibility = "hidden";
         triggerRefs.current.forEach((trigger, itemValue) => {
           const active = itemValue === resolvedValue;
@@ -318,28 +324,50 @@ export const ClipPathTabs = React.forwardRef<
       });
 
       if (!activeTrigger) {
+        if (activeIndicator) activeIndicator.style.visibility = "hidden";
         activeLayer.style.visibility = "hidden";
         return;
       }
 
-      const listRect = list.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
       const triggerRect = activeTrigger.getBoundingClientRect();
-      const top = triggerRect.top - listRect.top;
-      const right = listRect.right - triggerRect.right;
-      const bottom = listRect.bottom - triggerRect.bottom;
-      const left = triggerRect.left - listRect.left;
-
-      activeLayer.style.transitionDuration =
+      const top = triggerRect.top - stageRect.top;
+      const right = stageRect.right - triggerRect.right;
+      const bottom = stageRect.bottom - triggerRect.bottom;
+      const left = triggerRect.left - stageRect.left;
+      const duration =
         animate && hasMeasuredRef.current
           ? `${Math.max(0, transitionDuration)}ms`
           : "0ms";
+
+      activeLayer.style.transitionDuration = duration;
       activeLayer.style.transitionTimingFunction = transitionEasing;
       activeLayer.style.clipPath = `inset(${toFixedPixel(top)} ${toFixedPixel(right)} ${toFixedPixel(bottom)} ${toFixedPixel(left)} round ${clipRadius})`;
       activeLayer.style.visibility = "visible";
+
+      if (activeIndicator) {
+        activeIndicator.style.transitionDuration = duration;
+        activeIndicator.style.transitionTimingFunction = transitionEasing;
+        activeIndicator.style.width = toFixedPixel(triggerRect.width);
+        activeIndicator.style.height = toFixedPixel(triggerRect.height);
+        activeIndicator.style.transform = `translate3d(${toFixedPixel(left)}, ${toFixedPixel(top)}, 0)`;
+        activeIndicator.style.visibility = "visible";
+      }
+
       hasMeasuredRef.current = true;
     },
-    [clipRadius, resolvedValue, transitionDuration, transitionEasing],
+    [
+      clipRadius,
+      resolvedValue,
+      shouldUseSmoothContinuousIndicator,
+      transitionDuration,
+      transitionEasing,
+    ],
   );
+
+  React.useLayoutEffect(() => {
+    hasMeasuredRef.current = false;
+  }, [shouldUseSmoothContinuousIndicator]);
 
   React.useLayoutEffect(() => {
     updateClipPathRef.current = updateClipPath;
@@ -477,6 +505,22 @@ export const ClipPathTabs = React.forwardRef<
           ))}
         </TabsList>
 
+        {shouldUseSmoothContinuousIndicator ? (
+          <SmoothCorners
+            asChild
+            radius={smoothCornerRadius}
+            smoothing={smoothCornerSmoothing}
+          >
+            <span
+              ref={activeIndicatorRef}
+              aria-hidden="true"
+              data-slot="clip-path-tabs-active-indicator"
+              className="pointer-events-none absolute left-0 top-0 z-[5] bg-[var(--clip-path-tabs-active-background)] transition-[transform,width,height] motion-reduce:transition-none"
+              style={{ visibility: "hidden" }}
+            />
+          </SmoothCorners>
+        ) : null}
+
         <div
           ref={activeLayerRef}
           aria-hidden="true"
@@ -486,7 +530,8 @@ export const ClipPathTabs = React.forwardRef<
           style={{
             gridTemplateColumns: columns,
             backgroundColor:
-              transitionMode === "continuous"
+              transitionMode === "continuous" &&
+              !shouldUseSmoothContinuousIndicator
                 ? "var(--clip-path-tabs-active-background)"
                 : "transparent",
             visibility: "hidden",

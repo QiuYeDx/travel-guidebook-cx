@@ -11,6 +11,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { createAmapNavigationUrl } from "@/lib/navigation/map-links";
 import type { ScenicItem } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
@@ -109,18 +110,20 @@ export function ScenicDetailPanel({
 }) {
   if (!item) {
     return (
-      <section className="flex h-[34rem] items-center justify-center rounded-2xl border p-6 text-center lg:h-auto lg:min-h-[38rem]">
-        <div>
-          <RouteIcon
-            className="mx-auto size-5 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <h2 className="mt-3 text-base font-semibold">没有匹配的详情</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            清除部分筛选条件后，路线带和详情会重新出现。
-          </p>
-        </div>
-      </section>
+      <SmoothCorners asChild radius={16} smoothing={0.7}>
+        <section className="flex h-[34rem] items-center justify-center border p-6 text-center lg:h-auto lg:min-h-[38rem]">
+          <div>
+            <RouteIcon
+              className="mx-auto size-5 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <h2 className="mt-3 text-base font-semibold">没有匹配的详情</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              清除部分筛选条件后，路线带和详情会重新出现。
+            </p>
+          </div>
+        </section>
+      </SmoothCorners>
     );
   }
 

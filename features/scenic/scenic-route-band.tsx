@@ -8,6 +8,7 @@ import {
   RouteIcon,
 } from "lucide-react";
 
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import type { ScenicItem, Viewpoint } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 
@@ -46,41 +47,43 @@ export function ScenicRouteBand({
         const selected = item.id === selectedId;
         return (
           <li key={item.id} className="relative z-10 w-48 shrink-0 lg:w-full">
-            <button
-              id={`scenic-route-${item.id}`}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => onSelect(item.id)}
-              className={cn(
-                "flex min-h-24 w-full items-start gap-3 rounded-xl border bg-background p-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:min-h-20",
-                corridor && "border-dashed",
-                selected
-                  ? "border-emerald-700 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950/25"
-                  : "hover:bg-accent",
-              )}
-            >
-              <span
+            <SmoothCorners asChild radius={12} smoothing={0.7}>
+              <button
+                id={`scenic-route-${item.id}`}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onSelect(item.id)}
                 className={cn(
-                  "flex size-10 shrink-0 items-center justify-center rounded-full border bg-background text-emerald-700 dark:text-emerald-400",
-                  corridor && "rounded border-dashed",
-                  selected && "border-emerald-700 dark:border-emerald-500",
+                  "flex min-h-24 w-full items-start gap-3 border bg-background p-3 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:min-h-20",
+                  corridor && "border-dashed",
+                  selected
+                    ? "border-emerald-700 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950/25"
+                    : "hover:bg-accent",
                 )}
               >
-                <Icon className="size-4" aria-hidden="true" />
-              </span>
-              <span className="min-w-0">
-                <span className="block font-mono text-[11px] text-muted-foreground tabular-nums">
-                  {String(index + 1).padStart(2, "0")}
+                <span
+                  className={cn(
+                    "flex size-10 shrink-0 items-center justify-center rounded-full border bg-background text-emerald-700 dark:text-emerald-400",
+                    corridor && "rounded border-dashed",
+                    selected && "border-emerald-700 dark:border-emerald-500",
+                  )}
+                >
+                  <Icon className="size-4" aria-hidden="true" />
                 </span>
-                <span className="mt-1 block text-sm font-semibold leading-5">
-                  {item.title}
+                <span className="min-w-0">
+                  <span className="block font-mono text-[11px] text-muted-foreground tabular-nums">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="mt-1 block text-sm font-semibold leading-5">
+                    {item.title}
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                    {corridor ? "车览走廊" : scenicKindLabels[item.kind]} ·{" "}
+                    {scenicParkingLabels[item.parking.level]}
+                  </span>
                 </span>
-                <span className="mt-1 block text-xs leading-5 text-muted-foreground">
-                  {corridor ? "车览走廊" : scenicKindLabels[item.kind]} ·{" "}
-                  {scenicParkingLabels[item.parking.level]}
-                </span>
-              </span>
-            </button>
+              </button>
+            </SmoothCorners>
           </li>
         );
       })}

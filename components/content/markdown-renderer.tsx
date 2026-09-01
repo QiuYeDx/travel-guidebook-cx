@@ -1,9 +1,13 @@
+import type { CSSProperties } from "react";
+import { smoothCorners } from "@qiuyedx/smooth-corners";
 import { ArrowUpRightIcon, LinkIcon } from "lucide-react";
 import Markdown, { type Components } from "react-markdown";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
 import { ScrollEdgeFades } from "@/components/content/scroll-edge-fades";
+
+const insetContentCorners = smoothCorners(8, 0.65) as CSSProperties;
 
 function HeadingLink({
   id,
@@ -112,7 +116,10 @@ const components: Components = {
     </code>
   ),
   pre: ({ children }) => (
-    <pre className="my-6 overflow-x-auto rounded-md border bg-muted/50 p-4 text-sm leading-6">
+    <pre
+      className="smooth-corners my-6 overflow-x-auto border bg-muted/50 p-4 text-sm leading-6"
+      style={insetContentCorners}
+    >
       {children}
     </pre>
   ),
@@ -120,8 +127,9 @@ const components: Components = {
     <ScrollEdgeFades
       ariaLabel="攻略数据表格"
       axis="horizontal"
-      className="my-6 max-w-full rounded-md border bg-background"
+      className="smooth-corners my-6 max-w-full border bg-background"
       role="region"
+      style={insetContentCorners}
       tabIndex={0}
     >
       <table className="w-max min-w-full border-collapse text-left text-sm leading-6">

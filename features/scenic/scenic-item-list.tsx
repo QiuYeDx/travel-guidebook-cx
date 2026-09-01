@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import type { ParkingLevel, ScenicItem, Viewpoint } from "@/lib/trip/types";
 import { cn } from "@/lib/utils";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
@@ -237,7 +238,7 @@ function ScenicCardContent({
 }
 
 const CARD_CLASS_NAME =
-  "flex min-h-44 w-full flex-col gap-3 rounded-2xl border border-border/65 bg-card p-4 text-left shadow-xs sm:p-5";
+  "flex min-h-44 w-full flex-col gap-3 border border-border/65 bg-card p-4 text-left shadow-xs sm:p-5";
 
 function ScenicDetailVisual({
   item,
@@ -272,60 +273,66 @@ function ScenicDetailVisual({
   }, [item.id, onContentHeightChange]);
 
   return (
-    <div
-      id={detailsPanelId}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      tabIndex={-1}
-      className="pointer-events-auto relative h-full w-full overflow-hidden rounded-2xl"
-    >
-      <motion.button
-        data-scenic-detail-close=""
-        type="button"
-        onClick={() => onClose()}
-        className={cn(
-          "absolute right-3 top-3 z-40 flex size-9 cursor-pointer items-center justify-center rounded-md bg-background/90 text-muted-foreground backdrop-blur-sm transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
-          phase === "closing" && "pointer-events-none",
-        )}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase === "closing" ? 0 : 1 }}
-        transition={{
-          duration: shouldReduceMotion ? 0 : 0.16,
-          ease: CARD_EASE,
-        }}
-        aria-label="关闭观景详情"
+    <SmoothCorners asChild radius={16} smoothing={0.72}>
+      <div
+        id={detailsPanelId}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="pointer-events-auto relative h-full w-full overflow-hidden"
       >
-        <XIcon className="size-4" aria-hidden="true" />
-      </motion.button>
+        <SmoothCorners asChild radius={8} smoothing={0.7}>
+          <motion.button
+            data-scenic-detail-close=""
+            type="button"
+            onClick={() => onClose()}
+            className={cn(
+              "absolute right-3 top-3 z-40 flex size-9 cursor-pointer items-center justify-center bg-background/90 text-muted-foreground backdrop-blur-sm transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
+              phase === "closing" && "pointer-events-none",
+            )}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: phase === "closing" ? 0 : 1 }}
+            transition={{
+              duration: shouldReduceMotion ? 0 : 0.16,
+              ease: CARD_EASE,
+            }}
+            aria-label="关闭观景详情"
+          >
+            <XIcon className="size-4" aria-hidden="true" />
+          </motion.button>
+        </SmoothCorners>
 
-      <div className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl">
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-2xl border bg-background"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: phase === "closing" ? 0 : 1 }}
-          transition={{
-            duration: shouldReduceMotion ? 0 : 0.24,
-            delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.04,
-            ease: CARD_EASE,
-          }}
-        />
-        <div
-          ref={contentRef}
-          className="relative z-10 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <ScenicDetailPanel
-            item={item}
-            index={index}
-            titleId={titleId}
-            layoutPrefix={`scenic-${item.id}`}
-            supportingPhase={phase}
-            shouldReduceMotion={shouldReduceMotion}
-          />
+        <div className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col overflow-hidden">
+          <SmoothCorners asChild radius={16} smoothing={0.72}>
+            <motion.div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 border bg-background"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: phase === "closing" ? 0 : 1 }}
+              transition={{
+                duration: shouldReduceMotion ? 0 : 0.24,
+                delay: shouldReduceMotion || phase !== "opening" ? 0 : 0.04,
+                ease: CARD_EASE,
+              }}
+            />
+          </SmoothCorners>
+          <div
+            ref={contentRef}
+            className="relative z-10 min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
+            <ScenicDetailPanel
+              item={item}
+              index={index}
+              titleId={titleId}
+              layoutPrefix={`scenic-${item.id}`}
+              supportingPhase={phase}
+              shouldReduceMotion={shouldReduceMotion}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </SmoothCorners>
   );
 }
 
@@ -341,23 +348,25 @@ function ScenicCardVisual({
   shouldReduceMotion: boolean | null;
 }) {
   return (
-    <div
-      aria-hidden="true"
-      className={cn(CARD_CLASS_NAME, "h-full pointer-events-none")}
-    >
-      <ScenicCardHeader
-        item={item}
-        index={index}
-        layoutPrefix={`scenic-${item.id}`}
-        fadeNonShared={fadeBody}
-        shouldReduceMotion={shouldReduceMotion}
-      />
-      <ScenicCardBody
-        item={item}
-        fadeNonShared={fadeBody}
-        shouldReduceMotion={shouldReduceMotion}
-      />
-    </div>
+    <SmoothCorners asChild radius={16} smoothing={0.72}>
+      <div
+        aria-hidden="true"
+        className={cn(CARD_CLASS_NAME, "h-full pointer-events-none")}
+      >
+        <ScenicCardHeader
+          item={item}
+          index={index}
+          layoutPrefix={`scenic-${item.id}`}
+          fadeNonShared={fadeBody}
+          shouldReduceMotion={shouldReduceMotion}
+        />
+        <ScenicCardBody
+          item={item}
+          fadeNonShared={fadeBody}
+          shouldReduceMotion={shouldReduceMotion}
+        />
+      </div>
+    </SmoothCorners>
   );
 }
 

@@ -14,11 +14,7 @@ type ButtonProps = React.ComponentProps<typeof Button>;
 
 /** 内置过渡效果预设名 */
 type ToggleEffectPreset =
-  | "fade"
-  | "rotate"
-  | "slide-up"
-  | "slide-down"
-  | "scale";
+  "fade" | "rotate" | "slide-up" | "slide-down" | "scale";
 
 type MotionValues = Record<string, string | number>;
 
@@ -260,6 +256,7 @@ export const DualStateToggle = React.forwardRef<
       ref={ref}
       variant={variant}
       size={size}
+      smoothCorners={shape !== "circle"}
       className={cn(
         "relative transition-transform duration-150 active:scale-[0.97] cursor-pointer",
         shape === "circle" && "rounded-full",

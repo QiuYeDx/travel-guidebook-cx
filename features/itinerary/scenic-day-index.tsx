@@ -7,6 +7,7 @@ import { ArrowLeftIcon, Clock3Icon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { ScenicWorkspace } from "@/features/scenic/scenic-workspace";
 import type { ScenicCatalog, Trip } from "@/lib/trip/types";
@@ -80,30 +81,33 @@ export function ScenicDayIndex({
         />
       </div>
 
-      <section className="mt-5 rounded-2xl bg-[#17231d] px-5 py-5 text-white shadow-sm dark:bg-[#111a16] sm:px-7">
-        <div className="flex flex-wrap items-start justify-between gap-4 sm:items-center">
-          <div className="min-w-0">
-            <p className="text-xs font-medium text-emerald-200">
-              今天只记住这一件事
-            </p>
-            <p className="mt-2 text-xl font-semibold leading-8 sm:text-2xl">
-              {selectedDay.primaryGoal}
-            </p>
+      <SmoothCorners asChild radius={16} smoothing={0.72}>
+        <section className="mt-5 bg-[#17231d] px-5 py-5 text-white shadow-sm dark:bg-[#111a16] sm:px-7">
+          <div className="flex flex-wrap items-start justify-between gap-4 sm:items-center">
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-emerald-200">
+                今天只记住这一件事
+              </p>
+              <p className="mt-2 text-xl font-semibold leading-8 sm:text-2xl">
+                {selectedDay.primaryGoal}
+              </p>
+            </div>
+            <Button asChild variant="secondary">
+              <Link href={buildDayHref(selectedDay.id, returnTab)}>
+                <ArrowLeftIcon aria-hidden="true" />
+                返回 {selectedDay.id} 行程
+              </Link>
+            </Button>
           </div>
-          <Button asChild variant="secondary">
-            <Link href={buildDayHref(selectedDay.id, returnTab)}>
-              <ArrowLeftIcon aria-hidden="true" />
-              返回 {selectedDay.id} 行程
-            </Link>
-          </Button>
-        </div>
-        {itinerary.timePriority ? (
-          <p className="mt-3 flex items-start gap-2 border-t border-white/15 pt-3 text-sm leading-6 text-white/70">
-            <Clock3Icon className="mt-1 size-4 shrink-0" aria-hidden="true" />
-            {itinerary.timePriority.condition}：{itinerary.timePriority.action}
-          </p>
-        ) : null}
-      </section>
+          {itinerary.timePriority ? (
+            <p className="mt-3 flex items-start gap-2 border-t border-white/15 pt-3 text-sm leading-6 text-white/70">
+              <Clock3Icon className="mt-1 size-4 shrink-0" aria-hidden="true" />
+              {itinerary.timePriority.condition}：
+              {itinerary.timePriority.action}
+            </p>
+          ) : null}
+        </section>
+      </SmoothCorners>
 
       <ScenicWorkspace
         key={`${selectedDay.id}:${selectedItemId ?? ""}`}

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type CSSProperties,
   type ReactNode,
   useCallback,
   useEffect,
@@ -23,6 +24,7 @@ interface ScrollEdgeFadesProps {
   ariaLabel?: string;
   role?: "region";
   tabIndex?: number;
+  style?: CSSProperties;
 }
 
 const horizontalStartFade =
@@ -44,6 +46,7 @@ export function ScrollEdgeFades({
   ariaLabel,
   role,
   tabIndex,
+  style,
 }: ScrollEdgeFadesProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [visibility, setVisibility] = useState({
@@ -110,6 +113,7 @@ export function ScrollEdgeFades({
     <div
       className={cn("relative min-w-0 overflow-hidden", className)}
       data-scroll-fade-axis={axis}
+      style={style}
     >
       <div
         ref={viewportRef}

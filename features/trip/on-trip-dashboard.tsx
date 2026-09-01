@@ -20,6 +20,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { ResponsiveTabs } from "@/components/qiuye-ui/responsive-tabs";
 import { CopyAction } from "@/features/navigation/copy-action";
 import { createAmapSearchUrl } from "@/lib/navigation/map-links";
@@ -78,52 +79,59 @@ export function OnTripDashboard({
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-9">
       {storageStatus === "unavailable" ? (
-        <div
-          className="mb-5 flex items-start gap-3 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
-          role="status"
-        >
-          <CloudOffIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          模式和手动日期只能在本页临时使用，刷新后可能恢复默认值。
-        </div>
+        <SmoothCorners asChild radius={12} smoothing={0.68}>
+          <div
+            className="mb-5 flex items-start gap-3 border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100"
+            role="status"
+          >
+            <CloudOffIcon
+              className="mt-0.5 size-4 shrink-0"
+              aria-hidden="true"
+            />
+            模式和手动日期只能在本页临时使用，刷新后可能恢复默认值。
+          </div>
+        </SmoothCorners>
       ) : null}
 
-      <section
-        className="overflow-hidden rounded-2xl bg-[#17231d] text-white dark:bg-[#101914]"
-        aria-labelledby="today-title"
-      >
-        <div className="grid gap-6 px-5 py-6 sm:px-7 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
-          <div>
-            <p className="flex items-center gap-2 text-xs font-medium text-emerald-200">
-              <NavigationIcon className="size-4" aria-hidden="true" />
-              行中执行 ·{" "}
-              {isManualDay ? "手动日期" : relationLabels[clock.relation]}
-            </p>
-            <h1
-              id="today-title"
-              className="mt-2 text-2xl font-semibold leading-tight sm:text-3xl"
-            >
-              {day.id} · {day.title}
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-white/70">
-              {formatTripDate(day.date)} · 今日唯一主目标：{day.primaryGoal}
-            </p>
+      <SmoothCorners asChild radius={16} smoothing={0.72}>
+        <section
+          className="overflow-hidden bg-[#17231d] text-white dark:bg-[#101914]"
+          aria-labelledby="today-title"
+        >
+          <div className="grid gap-6 px-5 py-6 sm:px-7 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
+            <div>
+              <p className="flex items-center gap-2 text-xs font-medium text-emerald-200">
+                <NavigationIcon className="size-4" aria-hidden="true" />
+                行中执行 ·{" "}
+                {isManualDay ? "手动日期" : relationLabels[clock.relation]}
+              </p>
+              <h1
+                id="today-title"
+                className="mt-2 text-2xl font-semibold leading-tight sm:text-3xl"
+              >
+                {day.id} · {day.title}
+              </h1>
+              <p className="mt-3 text-sm leading-6 text-white/70">
+                {formatTripDate(day.date)} · 今日唯一主目标：{day.primaryGoal}
+              </p>
+            </div>
+            <dl className="grid grid-cols-2 gap-4 border-t border-white/15 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+              <div>
+                <dt className="text-xs text-white/55">驾驶强度</dt>
+                <dd className="mt-1 text-sm font-semibold">
+                  {intensityLabels[day.intensity]}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-white/55">当晚落脚</dt>
+                <dd className="mt-1 text-sm font-semibold">
+                  {day.overnight.place}
+                </dd>
+              </div>
+            </dl>
           </div>
-          <dl className="grid grid-cols-2 gap-4 border-t border-white/15 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-            <div>
-              <dt className="text-xs text-white/55">驾驶强度</dt>
-              <dd className="mt-1 text-sm font-semibold">
-                {intensityLabels[day.intensity]}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-white/55">当晚落脚</dt>
-              <dd className="mt-1 text-sm font-semibold">
-                {day.overnight.place}
-              </dd>
-            </div>
-          </dl>
-        </div>
-      </section>
+        </section>
+      </SmoothCorners>
 
       <section aria-label="手动切换行程日期" className="mt-4 border-y py-3">
         <div className="min-w-0 text-center">

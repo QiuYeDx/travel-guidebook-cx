@@ -3,6 +3,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.smooth-corners {
+  border-radius: var(--sc-r);
+}
+
+@supports (corner-shape: superellipse(2)) {
+  .smooth-corners {
+    border-radius: var(--sc-i);
+    corner-shape: var(--sc-s);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
