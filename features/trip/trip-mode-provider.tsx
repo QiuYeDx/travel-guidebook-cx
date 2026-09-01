@@ -51,7 +51,7 @@ export function TripModeProvider({
     () => ({
       date: config.startDate,
       relation: "before",
-      inferredDayId: config.days[0]?.id ?? "D0",
+      inferredDayId: config.days[0]?.id ?? "D1",
     }),
     [config.days, config.startDate],
   );

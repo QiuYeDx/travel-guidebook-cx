@@ -36,12 +36,6 @@ import {
 import { buildDayItinerary } from "../itinerary/itinerary-model";
 import { useTripMode } from "./trip-mode-provider";
 
-const relationLabels = {
-  before: "当前日期在行程前，自动定位 D0",
-  during: "按中国标准时间定位今天",
-  after: "行程日期已结束，自动定位 D9",
-} as const;
-
 export function OnTripDashboard({
   trip,
   scenicCatalog,
@@ -75,6 +69,11 @@ export function OnTripDashboard({
   const timeBoundary = day.fallbackTriggers.find(
     (trigger) => trigger.category === "time",
   );
+  const relationLabels = {
+    before: `当前日期在行程前，自动定位 ${trip.days[0]?.id ?? "D1"}`,
+    during: "按中国标准时间定位今天",
+    after: `行程日期已结束，自动定位 ${trip.days.at(-1)?.id ?? "D7"}`,
+  } as const;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-9">
@@ -112,7 +111,8 @@ export function OnTripDashboard({
                 {day.id} · {day.title}
               </h1>
               <p className="mt-3 text-sm leading-6 text-white/70">
-                {formatTripDate(day.date)} · 今日唯一主目标：{day.primaryGoal}
+                {formatTripDate(day.date)} · {day.lunarDate} · 今日唯一主目标：
+                {day.primaryGoal}
               </p>
             </div>
             <dl className="grid grid-cols-2 gap-4 border-t border-white/15 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">

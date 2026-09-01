@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "川西同行路书",
   shortName: "川西路书",
-  description: "2026 年 3 人驾驶蔚来 EC6，从深圳往返川西短环线的行前与行中执行手册。",
+  description: "2026 年 9 月 29 日至 10 月 5 日，成都往返四姑娘山、稻城亚丁与鱼子西的 7 天川西大环线执行手册。",
   author: {
     name: "QiuYeDx",
     url: "https://qiuvision.com",

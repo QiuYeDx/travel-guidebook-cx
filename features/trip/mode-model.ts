@@ -53,7 +53,7 @@ export function resolveTripClock(
   now: Date,
 ): TripClockState {
   const date = getDateInTimeZone(now, config.timezone);
-  const firstDayId = config.days[0]?.id ?? "D0";
+  const firstDayId = config.days[0]?.id ?? "D1";
   const lastDayId = config.days.at(-1)?.id ?? firstDayId;
 
   if (date < config.startDate) {

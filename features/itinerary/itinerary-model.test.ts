@@ -12,18 +12,7 @@ import {
 
 test("all trip days can build stable previous and next navigation", () => {
   const ids = getTripDayIds(chuanxiTrip);
-  assert.deepEqual(ids, [
-    "D0",
-    "D1",
-    "D2",
-    "D3",
-    "D4",
-    "D5",
-    "D6",
-    "D7",
-    "D8",
-    "D9",
-  ]);
+  assert.deepEqual(ids, ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]);
 
   for (const [index, id] of ids.entries()) {
     const itinerary = buildDayItinerary(chuanxiTrip, chuanxiScenicCatalog, id);
@@ -34,12 +23,12 @@ test("all trip days can build stable previous and next navigation", () => {
   }
 });
 
-test("D6 keeps the three-stop ceiling and route-order scenic items", () => {
+test("D6 keeps the two-stop ceiling and route-order scenic items", () => {
   const d6 = buildDayItinerary(chuanxiTrip, chuanxiScenicCatalog, "D6");
   assert.ok(d6);
   assert.equal(d6.scenicPlan?.mode, "road-stops");
-  assert.equal(d6.parkingBudgetLabel, "1-3 次");
-  assert.equal(d6.scenicItems.length, 8);
+  assert.equal(d6.parkingBudgetLabel, "最多 2 次");
+  assert.equal(d6.scenicItems.length, 4);
   assert.ok(d6.scenicItems.every((item) => item.dayId === "D6"));
   assert.ok(d6.degradeAction?.includes("其余候选自动改为车览"));
 });
@@ -66,10 +55,10 @@ test("scenic items stay in route order", () => {
 });
 
 test("map search links encode the public route query", () => {
-  const url = new URL(createAmapSearchUrl("深圳 → 贵阳"));
+  const url = new URL(createAmapSearchUrl("成都 → 四姑娘山镇"));
   assert.equal(url.origin, "https://uri.amap.com");
   assert.equal(url.pathname, "/search");
-  assert.equal(url.searchParams.get("keyword"), "深圳 → 贵阳");
+  assert.equal(url.searchParams.get("keyword"), "成都 → 四姑娘山镇");
   assert.equal(url.searchParams.get("callnative"), "1");
   assert.throws(() => createAmapSearchUrl("  "));
 });

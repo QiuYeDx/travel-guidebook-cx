@@ -234,8 +234,12 @@ export function validateTrip(
 
   trip.days.forEach((day, index) => {
     const path = `trip.days[${index}]`;
-    if (day.dayNumber !== index) {
-      issues.push({ path: `${path}.dayNumber`, message: `expected ${index}` });
+    const expectedDayNumber = index + 1;
+    if (day.dayNumber !== expectedDayNumber) {
+      issues.push({
+        path: `${path}.dayNumber`,
+        message: `expected ${expectedDayNumber}`,
+      });
     }
     if (day.id !== `D${day.dayNumber}`) {
       issues.push({
@@ -255,7 +259,36 @@ export function validateTrip(
       }
     }
 
+    validateText(day.lunarDate, `${path}.lunarDate`, issues);
     validateText(day.title, `${path}.title`, issues);
+    const altitudeValues = [
+      day.altitudeProfile.startM,
+      day.altitudeProfile.endM,
+      ...(day.altitudeProfile.peakM === undefined
+        ? []
+        : [day.altitudeProfile.peakM]),
+    ];
+    if (
+      altitudeValues.some(
+        (value) => !Number.isFinite(value) || value < 0 || value > 9_000,
+      )
+    ) {
+      issues.push({
+        path: `${path}.altitudeProfile`,
+        message: "altitudes must be finite numbers between 0 and 9000",
+      });
+    }
+    if (
+      day.altitudeProfile.peakM !== undefined &&
+      day.altitudeProfile.peakM <
+        Math.max(day.altitudeProfile.startM, day.altitudeProfile.endM)
+    ) {
+      issues.push({
+        path: `${path}.altitudeProfile.peakM`,
+        message: "must not be lower than the start or end altitude",
+      });
+    }
+    validateText(day.altitudeProfile.note, `${path}.altitudeProfile.note`, issues);
     validateText(day.overnight.place, `${path}.overnight.place`, issues);
     validateRange(
       day.overnight.altitudeMEstimate,
@@ -264,6 +297,24 @@ export function validateTrip(
       9_000,
     );
     validateText(day.primaryGoal, `${path}.primaryGoal`, issues);
+    if (day.timeline.length === 0) {
+      issues.push({ path: `${path}.timeline`, message: "must not be empty" });
+    }
+    day.timeline.forEach((item, timelineIndex) => {
+      const timelinePath = `${path}.timeline[${timelineIndex}]`;
+      validateText(item.time, `${timelinePath}.time`, issues);
+      validateText(item.title, `${timelinePath}.title`, issues);
+      validateText(item.detail, `${timelinePath}.detail`, issues);
+    });
+    validateText(day.stargazing.title, `${path}.stargazing.title`, issues);
+    validateText(day.stargazing.note, `${path}.stargazing.note`, issues);
+    if (day.stargazing.moonriseApprox !== undefined) {
+      validateText(
+        day.stargazing.moonriseApprox,
+        `${path}.stargazing.moonriseApprox`,
+        issues,
+      );
+    }
 
     day.legs.forEach((leg, legIndex) => {
       validateLeg(leg, `${path}.legs[${legIndex}]`, issues);
@@ -578,7 +629,7 @@ export function validateScenicCatalog(
   }
 
   const dayPlanIds = new Set(catalog.dayPlans.map((plan) => plan.dayId));
-  trip.days.slice(1).forEach((day) => {
+  trip.days.forEach((day) => {
     if (!dayPlanIds.has(day.id)) {
       issues.push({
         path: "scenic.dayPlans",

@@ -9,8 +9,10 @@ import {
   BedDoubleIcon,
   CheckCircle2Icon,
   Clock3Icon,
+  GaugeIcon,
   MapPinIcon,
   MapPinnedIcon,
+  MoonStarIcon,
   RouteIcon,
   ShieldAlertIcon,
   SparklesIcon,
@@ -401,6 +403,80 @@ function NoteList({
   );
 }
 
+function DayExecutionOverview({ day }: { day: TripDay }) {
+  return (
+    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)]">
+      <SmoothCorners asChild radius={12} smoothing={0.7}>
+        <section className="border p-4 sm:p-5" aria-labelledby="day-timeline-title">
+          <p className="text-xs text-muted-foreground">按时间执行</p>
+          <h2 id="day-timeline-title" className="mt-1 text-xl font-semibold">
+            今日时间轴
+          </h2>
+          <ol className="mt-4 divide-y border-t">
+            {day.timeline.map((item) => (
+              <li
+                key={`${item.time}-${item.title}`}
+                className="grid grid-cols-[5.25rem_minmax(0,1fr)] gap-3 py-3"
+              >
+                <time className="font-mono text-xs font-semibold tabular-nums text-emerald-700 dark:text-emerald-400">
+                  {item.time}
+                </time>
+                <div>
+                  <p className="text-sm font-semibold leading-5">{item.title}</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {item.detail}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </SmoothCorners>
+
+      <div className="space-y-3">
+        <SmoothCorners asChild radius={12} smoothing={0.7}>
+          <section className="border p-4 sm:p-5">
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <GaugeIcon className="size-4" aria-hidden="true" />
+              当日海拔
+            </p>
+            <p className="mt-2 text-lg font-semibold tabular-nums">
+              {day.altitudeProfile.startM} → {day.altitudeProfile.endM} m
+            </p>
+            {day.altitudeProfile.peakM ? (
+              <p className="mt-1 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                最高暴露约 {day.altitudeProfile.peakM} m
+              </p>
+            ) : null}
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {day.altitudeProfile.note}
+            </p>
+          </section>
+        </SmoothCorners>
+        <SmoothCorners asChild radius={12} smoothing={0.7}>
+          <section className="border p-4 sm:p-5">
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <MoonStarIcon className="size-4" aria-hidden="true" />
+              观星安排
+            </p>
+            <p className="mt-2 text-base font-semibold">
+              {day.stargazing.title}
+            </p>
+            {day.stargazing.moonriseApprox ? (
+              <p className="mt-1 text-xs font-medium tabular-nums text-emerald-700 dark:text-emerald-400">
+                参考月出 {day.stargazing.moonriseApprox}
+              </p>
+            ) : null}
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {day.stargazing.note}
+            </p>
+          </section>
+        </SmoothCorners>
+      </div>
+    </div>
+  );
+}
+
 export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
   const { day } = itinerary;
   const [selectedTab, setSelectedTab] = React.useState<DayGuideTab>("overview");
@@ -434,6 +510,7 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
             {day.id}
           </Badge>
           <Badge variant="outline">{formatTripDate(day.date)}</Badge>
+          <Badge variant="outline">{day.lunarDate}</Badge>
           <Badge variant="outline">{intensityLabels[day.intensity]}</Badge>
         </div>
         <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">
@@ -474,7 +551,10 @@ export function DayGuide({ itinerary }: { itinerary: DayItinerary }) {
           className="w-full gap-3 md:gap-4"
         >
           <TabsContent value="overview" className="mt-0">
-            <RoutePanel itinerary={itinerary} />
+            <div className="space-y-3 md:space-y-4">
+              <DayExecutionOverview day={day} />
+              <RoutePanel itinerary={itinerary} />
+            </div>
           </TabsContent>
           <TabsContent value="route" className="mt-0">
             <div className="space-y-3 md:space-y-4">

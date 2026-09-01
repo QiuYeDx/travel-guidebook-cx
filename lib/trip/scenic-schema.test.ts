@@ -28,47 +28,40 @@ test("the scenic catalog satisfies the data contract", () => {
   );
 });
 
-test("all 37 guidebook ids are migrated in route order", () => {
+test("all 30 guidebook ids are migrated in route order", () => {
   assert.deepEqual(
     chuanxiScenicCatalog.items.map((item) => item.id),
     [
       "SC-D1-01",
       "VP-D1-01",
+      "SC-D1-02",
+      "VP-D1-02",
       "SC-D2-01",
       "VP-D2-01",
-      "SC-D2-02",
       "VP-D2-02",
-      "VP-D2-03",
-      "SC-D3-01",
+      "SC-D2-02",
       "VP-D3-01",
-      "SC-D3-02",
-      "SC-D3-03",
       "VP-D3-02",
+      "VP-D3-03",
+      "SC-D3-01",
+      "VP-D3-04",
+      "VP-D3-05",
       "VP-D4-01",
       "VP-D4-02",
       "VP-D4-03",
       "VP-D4-04",
-      "SC-D5-01",
       "VP-D5-01",
+      "SC-D5-01",
       "SC-D5-02",
       "VP-D5-02",
-      "SC-D6-01",
       "VP-D6-01",
-      "SC-D6-02",
+      "SC-D6-01",
       "VP-D6-02",
       "VP-D6-03",
-      "VP-D6-04",
-      "SC-D6-03",
-      "SC-D6-04",
       "VP-D7-01",
-      "VP-D7-02",
       "SC-D7-01",
-      "VP-D7-03",
+      "VP-D7-02",
       "SC-D7-02",
-      "VP-D8-01",
-      "SC-D8-01",
-      "VP-D9-01",
-      "SC-D9-01",
     ],
   );
 });
@@ -92,16 +85,16 @@ test("each day has stable sequence order and no pre-verified parking navigation"
   );
 });
 
-test("D4 is a scenic-transit day and D6 keeps a three-stop ceiling", () => {
+test("D4 is a scenic-transit day and D6 keeps a two-stop ceiling", () => {
   const d4 = chuanxiScenicCatalog.dayPlans.find((item) => item.dayId === "D4");
   const d6 = chuanxiScenicCatalog.dayPlans.find((item) => item.dayId === "D6");
   assert.equal(d4?.mode, "scenic-transit");
   assert.equal(d4?.photoStopBudget, undefined);
   assert.equal(d6?.mode, "road-stops");
-  assert.deepEqual(d6?.photoStopBudget, [1, 3]);
+  assert.deepEqual(d6?.photoStopBudget, [0, 2]);
   assert.equal(
     chuanxiScenicCatalog.items.filter((item) => item.dayId === "D6").length,
-    8,
+    4,
   );
 });
 

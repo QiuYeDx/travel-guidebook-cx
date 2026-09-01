@@ -6,7 +6,7 @@ import { ItineraryTimeline } from "@/features/itinerary/itinerary-timeline";
 
 export const metadata: Metadata = {
   title: "行程时间线",
-  description: "2026 深圳往返川西短环线 D0-D9 最终行程",
+  description: "2026 成都往返川西大环线 D1-D7 最终行程",
 };
 
 export default function ItineraryPage() {

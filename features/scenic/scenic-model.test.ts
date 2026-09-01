@@ -22,14 +22,14 @@ test("scenic filters combine without changing route order", () => {
     priority: "core",
     parking: "P1",
     subject: "snow-mountain",
-    direction: "outbound",
+    direction: "return",
     verification: "needs-review",
   };
   const filtered = filterScenicItems(d6Items, filters);
 
   assert.deepEqual(
     filtered.map((item) => item.id),
-    ["VP-D6-02", "VP-D6-03"],
+    ["VP-D6-02"],
   );
   assert.deepEqual(
     filtered.map((item) => item.sequence),
@@ -45,14 +45,14 @@ test("direction filtering treats bidirectional items as usable both ways", () =>
       ...defaultScenicFilters,
       direction: "outbound",
     }).length,
-    d4Items.length,
+    3,
   );
   assert.equal(
     filterScenicItems(d6Items, {
       ...defaultScenicFilters,
       direction: "return",
     }).length,
-    0,
+    d6Items.length,
   );
 });
 
@@ -62,11 +62,11 @@ test("available subjects are stable and limited to the selected day", () => {
   );
   assert.deepEqual(subjects, [
     "snow-mountain",
-    "mountain",
-    "valley",
+    "grassland",
+    "wetland",
     "forest",
     "lake",
-    "geology",
+    "architecture",
     "culture",
   ]);
 });
@@ -92,14 +92,14 @@ test("parking navigation requires verified exact P0 or P1 data", () => {
       lat: 30.1,
       lng: 101.2,
       coordinateSystem: "gcj02" as const,
-      mapQuery: "雅拉雪山观景台",
-      verifiedAt: "2026-09-20",
+      mapQuery: "鱼子西观景区域",
+      verifiedAt: "2026-09-26",
     },
     parking: {
       ...base.parking,
       level: "P1" as const,
       verificationStatus: "verified" as const,
-      parkingNavigationQuery: "雅拉雪山观景台 停车场",
+      parkingNavigationQuery: "鱼子西观景区域 停车场",
     },
   };
 
@@ -107,7 +107,7 @@ test("parking navigation requires verified exact P0 or P1 data", () => {
     lat: 30.1,
     lng: 101.2,
     coordinateSystem: "gcj02",
-    mapQuery: "雅拉雪山观景台 停车场",
+    mapQuery: "鱼子西观景区域 停车场",
   });
   assert.equal(
     getParkingNavigationTarget({

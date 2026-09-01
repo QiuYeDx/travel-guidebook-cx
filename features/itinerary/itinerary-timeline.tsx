@@ -35,6 +35,8 @@ export function ItineraryTimeline({
   scenicCatalog: ScenicCatalog;
 }) {
   const [dayTab, setDayTab] = React.useState<DayGuideTab>("overview");
+  const firstDayId = trip.days[0]?.id ?? "D1";
+  const lastDayId = trip.days.at(-1)?.id ?? firstDayId;
 
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -46,11 +48,11 @@ export function ItineraryTimeline({
       <header className="pb-7">
         <div className="max-w-3xl">
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-            D0-D9 · 10 天行程
+            {firstDayId}—{lastDayId} · {trip.days.length} 天行程
           </h1>
           <p className="mt-3 text-base leading-7 text-muted-foreground">
-            从深圳出发，经贵阳与川西短环线回到深圳。每天只保留一个主目标， 10 月
-            4 日到雅安、10 月 5 日到贵阳是返程硬边界。
+            从成都北进，经四姑娘山、丹巴、塔公与稻城亚丁，返程在鱼子西观星后经折多山、泸定回到成都。只有
+            D3 是重负荷日。
           </p>
         </div>
       </header>
@@ -144,7 +146,7 @@ export function ItineraryTimeline({
                         {!hasDrivingEstimate ? (
                           <div className="shrink-0">
                             <dt className="sr-only">驾驶安排</dt>
-                            <dd>非驾驶日</dd>
+                            <dd>园区交通日</dd>
                           </div>
                         ) : null}
                         <div className="flex min-w-0 items-center gap-1.5">

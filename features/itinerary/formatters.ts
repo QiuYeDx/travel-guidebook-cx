@@ -51,5 +51,7 @@ export function formatDriveTime(value: [number, number] | undefined): string {
     const rest = minutes % 60;
     return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
   };
-  return `${formatMinutes(value[0])}-${formatMinutes(value[1])}`;
+  return value[0] === value[1]
+    ? formatMinutes(value[0])
+    : `${formatMinutes(value[0])}-${formatMinutes(value[1])}`;
 }

@@ -10,32 +10,20 @@ function cloneTrip(): Trip {
   return structuredClone(chuanxiTrip);
 }
 
-test("the 2026 Chuanxi baseline satisfies the data contract", () => {
+test("the 2026 Chuanxi v2 baseline satisfies the data contract", () => {
   assert.deepEqual(validateTrip(chuanxiTrip, chuanxiSources), []);
   assert.equal(assertValidTrip(chuanxiTrip, chuanxiSources), chuanxiTrip);
 });
 
-test("driving days expose the guidebook target arrival state of charge", () => {
-  assert.deepEqual(
-    chuanxiTrip.days.flatMap((day) =>
-      day.legs.map((leg) => [day.id, leg.targetArrivalSoc]),
-    ),
-    [
-      ["D0", 25],
-      ["D1", 35],
-      ["D2", 35],
-      ["D3", 40],
-      ["D4", 55],
-      ["D5", 35],
-      ["D6", 40],
-      ["D7", 45],
-      ["D8", 35],
-      ["D9", 20],
-    ],
+test("the route does not fabricate vehicle-specific arrival state of charge", () => {
+  assert.ok(
+    chuanxiTrip.days
+      .flatMap((day) => day.legs)
+      .every((leg) => leg.targetArrivalSoc === undefined),
   );
 });
 
-test("dates, route titles, intensity, and overnight places match guidebook v1.0", () => {
+test("dates, route titles, intensity, and overnight places match guidebook v2.0", () => {
   assert.deepEqual(
     chuanxiTrip.days.map(({ id, date, title, intensity, overnight }) => ({
       id,
@@ -46,89 +34,80 @@ test("dates, route titles, intensity, and overnight places match guidebook v1.0"
     })),
     [
       {
-        id: "D0",
-        date: "2026-09-27",
-        title: "深圳 → 贵阳",
-        intensity: "medium-high",
-        overnight: "贵阳",
-      },
-      {
         id: "D1",
-        date: "2026-09-28",
-        title: "贵阳 → 成都外围 → 都江堰",
-        intensity: "medium-high",
-        overnight: "都江堰",
+        date: "2026-09-29",
+        title: "成都 → 四姑娘山 → 丹巴中路藏寨",
+        intensity: "medium",
+        overnight: "丹巴中路藏寨",
       },
       {
         id: "D2",
-        date: "2026-09-29",
-        title: "都江堰 → 汶川 → 毕棚沟 → 古尔沟",
-        intensity: "medium",
-        overnight: "古尔沟",
+        date: "2026-09-30",
+        title: "中路藏寨 → 八美 → 塔公 → 姑弄村 → 新都桥",
+        intensity: "low",
+        overnight: "新都桥",
       },
       {
         id: "D3",
-        date: "2026-09-30",
-        title: "古尔沟 → 米亚罗 → 奶子沟 → 黑水",
-        intensity: "medium",
-        overnight: "黑水",
+        date: "2026-10-01",
+        title: "新都桥 → 理塘 → 海子山 → 香格里拉镇",
+        intensity: "medium-high",
+        overnight: "香格里拉镇",
       },
       {
         id: "D4",
-        date: "2026-10-01",
-        title: "达古冰川景区",
-        intensity: "medium",
-        overnight: "黑水",
+        date: "2026-10-02",
+        title: "稻城亚丁短线",
+        intensity: "low-medium",
+        overnight: "香格里拉镇（连住）",
       },
       {
         id: "D5",
-        date: "2026-10-02",
-        title: "黑水 → 马尔康 → 金川",
-        intensity: "medium-high",
-        overnight: "金川",
+        date: "2026-10-03",
+        title: "香格里拉镇 → 桑堆 → 理塘 → 雅江",
+        intensity: "medium",
+        overnight: "雅江县城",
       },
       {
         id: "D6",
-        date: "2026-10-03",
-        title: "金川 → 丹巴 → 八美 → 塔公 → 新都桥",
-        intensity: "medium-high",
+        date: "2026-10-04",
+        title: "雅江 → 新都桥 → 甲根坝（可选）→ 鱼子西 → 新都桥",
+        intensity: "low",
         overnight: "新都桥",
       },
       {
         id: "D7",
-        date: "2026-10-04",
-        title: "新都桥 → 折多山 → 康定 → 雅安",
-        intensity: "medium",
-        overnight: "雅安",
-      },
-      {
-        id: "D8",
         date: "2026-10-05",
-        title: "雅安 → 贵阳",
-        intensity: "medium-high",
-        overnight: "贵阳",
-      },
-      {
-        id: "D9",
-        date: "2026-10-06",
-        title: "贵阳 → 深圳",
-        intensity: "medium-high",
-        overnight: "深圳",
+        title: "新都桥 → 折多山 → 泸定桥 → 成都",
+        intensity: "low",
+        overnight: "成都（行程结束）",
       },
     ],
   );
 });
 
-test("trip days are continuous from D0 through D9", () => {
+test("trip days are continuous from D1 through D7", () => {
   const trip = cloneTrip();
-  trip.days[4].date = "2026-10-02";
+  trip.days[3].date = "2026-10-03";
 
   assert.match(
     validateTrip(trip, chuanxiSources)
       .map((issue) => `${issue.path}: ${issue.message}`)
       .join("\n"),
-    /trip\.days\[4\]\.date: expected 2026-10-01/,
+    /trip\.days\[3\]\.date: expected 2026-10-02/,
   );
+});
+
+test("daily timeline and altitude fields reject empty or impossible values", () => {
+  const trip = cloneTrip();
+  trip.days[0].timeline = [];
+  trip.days[1].altitudeProfile.peakM = 1000;
+
+  const messages = validateTrip(trip, chuanxiSources)
+    .map((issue) => issue.message)
+    .join("\n");
+  assert.match(messages, /must not be empty/);
+  assert.match(messages, /must not be lower than the start or end altitude/);
 });
 
 test("unknown and undeclared source references fail validation", () => {
@@ -182,6 +161,6 @@ test("duplicate trigger ids fail the build-time assertion", () => {
 
   assert.throws(
     () => assertValidTrip(trip, chuanxiSources),
-    /duplicate id: TRIGGER-B-TIME/,
+    /duplicate id: TRIGGER-B-YUZIXI/,
   );
 });

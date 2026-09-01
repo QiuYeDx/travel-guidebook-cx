@@ -25,6 +25,29 @@ export type RouteLeg = {
   latestArrival?: string;
 };
 
+export type DayTimelineTone = "key" | "optional" | "rest";
+
+export type DayTimelineItem = {
+  time: string;
+  title: string;
+  detail: string;
+  tone: DayTimelineTone;
+};
+
+export type DayAltitudeProfile = {
+  startM: number;
+  endM: number;
+  peakM?: number;
+  note: string;
+};
+
+export type StargazingPlan = {
+  status: "primary" | "optional" | "rest" | "none";
+  title: string;
+  moonriseApprox?: string;
+  note: string;
+};
+
 export type FallbackTrigger = {
   id: string;
   category: "health" | "weather" | "road" | "booking" | "vehicle" | "time";
@@ -37,11 +60,15 @@ export type TripDay = {
   id: string;
   dayNumber: number;
   date: string;
+  lunarDate: string;
   title: string;
   status: DayStatus;
   intensity: Intensity;
+  altitudeProfile: DayAltitudeProfile;
   overnight: { place: string; altitudeMEstimate?: [number, number] };
   primaryGoal: string;
+  timeline: DayTimelineItem[];
+  stargazing: StargazingPlan;
   legs: RouteLeg[];
   mustDo: string[];
   optional: string[];

@@ -47,8 +47,8 @@ export function assertValidPlanningSnapshot(
     if (item.deadline.date < snapshot.updatedAt) {
       throw new Error(`${item.id} deadline cannot predate the snapshot`);
     }
-    if (item.deadline.date > trip.startDate) {
-      throw new Error(`${item.id} deadline cannot be after the trip starts`);
+    if (item.deadline.date > trip.endDate) {
+      throw new Error(`${item.id} deadline cannot be after the trip ends`);
     }
   }
 
