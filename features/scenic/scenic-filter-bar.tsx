@@ -36,7 +36,7 @@ function FilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="h-10 min-w-36" aria-label={label}>
+      <SelectTrigger className="h-10 min-w-36 data-[size=default]:h-10" aria-label={label}>
         <span className="text-xs text-muted-foreground">{label}</span>
         <SelectValue />
       </SelectTrigger>

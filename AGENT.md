@@ -43,6 +43,8 @@ content/notes/      讨论纪要、预订分工、临时复核记录
 - 默认使用 Server Component。需要 hooks、浏览器 API、localStorage 或交互时才使用 `"use client"`。
 - `app/layout.tsx` 保持薄，只负责 metadata、全局样式、Provider 和 App Shell。
 - 业务组件放入后续 `features/` 目录；`components/ui/` 只放 shadcn/ui 原子组件。
+- shadcn/ui 使用 `radix-nova` 风格（`radix-ui` 单包），CLI 生成的 `from "cn"` 要改回 `@/lib/utils`。重装 Button / Select 后要还原平滑圆角：Button 的 `smoothCorners` 属性（`.smooth-corners` + `createSmoothCorners(8, 0.7)`），SelectTrigger / SelectContent 外包 `SmoothCorners`，SelectItem 用 `createSmoothCorners(4, 0.65)`；Button 保留 `cursor-pointer`。
+- nova 用变体设置尺寸与选中态（`data-[size=default]:h-8`、`group-data-horizontal/tabs:h-8`、`data-active:*`），覆盖时要写同一变体，普通的 `h-10`、`data-[state=active]:*` 不会生效。
 - qiuye-ui 组件放在 `components/qiuye-ui/`，安装前确认项目确实会使用。
 - 优先使用 lucide 图标；不要手绘已有图标。
 - 不接入需要密钥的地图、CMS、认证、数据库或分析服务，除非工作包和设计明确要求。

@@ -358,7 +358,8 @@ const ResponsiveTabs = React.forwardRef<
 
     // TabsList：固定背景层（圆角灰底通常在这里），不滚动，负责 padding（edge gutter）
     const listClass = cn(
-      "h-auto w-full overflow-hidden p-0", // 关键：overflow-hidden，固定背景
+      // 关键：overflow-hidden，固定背景；radix-nova 的 TabsList 用 group-data-horizontal/tabs:h-8 定高，要用同一变体覆盖
+      "h-auto w-full overflow-hidden p-0 group-data-horizontal/tabs:h-auto",
       listClassName,
     );
 
@@ -397,6 +398,9 @@ const ResponsiveTabs = React.forwardRef<
       // 当启用 layoutId 动画高亮时，取消 trigger 自带的选中态背景/阴影/边框，改由 motion.span 承载
       animatedHighlight &&
         "relative data-[state=active]:bg-transparent data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-transparent",
+      // radix-nova 的 TabsTrigger 用 data-active:* 与 group 变体设置选中态，data-[state=active]:* 覆盖不到
+      animatedHighlight &&
+        "group-data-[variant=default]/tabs-list:data-active:shadow-none data-active:bg-transparent dark:data-active:bg-transparent dark:data-active:border-transparent",
       triggerClassName,
     );
 
